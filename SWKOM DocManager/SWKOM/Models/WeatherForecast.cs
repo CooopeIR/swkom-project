@@ -1,4 +1,4 @@
-namespace SWKOM
+namespace SWKOM.Models
 {
     public class WeatherForecast
     {
