@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using SWKOM.Models;
-using System.Reflection.Metadata;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
 namespace SWKOM.Controllers
 {
@@ -28,7 +26,7 @@ namespace SWKOM.Controllers
                 Author = "Me",
                 Content = "Line 1."
             };
-            
+
             // Dokument speichern / verarbeiten
             documentInformation.Id = Guid.NewGuid();
 
@@ -113,7 +111,7 @@ namespace SWKOM.Controllers
 
             documentInformation.Title = "Ich wurde aktualisiert o_0";
 
-            return Ok(documentInformation); 
+            return Ok(documentInformation);
 
             //return JsonSerializer.Serialize(documentInformation);
         }
