@@ -1,5 +1,4 @@
-﻿version: '3'
-services:
+﻿services:
   documents-api:
     container_name: documents-api
     image: documents-api

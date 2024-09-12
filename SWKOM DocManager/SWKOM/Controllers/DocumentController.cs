@@ -76,22 +76,6 @@ namespace SWKOM.Controllers
             return Ok(document); // Return the document
         }
 
-        //[HttpGet("{id}", Name = "GetDocumentById")]
-        //public string GetDocumentById(int id)
-        //{
-        //    var documentInformation = new DocumentInformation
-        //    {
-        //        Date = DateOnly.FromDateTime(DateTime.Now),
-        //        Title = "With Id",
-        //        Author = "Not Me",
-        //        Content = "Line 1. with Id",
-        //        Id = id
-        //    };
-
-        //    return JsonSerializer.Serialize(documentInformation);
-        //}
-
-
         [HttpPut("{id}", Name = "UpdateDocumentById")]
         public ActionResult Put(int id)
         {
@@ -112,11 +96,7 @@ namespace SWKOM.Controllers
             documentInformation.Title = "Ich wurde aktualisiert o_0";
 
             return Ok(documentInformation);
-
-            //return JsonSerializer.Serialize(documentInformation);
         }
-
-
 
         [HttpDelete("{id}", Name = "DeleteDocumentById")]
         public ActionResult Delete(int id)
@@ -138,8 +118,6 @@ namespace SWKOM.Controllers
             // Dann löschen
 
             return Ok();
-
-            //return JsonSerializer.Serialize(documentInformation);
         }
     }
 }

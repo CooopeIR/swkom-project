@@ -4,3 +4,7 @@
 4. Befehl eingeben: docker-compose watch
 
 Browser Adresse: localhost:8080
+
+Am Ende:
+Befehl zum stoppen vom Kontainer: docker-compose stop
+Befehl zum stoppen und löschen vom Kontainer: docker-compose down
