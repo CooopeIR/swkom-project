@@ -3,7 +3,7 @@
 3. Befehl eingeben: docker-compose up -d
 4. Befehl eingeben: docker-compose watch
 
-Browser Adresse: localhost:8080
+Browser Adresse: http://localhost:8080
 
 Am Ende:
 Befehl zum stoppen vom Kontainer: docker-compose stop
