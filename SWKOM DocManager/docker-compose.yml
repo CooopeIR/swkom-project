@@ -1,13 +1,32 @@
 ﻿services:
   documents-api:
     container_name: documents-api
-    image: documents-api
+    image: documents-api_image
     build:
       context: .
       dockerfile: SWKOM/Dockerfile
     ports:
-      - "8080:8080"
       - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8081 # Stellt sicher, dass nur HTTP verwendet wird
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+
+  webui:
+    image: webui_image
+    build:
+      context: .
+      dockerfile: WebUI/Dockerfile
+    ports:
+     - "80:80"
+    volumes:
+      - ./WebUI/nginx.conf:/etc/nginx/nginx.conf  # Binde die Nginx-Konfigurationsdatei ein
+      - ./WebUI/wwwroot:/app/wwwroot  # Statische Dateien mounten
+    depends_on:
+      - documents-api
     develop:
       watch:
         - action: rebuild
