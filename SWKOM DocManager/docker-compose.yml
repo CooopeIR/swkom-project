@@ -16,10 +16,11 @@
           path: .
 
   webui:
+    container_name: webui
     image: webui_image
     build:
-      context: .
-      dockerfile: WebUI/Dockerfile
+      context: ./WebUI
+      dockerfile: Dockerfile
     ports:
      - "80:80"
     volumes:
