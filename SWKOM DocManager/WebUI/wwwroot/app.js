@@ -4,24 +4,26 @@
 function fetchDocuments() {
     console.log('Fetching all documents...');
     fetch(apiUrl)
-        .then(response => response.json())
+        .then(response => {
+            console.log(response); // Log the response
+            return response.json(); // Return the parsed JSON
+        })
         .then(data => {
             const documentList = document.getElementById('document-list');
             documentList.innerHTML = ''; // Clear the list before appending new items
-            data.forEach(document => {
+            data.forEach(documentFromResponse => {
                 // Create list item with delete and toggle complete buttons
                 const li = document.createElement('div');
+                li.classList.add('document-item');
                 li.innerHTML = `
-                    <div class="container">
-                    <span>Task: ${document.name}</span>
-                    <button class="delete" style="margin-left: 10px;" onclick="deleteTask(${document.id})">Delete</button>
-                    <button style="margin-left: 10px;" onclick="toggleComplete(${document.id}, '${document.name}')">
-                        Mark as ${document.isComplete ? 'Incomplete' : 'Complete'}
-                    </button>
+                    <div class="document-content">
+                        <p class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</p>
                     </div>
                 `;
                 documentList.appendChild(li);
             });
+
+
         })
         .catch(error => console.error('Fehler beim Abrufen der Todo-Items:', error));
 }

@@ -1,29 +1,37 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
-    <link rel="stylesheet" href="styles.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocManager</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <!--<img src="https://cdn2.iconfinder.com/data/icons/weather-flat-14/64/weather02-512.png" alt="Logo" class="logo">-->
-    <h1 style="padding: 20px">DocManager</h1>
+<div class="content">
+    <div class="container">
+        <!--<img src="https://cdn2.iconfinder.com/data/icons/weather-flat-14/64/weather02-512.png" alt="Logo" class="logo">-->
+        <h1 style="padding: 20px">DocManager</h1>
 
-    <div class="search-bar">
-        <input type="text" id="search-bar" placeholder="">
-        <button type="submit">
-            <img src="https://cdn-icons-png.flaticon.com/512/342/342359.png" alt="Search">
-        </button>
+        <div class="search-bar">
+            <input type="text" id="search-bar" placeholder="">
+            <button type="submit">
+                <img src="https://cdn-icons-png.flaticon.com/512/342/342359.png" alt="Search">
+            </button>
+        </div>
     </div>
 
+    <div id="document-list" class="document-list">
+        <!--<div class="document-item">
+            <div class="document-content">
+                <p class="document-name">Dokument Name</p>
+            </div>
+        </div>
+        <div class="document-item"></div>-->
+    </div>
+</div>
 
-    <!--<div class="date-time-picker">
-        <input type="date" placeholder="Select Date">
-        <input type="time" step="3600" placeholder="Select Time">
-    </div>-->
-</div>
-<div class="document-list">
-</div>
+
+<script src="/app.js"></script>
 </body>
 </html>
