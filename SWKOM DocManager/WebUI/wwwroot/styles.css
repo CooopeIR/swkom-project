@@ -50,7 +50,7 @@ p {
 .document-list {
     margin-top: 10px;
     padding: 10px;
-    gap: 10px;
+    gap: 5px;
     background-color: transparent;
     border-radius: 5px;
     display: flex; /* Set display to flex */
@@ -66,23 +66,61 @@ p {
 }
 
 .document-item {
-    background-color: rgba(255, 255, 255, 0.7);
+    display: grid; /* Use CSS Grid for layout */
+    grid-template-columns: 1fr auto; /* Two columns: one for text and one for buttons */
+    align-items: center; /* Center items vertically */
+    background-color: rgba(255, 255, 255, 0.9);
     height: 50px; /* Set a fixed height */
-    width: 100%;
-    margin: 10px 0; /* Space between items */
+    margin: 5px 0; /* Space between items */
     border-radius: 20px; /* Rounded corners */
-    transition: transform 0.4s ease; /* Animation on hover */
-    display: flex; /* Use flexbox for layout */
-    align-items: center;
-    flex-direction: row;
-    justify-content: stretch; /* Space between name and button group */
     padding: 0 10px; /* Horizontal padding */
+    transition: transform 0.3s ease; /* Animation on hover */
 }
 
-    .document-item:hover {
-        transform: scale(1.01);
-        background-color: rgba(255, 255, 255, 0.9); /* Scales the box up by 20% */
-    }
+.document-item:hover {
+    transform: scale(1.01); /* Scale up on hover */
+    background-color: #ffffff; /* Darker background on hover */
+}
+
+/* Styling for document name */
+.document-name {
+    justify-self: start; /* Justify text to the left */
+    color: var(--primary-color); /* Default text color */
+}
+
+/* Styling for button group */
+.button-group {
+    justify-self: end; /* Justify buttons to the right */
+    display: flex; /* Use flexbox for button alignment */
+    gap: 10px; /* Space between buttons */
+}
+
+.button-group button {
+    padding: 5px 10px; /* Padding for buttons */
+    background-color: #ffc300; /* Button color for edit */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners for buttons */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    font-weight: bold;
+}
+
+.button-group .delete {
+    background-color: red; /* Red background for delete button */
+    color: white; /* White text color */
+}
+
+.button-group .delete:hover {
+    background-color: darkred; /* Darker red on hover */
+}
+
+/* Icon styling */
+.material-icons {
+    vertical-align: middle; /* Center the icon with the text */
+}
+
+
+/* Ensure to target the text elements specifically */
+
 
 .container {
     text-align: center;

@@ -16,14 +16,16 @@ function fetchDocuments() {
                 const li = document.createElement('div');
                 li.classList.add('document-item');
                 li.innerHTML = `
-                    <div class="document-content">
-                        <p class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</p>
-                    </div>
+                <span class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</span>
+                <div class="button-group">
+                    <button class="view">view</button>    
+                    <button class="delete">
+                            <span class="material-icons">delete</span>
+                    </button>
+                </div>
                 `;
                 documentList.appendChild(li);
             });
-
-
         })
         .catch(error => console.error('Fehler beim Abrufen der Todo-Items:', error));
 }
