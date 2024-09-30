@@ -1,4 +1,4 @@
-﻿* {
+﻿{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -6,12 +6,14 @@
 
 :root {
     --primary-color: #003049;
-    --secondary-color: #F77F00; /* Define your primary color here */
+    --secondary-color: #669bbc; /* Define your primary color here */
 }
 
-body,
-html {
-    height: 100%;
+body, html {
+    overflow-y: hidden;
+    height: 100%; /* Ensures full viewport height */
+    margin: 0px;
+    padding: 0px;
 }
 
 body {
@@ -20,43 +22,51 @@ body {
     background-position: center;
     display: flex;
     justify-content: center;
-    align-items: center;
-    font-family: 'Lato', sans-serif; /* Paragraph font */
+    align-items: flex-start; /* Align items to the top */
+    font-family: "Lato", sans-serif; /* Paragraph font */
     color: var(--primary-color); /* Dark text for readability */
-    padding: 0px;
-    margin: 0px;
+    padding-top: 20px;*/ /* Adds 20px padding to the top */
 }
 
 .content {
-    min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0px;
-    margin: 0px;
+    padding-top: 20px;
+    width: 60vw;
+    height: 90vh;
+    padding: 10px;
 }
 
 h1 {
-    font-family: 'Roboto Slab', serif; /* Headline font */
+    font-family: "Roboto Slab", serif; /* Headline font */
     font-size: 2.5rem; /* Increase size for visibility */
     color: var(--primary-color); /* Darker color for the header */
 }
 
 p {
-    font-family: 'Lato', sans-serif;
-    color: var(--primary-color) /* Paragraph font */
+    font-family: "Lato", sans-serif;
+    color: var(--primary-color); /* Paragraph font */
 }
 
 .document-list {
     margin-top: 10px;
-    padding: 10px;
-    gap: 5px;
+    padding: 20px;
+    gap: 15px;
     background-color: transparent;
     border-radius: 5px;
-    display: flex; /* Set display to flex */
-    flex-direction: column; /* Stack items vertically */
-    align-items: stretch; /* Stretch items to take full width */
-    width: 140%;
+    display: flex;  
+    flex-direction: column;
+    align-items: stretch;
+    width: 60%;
+}
+
+#document-list {
+    max-height: 500px; /* Set a maximum height for the list */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Enable vertical scrolling */
+    gap: 10px;
+    padding: 15px;
 }
 
 .document-name {
@@ -67,13 +77,12 @@ p {
 
 .document-item {
     display: grid; /* Use CSS Grid for layout */
-    grid-template-columns: 1fr auto; /* Two columns: one for text and one for buttons */
+    grid-template-columns: 3fr auto; /* Two columns: one for text and one for buttons */
     align-items: center; /* Center items vertically */
     background-color: rgba(255, 255, 255, 0.9);
     height: 50px; /* Set a fixed height */
     margin: 5px 0; /* Space between items */
     border-radius: 20px; /* Rounded corners */
-    padding: 0 10px; /* Horizontal padding */
     transition: transform 0.3s ease; /* Animation on hover */
 }
 
@@ -82,7 +91,6 @@ p {
     background-color: #ffffff; /* Darker background on hover */
 }
 
-/* Styling for document name */
 .document-name {
     justify-self: start; /* Justify text to the left */
     color: var(--primary-color); /* Default text color */
@@ -93,32 +101,33 @@ p {
     justify-self: end; /* Justify buttons to the right */
     display: flex; /* Use flexbox for button alignment */
     gap: 10px; /* Space between buttons */
+    padding-right: 20px;
 }
 
-.button-group button {
+button {
     padding: 5px 10px; /* Padding for buttons */
+    background-color: var(--secondary-color); /* Button color */
     border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners for buttons */
-    cursor: pointer; /* Change cursor to pointer on hover */
-    font-weight: bold;
+    border-radius: 20px; /* Rounded corners for buttons */
+    cursor: pointer;
+    font-weight: bold; /* Change cursor to pointer on hover */
+    min-width: auto;
+    width: fit-content;
 }
 
-.button-group .delete {
+button:hover {
+    background-color: #001d3d; /* Darker background on hover */
+    color: #ffffff; /* Change text color on hover */
+}
+
+
+button delete {
     background-color: red; /* Red background for delete button */
     color: white; /* White text color */
 }
 
-.button-group .delete:hover {
+button delete:hover {
     background-color: darkred; /* Darker red on hover */
-}
-
-.button-group .view {
-    background-color: #ffc300; /* Button color for view */
-    color: black; /* White text color */
-}
-
-.button-group .view:hover {
-    background-color: #fcd658; /* Darker red on hover */
 }
 
 /* Icon styling */
@@ -126,20 +135,11 @@ p {
     vertical-align: middle; /* Center the icon with the text */
 }
 
-
-/* Ensure to target the text elements specifically */
-
-
 .container {
     text-align: center;
     background-color: rgba(255, 255, 255);
     padding: 40px;
     border-radius: 20px;
-}
-
-.logo {
-    width: 150px;
-    margin-bottom: 20px;
 }
 
 .search-bar {
@@ -149,32 +149,104 @@ p {
     margin-top: 20px; /* Add some space above the search bar */
 }
 
-    .search-bar input {
-        width: 300px;
-        height: 40px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-right: none; /* Remove the border on the right to connect with button */
-        border-radius: 25px 0 0 25px; /* Rounded left corners */
-        outline: none;
-        box-sizing: border-box; /* Ensures padding is included in the width and height */
+.search-bar input {
+    width: 300px;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-right: none; /* Remove the border on the right to connect with button */
+    border-radius: 25px 0 0 25px; /* Rounded left corners */
+    outline: none;
+    box-sizing: border-box; /* Ensures padding is included in the width and height */
+}
+
+.search-bar button {
+    width: 50px; /* Set a fixed width for the button */
+    height: 40px; /* Match the input height */
+    border: 1px solid #ccc; /* Add a border to match the input field */
+    background-color: #ccc;
+    border-left: none; /* Remove the border on the left to connect with input */
+    border-radius: 0 25px 25px 0; /* Rounded right corners */
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0; /* Remove default padding */
+}
+
+.search-bar button img {
+    width: 20px;
+    height: 20px; /* Ensure the image fits inside the button */
+}
+
+
+.document-item.add {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    min-height: 50px;
+    height: auto;
+    align-items: center;
+}
+
+/* Form styling inside the expandable content */
+#expandable-form {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, 0.5s ease;
+    width: 90%;
+}
+
+    #expandable-form.open {
+        max-height: 300px; /* Adjust as needed */
+        padding: 20px; /* Add padding to the content */
+        width: 90%;
     }
 
-    .search-bar button {
-        width: 50px; /* Set a fixed width for the button */
-        height: 40px; /* Match the input height */
-        border: 1px solid #ccc; /* Add a border to match the input field */
-        background-color: #ccc;
-        border-left: none; /* Remove the border on the left to connect with input */
-        border-radius: 0 25px 25px 0; /* Rounded right corners */
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0; /* Remove default padding */
+#my-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    justify-content: center;
+}
+
+    #my-form button {
+        align-self: center; /* This centers the button horizontally */
     }
 
-        .search-bar button img {
-            width: 20px;
-            height: 20px; /* Ensure the image fits inside the button */
-        }
+    #expand-btn {
+        margin: 10px;
+    }
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.expandable form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row label {
+    flex-basis: 30%; /* Label takes up 30% of the row width */
+    text-align: left; /* Align text left */
+    padding-right: 10px; /* Add some space between the label and input */
+}
+
+.form-row input {
+    background-color: transparent; /* Make the background transparent */
+    border: none; /* Remove all borders */
+    border-bottom: 2px solid var(--primary-color); /* Add a bottom border */
+    outline: none; /* Remove outline on focus */
+    color: var(--primary-color); /* Text color */
+    padding: 8px; /* Add some padding for a better appearance */
+    width: 100%; /* Ensure the input takes full width */
+    box-sizing: border-box; /* Include padding in the width */
+}
+
+    .form-row input:focus {
+        border-bottom: 2px solid var(--secondary-color); /* Optional: Change bottom border color on focus */
+    }
