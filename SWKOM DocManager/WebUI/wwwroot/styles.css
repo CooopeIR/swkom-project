@@ -97,7 +97,6 @@ p {
 
 .button-group button {
     padding: 5px 10px; /* Padding for buttons */
-    background-color: #ffc300; /* Button color for edit */
     border: none; /* Remove default border */
     border-radius: 5px; /* Rounded corners for buttons */
     cursor: pointer; /* Change cursor to pointer on hover */
@@ -111,6 +110,15 @@ p {
 
 .button-group .delete:hover {
     background-color: darkred; /* Darker red on hover */
+}
+
+.button-group .view {
+    background-color: #ffc300; /* Button color for view */
+    color: black; /* White text color */
+}
+
+.button-group .view:hover {
+    background-color: #fcd658; /* Darker red on hover */
 }
 
 /* Icon styling */
