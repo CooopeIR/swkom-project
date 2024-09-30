@@ -8,3 +8,8 @@ Browser Adresse: http://localhost:8081
 Am Ende:
 Befehl zum stoppen vom Kontainer: docker-compose stop
 Befehl zum stoppen und löschen vom Kontainer: docker-compose down
+
+PGadmin:
+register server
+connection
+host name/address: host.docker.internal
