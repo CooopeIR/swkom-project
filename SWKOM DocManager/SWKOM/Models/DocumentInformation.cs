@@ -1,6 +1,4 @@
-﻿using System.Dynamic;
-
-namespace SWKOM.Models
+﻿namespace SWKOM.Models
 {
     public class DocumentInformation
     {

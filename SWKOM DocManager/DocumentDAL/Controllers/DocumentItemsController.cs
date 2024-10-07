@@ -1,21 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using DocumentDAL.Entities;
 using DocumentDAL.Repositories;
-using DocumentDAL.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DocumentDAL.Controllers
 {
     [ApiController]
-    [Route("api/documents")]
+    //[Route("api/documents")]
+    [Route("")]
     public class DocumentController(IDocumentItemRepository repository) : ControllerBase
     {
-        [HttpGet]
+        [HttpGet(Name = "GetAllDocuments")]
+        public ActionResult<IEnumerable<DocumentItem>> Get()
+        {
+
+            var documents = Enumerable.Range(1, 5).Select(index => new DocumentItem
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Title = "Title 1",
+                Author = "Me",
+                Content = "Line 1.",
+                Id = Guid.NewGuid()
+            })
+            .ToArray();
+
+            return Ok(documents);
+        }
+        /*[HttpGet]
         public async Task<IEnumerable<DocumentItem>> GetAsync()
         {
             return await repository.GetAllAsync();
-        }
+        }*/
 
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
