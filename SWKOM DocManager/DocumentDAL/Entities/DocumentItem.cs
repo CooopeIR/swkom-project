@@ -2,13 +2,14 @@
 {
     public class DocumentItem
     {
-        public DateOnly Date { get; set; }
+        public DateOnly? date { get; set; }
 
-        public string Title { get; set; } = "";
+        public string title { get; set; } = "";
 
-        public string? Author { get; set; }
+        public string? author { get; set; }
 
-        public string? Content { get; set; }
-        public Guid? Id { get; set; }
+        public string? contentpath { get; set; }
+
+        public int? id { get; set; }
     }
 }

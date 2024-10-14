@@ -37,6 +37,12 @@ namespace SWKOM.Controllers
             //return JsonSerializer.Serialize(documentInformation);
         }
 
+        /*[HttpGet(Name = "GetAllDocuments")]
+        public async Task<IEnumerable<DocumentItem>> GetAsync()
+        {
+            return await _documentItemRepository.GetAllAsync();
+        }*/
+
         [HttpGet(Name = "GetAllDocuments")]
         public ActionResult<IEnumerable<DocumentInformation>> Get()
         {
