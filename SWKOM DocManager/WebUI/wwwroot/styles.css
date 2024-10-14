@@ -73,6 +73,8 @@ p {
     font-weight: bold;
     font-size: 1.2rem;
     padding-left: 20px;
+    justify-self: start; /* Justify text to the left */
+    color: var(--primary-color); /* Default text color */
 }
 
 .document-item {
@@ -89,11 +91,6 @@ p {
 .document-item:hover {
     transform: scale(1.01); /* Scale up on hover */
     background-color: #ffffff; /* Darker background on hover */
-}
-
-.document-name {
-    justify-self: start; /* Justify text to the left */
-    color: var(--primary-color); /* Default text color */
 }
 
 /* Styling for button group */
@@ -187,6 +184,20 @@ button delete:hover {
     min-height: 50px;
     height: auto;
     align-items: center;
+}
+
+
+.document-item.error img {
+    height: 20px;
+    width: 20px;
+    justify-self: start;
+}
+
+.document-item.error {
+    background-color: rgba(193, 18, 31, 0.9);
+    display: none;
+    color: white;
+    min-height: 50px;
 }
 
 /* Form styling inside the expandable content */

@@ -1,6 +1,7 @@
 ﻿const apiUrl = 'http://localhost:8081/documents';
 
 
+
 // Function to fetch and display Todo items
 function fetchDocuments() {
     console.log('Fetching all documents...');
@@ -50,3 +51,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 });
+

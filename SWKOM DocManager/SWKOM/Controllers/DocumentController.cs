@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SWKOM.Models;
 using System.Text.Json;
+using AutoMapper;
+using SWKOM.Mappings;
 
 namespace SWKOM.Controllers
 {
@@ -9,10 +11,14 @@ namespace SWKOM.Controllers
     public class DocumentController : ControllerBase
     {
         private readonly ILogger<DocumentController> _logger;
+        private readonly IMapper _mapper;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public DocumentController(ILogger<DocumentController> logger)
+        public DocumentController(ILogger<DocumentController> logger, IMapper mapper, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
+            _mapper = mapper;
+            _httpClientFactory = httpClientFactory;
         }
 
         [HttpPost(Name = "PostDocument")]
@@ -33,13 +39,14 @@ namespace SWKOM.Controllers
             // 201 Created Response mit Location Header (wo File liegt)
             return CreatedAtAction(nameof(GetDocumentById), new { id = documentInformation.Id },
                 JsonSerializer.Serialize(documentInformation));
-
             //return JsonSerializer.Serialize(documentInformation);
         }
 
         [HttpGet(Name = "GetAllDocuments")]
-        public ActionResult<IEnumerable<DocumentInformation>> Get()
+        public async Task<ActionResult<IEnumerable<DocumentInformation>>> Get()
         {
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var response = await client.GetAsync("/api/documents/");
 
             var documents = Enumerable.Range(1, 5).Select(index => new DocumentInformation
             {
