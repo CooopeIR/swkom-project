@@ -9,7 +9,7 @@ namespace DocumentDAL.Controllers
     [Route("")]
     public class DocumentController(IDocumentItemRepository repository) : ControllerBase
     {
-        [HttpGet(Name = "GetAllDocuments")]
+        /*[HttpGet(Name = "GetAllDocuments")]
         public ActionResult<IEnumerable<DocumentItem>> Get()
         {
 
@@ -24,17 +24,17 @@ namespace DocumentDAL.Controllers
             .ToArray();
 
             return Ok(documents);
-        }
-        /*[HttpGet]
+        }*/
+        [HttpGet(Name = "GetAllDocuments")]
         public async Task<IEnumerable<DocumentItem>> GetAsync()
         {
             return await repository.GetAllAsync();
-        }*/
+        }
 
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
         {
-            if (string.IsNullOrWhiteSpace(item.Title))
+            if (string.IsNullOrWhiteSpace(item.title))
             {
                 return BadRequest(new { message = "Document Title cannot be empty :/" });
             }
@@ -51,10 +51,10 @@ namespace DocumentDAL.Controllers
                 return NotFound();
             }
 
-            existingItem.Title = item.Title;
-            existingItem.Author = item.Author;
-            existingItem.Content = item.Content;
-            existingItem.Date = item.Date;
+            existingItem.title = item.title;
+            existingItem.author = item.author;
+            existingItem.contentpath = item.contentpath;
+            existingItem.date = item.date;
             await repository.UpdateAsync(existingItem);
             return NoContent();
         }

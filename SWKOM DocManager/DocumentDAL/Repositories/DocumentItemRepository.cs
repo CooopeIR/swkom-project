@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentDAL.Data;
 using DocumentDAL.Entities;
-using DocumentDAL.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace DocumentDAL.Repositories
 {

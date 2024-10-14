@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using DocumentDAL.Entities;
+﻿using DocumentDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DocumentDAL.Data
 {
@@ -12,18 +12,21 @@ namespace DocumentDAL.Data
             // Manuelle Konfiguration der Tabelle
             modelBuilder.Entity<DocumentItem>(entity =>
             {
-                entity.ToTable("DocumentItems");  // Setzt den Tabellennamen
+                entity.ToTable("documents");  // Setzt den Tabellennamen
 
-                entity.HasKey(e => e.Id);  // Setzt den Primärschlüssel
+                entity.HasKey(e => e.id);  // Setzt den Primärschlüssel
 
 
-                entity.Property(e => e.Title)
+                entity.Property(e => e.title)
                     .IsRequired()
-                    .HasMaxLength(100);  // Konfiguriert den "Name"-Spalten
+                    .HasMaxLength(200);  // Konfiguriert den "Name"-Spalten
 
-                entity.Property(e => e.Author);  // Konfiguriert die "IsComplete"-Spalte
-                entity.Property(e => e.Date);  // Konfiguriert die "IsComplete"-Spalte
-                entity.Property(e => e.Content);  // Konfiguriert die "IsComplete"-Spalte
+                entity.Property(e => e.author)
+                    .IsRequired()
+                    .HasMaxLength(80);  // Konfiguriert die "IsComplete"-Spalte
+
+                entity.Property(e => e.date);  // Konfiguriert die "IsComplete"-Spalte
+                entity.Property(e => e.contentpath);  // Konfiguriert die "IsComplete"-Spalte
             });
 
             base.OnModelCreating(modelBuilder);
