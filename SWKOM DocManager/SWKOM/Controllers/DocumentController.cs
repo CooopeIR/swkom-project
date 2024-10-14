@@ -2,12 +2,11 @@
 using SWKOM.Models;
 using System.Text.Json;
 using AutoMapper;
-using SWKOM.Mappings;
 
 namespace SWKOM.Controllers
 {
     [ApiController]
-    [Route("documents")]
+    [Route("[controller]")]
     public class DocumentController : ControllerBase
     {
         private readonly ILogger<DocumentController> _logger;
@@ -34,37 +33,31 @@ namespace SWKOM.Controllers
             };
 
             // Dokument speichern / verarbeiten
-            documentInformation.Id = Guid.NewGuid();
+            //documentInformation.Id = Guid.NewGuid();
 
             // 201 Created Response mit Location Header (wo File liegt)
             return CreatedAtAction(nameof(GetDocumentById), new { id = documentInformation.Id },
                 JsonSerializer.Serialize(documentInformation));
             //return JsonSerializer.Serialize(documentInformation);
         }
-
-        /*[HttpGet(Name = "GetAllDocuments")]
-        public async Task<IEnumerable<DocumentItem>> GetAsync()
-        {
-            return await _documentItemRepository.GetAllAsync();
-        }*/
+        
 
         [HttpGet(Name = "GetAllDocuments")]
-        public async Task<ActionResult<IEnumerable<DocumentInformation>>> Get()
+        public async Task<ActionResult> Get()
         {
             var client = _httpClientFactory.CreateClient("DocumentDAL");
-            var response = await client.GetAsync("/api/documents/");
+            var response = await client.GetAsync("/api/document");
 
-            var documents = Enumerable.Range(1, 5).Select(index => new DocumentInformation
+            if (response.IsSuccessStatusCode)
             {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Title = "Title 1",
-                Author = "Me",
-                Content = "Line 1.",
-                Id = Guid.NewGuid()
-            })
-            .ToArray();
-
-            return Ok(documents);
+                var items = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentInformation>>();
+                var documents = _mapper.Map<IEnumerable<DocumentInformation>>(items);
+                return Ok(documents);
+            }
+            else
+            {
+                return StatusCode((int)response.StatusCode, "Error retrieving documents.");
+            }
         }
 
         [HttpGet("{id}", Name = "GetDocumentById")]
@@ -76,17 +69,8 @@ namespace SWKOM.Controllers
                 return NotFound();
             }
 
-            // You'd fetch the document by its ID here, using your service layer.
-            var document = new DocumentInformation
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Title = "Title 1",
-                Author = "Me",
-                Content = "Line 1.",
-                Id = Guid.NewGuid()
-            };
+            return NotFound();
 
-            return Ok(document); // Return the document
         }
 
         [HttpPut("{id}", Name = "UpdateDocumentById")]
@@ -97,18 +81,8 @@ namespace SWKOM.Controllers
                 return NotFound();
             }
 
-            var documentInformation = new DocumentInformation
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Title = "Title 1",
-                Author = "Me",
-                Content = "Line 1.",
-                Id = Guid.NewGuid()
-            };
 
-            documentInformation.Title = "Ich wurde aktualisiert o_0";
-
-            return Ok(documentInformation);
+            return NotFound();
         }
 
         [HttpDelete("{id}", Name = "DeleteDocumentById")]
@@ -118,17 +92,6 @@ namespace SWKOM.Controllers
             {
                 return NotFound();
             }
-
-            var documentInformation = new DocumentInformation
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Title = "With Id",
-                Author = "Not Me",
-                Content = "Line 1. with Id",
-                Id = Guid.NewGuid()
-            };
-
-            // Dann löschen
 
             return Ok();
         }

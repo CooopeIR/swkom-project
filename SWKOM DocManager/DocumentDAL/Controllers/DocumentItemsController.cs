@@ -6,26 +6,10 @@ namespace DocumentDAL.Controllers
 {
     [ApiController]
     //[Route("api/documents")]
-    [Route("")]
+    [Route("api/[controller]")]
     public class DocumentController(IDocumentItemRepository repository) : ControllerBase
     {
-        /*[HttpGet(Name = "GetAllDocuments")]
-        public ActionResult<IEnumerable<DocumentItem>> Get()
-        {
-
-            var documents = Enumerable.Range(1, 5).Select(index => new DocumentItem
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Title = "Title 1",
-                Author = "Me",
-                Content = "Line 1.",
-                Id = Guid.NewGuid()
-            })
-            .ToArray();
-
-            return Ok(documents);
-        }*/
-        [HttpGet(Name = "GetAllDocuments")]
+        [HttpGet(Name = "GetAllDocumentsFromDB")]
         public async Task<IEnumerable<DocumentItem>> GetAsync()
         {
             return await repository.GetAllAsync();
@@ -43,7 +27,7 @@ namespace DocumentDAL.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(Guid id, DocumentItem item)
+        public async Task<IActionResult> PutAsync(int id, DocumentItem item)
         {
             var existingItem = await repository.GetByIdAsync(id);
             if (existingItem == null)
@@ -60,7 +44,7 @@ namespace DocumentDAL.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(Guid id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             var item = await repository.GetByIdAsync(id);
             if (item == null)

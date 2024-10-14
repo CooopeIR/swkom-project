@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using SWKOM.Mappings;
 using SWKOM.Validators;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +21,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowWebUI",
         policy =>
         {
-            policy.WithOrigins("http://localhost") // Remove trailing slash
+            policy.WithOrigins("http://host.docker.internal") // Remove trailing slash
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowAnyOrigin();
         });
 });
 
@@ -31,6 +33,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
+
+
+builder.Services.AddHttpClient("DocumentDAL", client =>
+{
+    client.BaseAddress = new Uri("http://host.docker.internal:8082");
+    //client.DefaultRequestHeaders.Accept.Clear();
+    //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+});
 
 
 var app = builder.Build();
@@ -44,9 +55,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowWebUI");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
+app.Urls.Add("http://*:8081"); // Stelle sicher, dass die App nur HTTP verwendet
 app.UseAuthorization();
+
 
 app.MapControllers();
 

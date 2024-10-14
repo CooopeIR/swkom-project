@@ -50,13 +50,14 @@
       watch:
         - action: rebuild
           path: .
-          
+
   postgres:
     container_name: postgres_container
     image: postgis/postgis:17-3.4
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-DocManagerDB}
       PGDATA: /data/postgres
     volumes:
        - postgres:/data/postgres

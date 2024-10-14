@@ -7,9 +7,9 @@ namespace DocumentDAL.Repositories
     public interface IDocumentItemRepository
     {
         Task<IEnumerable<DocumentItem>> GetAllAsync();
-        Task<DocumentItem> GetByIdAsync(Guid id);
+        Task<DocumentItem> GetByIdAsync(int id);
         Task AddAsync(DocumentItem item);
         Task UpdateAsync(DocumentItem item);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }

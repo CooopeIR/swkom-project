@@ -12,7 +12,7 @@ namespace DocumentDAL.Repositories
             return await context.DocumentItems.ToListAsync();
         }
 
-        public async Task<DocumentItem> GetByIdAsync(Guid id)
+        public async Task<DocumentItem> GetByIdAsync(int id)
         {
             return await context.DocumentItems.FindAsync(id);
         }
@@ -29,7 +29,7 @@ namespace DocumentDAL.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var item = await context.DocumentItems.FindAsync(id);
             if (item != null)
