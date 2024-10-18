@@ -1,4 +1,5 @@
-﻿const apiUrl = 'http://host.docker.internal:8081/document';
+﻿//const apiUrl = 'http://host.docker.internal:8081/document';
+const apiUrl = 'http://localhost:8081/document';
 
 // Function to fetch and display Todo items
 function fetchDocuments() {
