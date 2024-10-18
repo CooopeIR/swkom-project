@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', fetchDocuments);
 document.addEventListener('DOMContentLoaded', function () {
     // Code to execute once the DOM is fully loaded
     const expandBtn = document.getElementById('expand-btn');
+    const submitBtn = document.getElementById('submit');
 
     expandBtn.addEventListener('click', function () {
         const form = document.getElementById(this.dataset.target);
@@ -49,5 +50,9 @@ document.addEventListener('DOMContentLoaded', function () {
         this.style.color = isOpen ? '#ffffff' : '';
 
     });
+
+    submitBtn.addEventListener('click', function () {
+
+    })
 });
 

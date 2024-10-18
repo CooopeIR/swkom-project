@@ -82,7 +82,8 @@ p {
     grid-template-columns: 3fr auto; /* Two columns: one for text and one for buttons */
     align-items: center; /* Center items vertically */
     background-color: rgba(255, 255, 255, 0.9);
-    height: 50px; /* Set a fixed height */
+    height: auto; /* Set a fixed height */
+    min-height: 50px; /*Set min height*/
     margin: 5px 0; /* Space between items */
     border-radius: 20px; /* Rounded corners */
     transition: transform 0.3s ease; /* Animation on hover */
