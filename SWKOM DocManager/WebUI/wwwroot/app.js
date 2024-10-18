@@ -28,14 +28,31 @@ function fetchDocuments() {
                 documentList.appendChild(li);
             });
         })
-        .catch(error => console.error('Fehler beim Abrufen der Todo-Items:', error));
+        .catch(error => console.error('Fehler beim Abrufen der Documents:', error));
 }
 
-document.addEventListener('DOMContentLoaded', fetchDocuments);
+
 document.addEventListener('DOMContentLoaded', function () {
-    // Code to execute once the DOM is fully loaded
+    // Expand/collapse form logic remains the same
+    const errorMessageDiv = document.getElementById('error-message');
+    const successMessageDiv = document.getElementById('success-message');
     const expandBtn = document.getElementById('expand-btn');
-    const submitBtn = document.getElementById('submit');
+    const form = document.getElementById('expandable-form');
+
+    // Function to show a message for 5 seconds
+    function showMessage(messageDiv, message) {
+        messageDiv.style.display = 'flex'; // Show the message div
+        messageDiv.querySelector('span').textContent = message; // Set the message content
+
+        // Hide the message after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none'; // Hide the message div
+        }, 5000);
+    }
+
+    // Hide messages initially
+    errorMessageDiv.style.display = 'none';
+    successMessageDiv.style.display = 'none';
 
     expandBtn.addEventListener('click', function () {
         const form = document.getElementById(this.dataset.target);
@@ -50,9 +67,50 @@ document.addEventListener('DOMContentLoaded', function () {
         this.style.color = isOpen ? '#ffffff' : '';
 
     });
+  
+        
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission behavior
 
-    submitBtn.addEventListener('click', function () {
+        const title = document.getElementById('title').value;
+        const author = document.getElementById('author').value;
 
-    })
+        // Create a document object to send
+        const documentData = {
+            title: title,
+            author: author
+        };
+
+        // Send a POST request to the API
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(documentData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Parse the JSON response
+                } else {
+                    throw new Error('Failed to submit document');
+                }
+            })
+            .then(data => {
+                console.log('Document submitted successfully:', data);
+                fetchDocuments(); // Refresh the document list after successful submission
+
+                // Show success message
+                showMessage(successMessageDiv, 'Document submitted successfully!');
+            })
+            .catch(error => {
+                console.error('Error submitting document:', error);
+
+                // Show error message
+                showMessage(errorMessageDiv, 'An unexpected error occurred while submitting the document.');
+            });
+    });
 });
+
+document.addEventListener('DOMContentLoaded', fetchDocuments);
 

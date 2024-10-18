@@ -10,43 +10,54 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-<div class="content">
-    <div class="container">
-        <h1 style="padding: 20px">DocManager</h1>
+    <div class="content">
+        <div class="container">
+            <h1 style="padding: 5px">DocManager</h1>
 
-        <div class="search-bar">
-            <input type="text" id="search-bar" placeholder="">
-            <button type="submit">
-                <img src="https://cdn-icons-png.flaticon.com/512/342/342359.png" alt="Search">
-            </button>
-        </div>
-    </div>
-    <div id="error-message" class="document-item error">
-        <img src="https://cdn-icons-png.flaticon.com/512/1304/1304038.png" alt="Error" />;
-        <span class="error-message">An Error occurred!</span>
-    </div>
-    <div class="document-list">
-        <div class="document-item add">
-            <div id="expandable-form" class="expandable">
-                <form id="my-form">
-                    <div class="form-row">
-                        <label for="name">Title</label>
-                        <input type="text" id="title" name="title">
-                    </div>
-                    <div class="form-row">
-                        <label for="email">Author</label>
-                        <input type="name" id="author" name="author">
-                    </div>
-                    <button type="submit">Submit</button>
-                </form>
+            <div class="search-bar">
+                <input type="text" id="search-bar" placeholder="">
+                <button type="submit">
+                    <img src="https://cdn-icons-png.flaticon.com/512/342/342359.png" alt="Search">
+                </button>
             </div>
-            <button id="expand-btn" data-target="expandable-form">Add Document</button>
         </div>
-        <div id="document-list">
+        
 
+        <div class="document-list">
+            <div class="document-item add">
+                <div id="expandable-form" class="expandable">
+                    <form id="my-form">
+                        <div class="form-row">
+                            <label for="name">Title</label>
+                            <input type="text" id="title" name="title">
+                        </div>
+                        <div class="form-row">
+                            <label for="email">Author</label>
+                            <input type="name" id="author" name="author">
+                        </div>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+                <button id="expand-btn" data-target="expandable-form">Add Document</button>
+            </div>
+
+            <div id="error-message" class="document-item error">
+                <img src="https://cdn-icons-png.flaticon.com/512/1304/1304038.png" alt="Error" />
+                <span class="error-message">An Error occurred!</span>
+            </div>
+            <div id="success-message" class="document-item success">
+                <span class="error-message">Success!</span>
+            </div>
+            
         </div>
+        
+        <div class="document-list scrollable">
+            <div id="document-list">
+
+            </div>
+        </div>
+
     </div>
-</div>
 
 <script src="/app.js"></script>
 </body>

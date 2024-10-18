@@ -1,6 +1,7 @@
 ﻿using DocumentDAL.Entities;
 using DocumentDAL.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace DocumentDAL.Controllers
 {
@@ -18,9 +19,9 @@ namespace DocumentDAL.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
         {
-            if (string.IsNullOrWhiteSpace(item.title))
+            if (string.IsNullOrWhiteSpace(item.title) || string.IsNullOrWhiteSpace(item.author))
             {
-                return BadRequest(new { message = "Document Title cannot be empty :/" });
+                return BadRequest(new { message = "Document Information cannot be empty :/" });
             }
             await repository.AddAsync(item);
             return Ok();

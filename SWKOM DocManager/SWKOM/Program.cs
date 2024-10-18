@@ -39,6 +39,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("DocumentDAL", client =>
 {
     client.BaseAddress = new Uri("http://host.docker.internal:8082");
+    //client.BaseAddress = new Uri("http://localhost:8082");
+
     //client.DefaultRequestHeaders.Accept.Clear();
     //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 });

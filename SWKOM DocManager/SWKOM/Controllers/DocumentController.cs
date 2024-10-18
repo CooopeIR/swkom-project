@@ -2,6 +2,8 @@
 using SWKOM.Models;
 using System.Text.Json;
 using AutoMapper;
+using DocumentDAL.Entities;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace SWKOM.Controllers
 {
@@ -21,24 +23,22 @@ namespace SWKOM.Controllers
         }
 
         [HttpPost(Name = "PostDocument")]
-        public ActionResult<DocumentInformation> Post()
+        public async Task<ActionResult> Create(DocumentInformation documentDTO)
         {
-            // Dokument empfangen
-            var documentInformation = new DocumentInformation
+            if (!ModelState.IsValid)
             {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Title = "Title 1",
-                Author = "Me",
-                Content = "Line 1."
-            };
+                return BadRequest(ModelState);
+            }
 
-            // Dokument speichern / verarbeiten
-            //documentInformation.Id = Guid.NewGuid();
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var item = _mapper.Map<DocumentItem>(documentDTO);
+            var response = await client.PostAsJsonAsync("/api/document", item);
 
-            // 201 Created Response mit Location Header (wo File liegt)
-            return CreatedAtAction(nameof(GetDocumentById), new { id = documentInformation.Id },
-                JsonSerializer.Serialize(documentInformation));
-            //return JsonSerializer.Serialize(documentInformation);
+            if (response.IsSuccessStatusCode)
+            {
+                return CreatedAtAction(nameof(GetDocumentById), new { id = item.id }, documentDTO);
+            }
+            return StatusCode((int)response.StatusCode, "Error creating Document item in DAL");
         }
         
 
@@ -61,16 +61,23 @@ namespace SWKOM.Controllers
         }
 
         [HttpGet("{id}", Name = "GetDocumentById")]
-        public ActionResult<DocumentInformation> GetDocumentById(int id)
+        public async Task<ActionResult> GetDocumentById(int id)
         {
 
-            if (id == 0)
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var response = await client.GetAsync($"/api/document/{id}");
+
+            if (response.IsSuccessStatusCode)
             {
+                var item = await response.Content.ReadFromJsonAsync<DocumentInformation>();
+                var dtoItem = _mapper.Map<DocumentItem>(item);
+                if (item != null)
+                {
+                    return Ok(dtoItem);
+                }
                 return NotFound();
             }
-
-            return NotFound();
-
+            return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
         }
 
         [HttpPut("{id}", Name = "UpdateDocumentById")]

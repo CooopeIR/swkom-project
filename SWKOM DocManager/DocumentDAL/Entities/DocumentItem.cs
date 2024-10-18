@@ -10,6 +10,6 @@
 
         public string? contentpath { get; set; }
 
-        public int? id { get; set; }
+        public int id { get; set; }
     }
 }
