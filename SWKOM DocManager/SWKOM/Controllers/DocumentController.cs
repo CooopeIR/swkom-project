@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SWKOM.Models;
-using System.Text.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using DocumentDAL.Entities;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc;
+using SWKOM.Models;
+using System.Runtime.CompilerServices;
 
 namespace SWKOM.Controllers
 {
@@ -40,7 +39,7 @@ namespace SWKOM.Controllers
             }
             return StatusCode((int)response.StatusCode, "Error creating Document item in DAL");
         }
-        
+
 
         [HttpGet(Name = "GetAllDocuments")]
         public async Task<ActionResult> Get()

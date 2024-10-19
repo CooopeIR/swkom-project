@@ -19,8 +19,8 @@ function fetchDocuments() {
                 li.innerHTML = `
                 <span class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</span>
                 <div class="button-group">
-                    <button class="view">view</button>    
-                    <button class="delete">
+                    <button class="view" onclick="viewTask(${documentFromResponse.id})">view</button>    
+                    <button class="delete" onclick="deleteTask(${documentFromResponse.id})">
                             <span class="material-icons">delete</span>
                     </button>
                 </div>
@@ -91,9 +91,15 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => {
                 if (response.ok) {
+                    document.getElementById('title').value = '';
+                    document.getElementById('author').value = '';
                     return response.json(); // Parse the JSON response
                 } else {
-                    throw new Error('Failed to submit document');
+                    response.json().then(err => {
+                        console.log(Object.values(err.errors));
+                        Object.values(err.errors).forEach((singleError) => showMessage(errorMessageDiv, singleError));
+                    });
+                    throw new Error('');
                 }
             })
             .then(data => {
@@ -104,13 +110,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 showMessage(successMessageDiv, 'Document submitted successfully!');
             })
             .catch(error => {
-                console.error('Error submitting document:', error);
-
                 // Show error message
-                showMessage(errorMessageDiv, 'An unexpected error occurred while submitting the document.');
+                showMessage(errorMessageDiv, error);
             });
     });
 });
 
 document.addEventListener('DOMContentLoaded', fetchDocuments);
 
+function deleteTask(id) {
+    fetch(`${apiUrl}/${id}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (response.ok) {
+                fetchDocuments(); // Refresh the list after deletion
+            } else {
+                console.error('Fehler beim Löschen der Aufgabe.');
+            }
+        })
+        .catch(error => console.error('Fehler:', error));
+}
+
+function viewTask(id) {
+    fetch(`${apiUrl}/${id}`, {
+        method: 'GET'
+    })
+        .then(response => {
+            if (response.ok) {
+                fetchDocuments(); // Refresh the list after deletion
+                return response.json(); // Return the parsed JSON
+            } else {
+                console.error('Fehler beim Holen der Dokument Daten.');
+            }
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => console.error('Fehler:', error));
+}

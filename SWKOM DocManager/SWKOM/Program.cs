@@ -2,18 +2,18 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using SWKOM.Mappings;
 using SWKOM.Validators;
-using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<DocumentItemDtoValidator>(); // register validators
 
 // Add services to the container.
 builder.Services.AddControllers();
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+//Fluent Validation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<DocumentItemDtoValidator>(); // register validators
 
 // CORS konfigurieren, um Anfragen von localhost:80 (WebUI) zuzulassen
 builder.Services.AddCors(options =>

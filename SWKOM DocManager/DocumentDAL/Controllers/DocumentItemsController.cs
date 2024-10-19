@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Query;
 namespace DocumentDAL.Controllers
 {
     [ApiController]
-    //[Route("api/documents")]
+    //[Route("api/document")]
     [Route("api/[controller]")]
     public class DocumentController(IDocumentItemRepository repository) : ControllerBase
     {
@@ -14,6 +14,12 @@ namespace DocumentDAL.Controllers
         public async Task<IEnumerable<DocumentItem>> GetAsync()
         {
             return await repository.GetAllAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<DocumentItem> GetAsync(int id)
+        {
+            return await repository.GetByIdAsync(id);
         }
 
         [HttpPost]
