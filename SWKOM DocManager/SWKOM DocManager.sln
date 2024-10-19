@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{C3F4CB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentDAL", "DocumentDAL\DocumentDAL.csproj", "{41FBCC3B-29B1-4BC0-97DF-7507325FB716}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{75C1CAC4-A57B-45B7-AC51-840F9A1CF4DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{17086DB3-041F-4FD1-8550-A57187FE80CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{41FBCC3B-29B1-4BC0-97DF-7507325FB716}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41FBCC3B-29B1-4BC0-97DF-7507325FB716}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41FBCC3B-29B1-4BC0-97DF-7507325FB716}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75C1CAC4-A57B-45B7-AC51-840F9A1CF4DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75C1CAC4-A57B-45B7-AC51-840F9A1CF4DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75C1CAC4-A57B-45B7-AC51-840F9A1CF4DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75C1CAC4-A57B-45B7-AC51-840F9A1CF4DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

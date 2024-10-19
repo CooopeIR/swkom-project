@@ -12,16 +12,20 @@ namespace SWKOM.Mappings
                 .ForMember(dest => dest.Id, opt
                     => opt.MapFrom(src => src.id))
                 .ForMember(dest => dest.Title, opt
-                    => opt.MapFrom(src => $"*{src.title ?? string.Empty}*"))
+                    => opt.MapFrom(src => $"{src.title ?? string.Empty}"))
                 .ForMember(dest => dest.Author, opt
-                    => opt.MapFrom(src => $"*{src.author ?? string.Empty}*"))
+                    => opt.MapFrom(src => $"{src.author ?? string.Empty}"))
+                .ForMember(dest => dest.Contentpath, opt
+                    => opt.MapFrom(src => $"{src.contentpath ?? string.Empty}"))
                 .ReverseMap()
                 .ForMember(dest => dest.id, opt
                     => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.title, opt
-                    => opt.MapFrom(src => $"*{src.Title ?? string.Empty}*"))
+                    => opt.MapFrom(src => $"{src.Title ?? string.Empty}"))
                 .ForMember(dest => dest.author, opt
-                    => opt.MapFrom(src => $"*{src.Author ?? string.Empty}*"));
+                    => opt.MapFrom(src => $"{src.Author ?? string.Empty}"))
+                .ForMember(dest => dest.contentpath, opt
+                    => opt.MapFrom(src => $"{src.Contentpath ?? string.Empty}"));
         }
     }
 }
