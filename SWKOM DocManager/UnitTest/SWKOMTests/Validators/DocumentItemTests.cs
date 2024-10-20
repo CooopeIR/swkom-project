@@ -6,10 +6,12 @@ namespace UnitTest.SWKOMTests.Validators
 {
     public class TestsDocumentItemValidator
     {
+        private DocumentItemDtoValidator _validator;
+
         [SetUp]
         public void Setup()
         {
-
+            _validator = new DocumentItemDtoValidator();
         }
 
         [Test]
@@ -21,10 +23,9 @@ namespace UnitTest.SWKOMTests.Validators
                 Title = "",
                 Author = "TestAuthor",
             };
-            var validator = new DocumentItemDtoValidator();
 
             //Act
-            TestValidationResult<DocumentInformation> result = validator.TestValidate(request);
+            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldHaveValidationErrorFor(x => x.Title);
@@ -40,10 +41,9 @@ namespace UnitTest.SWKOMTests.Validators
                 Title = "TestTitle",
                 Author = "",
             };
-            var validator = new DocumentItemDtoValidator();
 
             //Act
-            TestValidationResult<DocumentInformation> result = validator.TestValidate(request);
+            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldNotHaveValidationErrorFor(x => x.Title);
@@ -59,10 +59,9 @@ namespace UnitTest.SWKOMTests.Validators
                 Title = "TestTitle",
                 Author = "TestAuthor",
             };
-            var validator = new DocumentItemDtoValidator();
 
             //Act
-            TestValidationResult<DocumentInformation> result = validator.TestValidate(request);
+            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldNotHaveValidationErrorFor(x => x.Title);
@@ -78,10 +77,9 @@ namespace UnitTest.SWKOMTests.Validators
                 Title = "Test_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_Title1",
                 Author = "TestAuthor",
             };
-            var validator = new DocumentItemDtoValidator();
 
             //Act
-            TestValidationResult<DocumentInformation> result = validator.TestValidate(request);
+            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldHaveValidationErrorFor(x => x.Title);
@@ -97,10 +95,9 @@ namespace UnitTest.SWKOMTests.Validators
                 Title = "TestTitle",
                 Author = "TestAuthorTestAuthorTestAuthorTestAuthorTestAuthorTestAuthorTestAuthorTestAuthor1",
             };
-            var validator = new DocumentItemDtoValidator();
 
             //Act
-            TestValidationResult<DocumentInformation> result = validator.TestValidate(request);
+            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldNotHaveValidationErrorFor(x => x.Title);

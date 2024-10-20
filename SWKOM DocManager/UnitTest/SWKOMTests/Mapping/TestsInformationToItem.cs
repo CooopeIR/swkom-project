@@ -7,10 +7,13 @@ namespace UnitTest.SWKOMTests.Mapping
 {
     public class TestsInformationToItem
     {
+        private IMapper? _mapper;
+
         [SetUp]
         public void Setup()
         {
-
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
+            _mapper = config.CreateMapper();
         }
 
         [Test]
@@ -34,11 +37,8 @@ namespace UnitTest.SWKOMTests.Mapping
                 contentpath = "C://all",
             };
 
-            var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-            var mapper = config.CreateMapper();
-
             //Act
-            var actual = mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
 
             //Assert
             Assert.NotNull(actual);
@@ -69,11 +69,8 @@ namespace UnitTest.SWKOMTests.Mapping
                 contentpath = "C://all",
             };
 
-            var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-            var mapper = config.CreateMapper();
-
             //Act
-            var actual = mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
 
             //Assert
             Assert.NotNull(actual);
@@ -103,11 +100,8 @@ namespace UnitTest.SWKOMTests.Mapping
                 contentpath = "C://all",
             };
 
-            var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-            var mapper = config.CreateMapper();
-
             //Act
-            var actual = mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
 
             //Assert
             Assert.NotNull(actual);
@@ -137,11 +131,8 @@ namespace UnitTest.SWKOMTests.Mapping
                 contentpath = "",
             };
 
-            var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-            var mapper = config.CreateMapper();
-
             //Act
-            var actual = mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
 
             //Assert
             Assert.NotNull(actual);
