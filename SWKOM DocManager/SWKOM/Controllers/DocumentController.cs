@@ -92,14 +92,16 @@ namespace SWKOM.Controllers
         }
 
         [HttpDelete("{id}", Name = "DeleteDocumentById")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (id == 0)
-            {
-                return NotFound();
-            }
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var response = await client.DeleteAsync($"/api/document/{id}");
 
-            return Ok();
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok(nameof(Delete));
+            }
+            return StatusCode((int)response.StatusCode, "Error deleting Document item in DAL");
         }
     }
 }
