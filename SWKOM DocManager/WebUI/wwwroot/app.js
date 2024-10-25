@@ -48,6 +48,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchTerm = document.getElementById('search-term');
     const clearBtn = document.getElementById("clear-btn");
 
+    document.getElementById("upload-btn").addEventListener("click", () => {
+        document.getElementById("fileupload").click();
+    });
+
+    document.getElementById("fileupload").addEventListener("change", (event) => {
+        showMessage(successMessageDiv, "File uploaded successfully!");
+
+        const fileNameElement = document.getElementById("file-name");
+        const file = event.target.files[0]; // Get the selected file
+
+        // Display the file name or a placeholder if no file is selected
+        fileNameElement.textContent = file ? `${file.name}` : "No file selected";
+
+    });
+
 
     // Function to show a message for 5 seconds
     function showMessage(messageDiv, message) {
@@ -102,17 +117,20 @@ document.addEventListener('DOMContentLoaded', function () {
         this.style.color = isOpen ? '#ffffff' : '';
     });
   
-        
     form.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission behavior
 
         const title = document.getElementById('title').value;
         const author = document.getElementById('author').value;
+        const file = document.getElementById('fileupload').value;
+
+        console.log("File: ", file);
 
         // Create a document object to send
         const documentData = {
             title: title,
-            author: author
+            author: author,
+            document: file
         };
 
         // Send a POST request to the API

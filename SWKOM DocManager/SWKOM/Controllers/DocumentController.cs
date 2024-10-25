@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
 using DocumentDAL.Entities;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SWKOM.Models;
+using RabbitMQ.Client;
 using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using IModel = RabbitMQ.Client.IModel;
+using System.Text;
 
 namespace SWKOM.Controllers
 {
@@ -14,12 +20,23 @@ namespace SWKOM.Controllers
         private readonly ILogger<DocumentController> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConnection _connection;
+        private readonly IModel _channel;
 
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
+
+            // Stelle die Verbindung zu RabbitMQ her
+            var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
+            _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
+
+            // Deklariere die Queue
+            _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
         }
 
         [HttpPost(Name = "PostDocument")]
@@ -112,6 +129,68 @@ namespace SWKOM.Controllers
                 return Ok(nameof(Delete));
             }
             return StatusCode((int)response.StatusCode, "Error deleting Document item in DAL");
+        }
+
+        [HttpPut("{id}/upload")]
+        public async Task<IActionResult> UploadFile(int id, IFormFile? documentFile)
+        {
+            if (documentFile == null || documentFile.Length == 0)
+            {
+                return BadRequest("Keine Datei hochgeladen.");
+            }
+
+            // Hole den Task vom DAL
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var response = await client.GetAsync($"/api/document/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound($"Error while fetching document with id {id}");
+            }
+
+            // Mappe das empfangene TodoItem auf ein TodoItemDto
+            var documentItem = await response.Content.ReadFromJsonAsync<DocumentInformation>();
+            if (documentItem == null)
+            {
+                return NotFound($"Document with id {id} not found.");
+            }
+
+            var documentItemDto = _mapper.Map<DocumentItem>(documentItem);
+
+            // Setze den Dateinamen im DTO
+            documentItemDto.FileName = documentFile.FileName;
+
+            // Aktualisiere das Item im DAL, nutze das DTO
+            var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItemDto);
+            if (!updateResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)updateResponse.StatusCode, $"Fehler beim Speichern des Dateinamens für Dokument {id}");
+            }
+
+            // Nachricht an RabbitMQ
+            try
+            {
+                SendToMessageQueue(documentFile.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Fehler beim Senden der Nachricht an RabbitMQ: {ex.Message}");
+            }
+
+            return Ok(new { message = $"Dateiname {documentFile.FileName} für Dokument {id} erfolgreich gespeichert." });
+        }
+
+        private void SendToMessageQueue(string fileName)
+        {
+            // Sende die Nachricht in den RabbitMQ channel/queue
+            var body = Encoding.UTF8.GetBytes(fileName);
+            _channel.BasicPublish(exchange: "", routingKey: "file_queue", basicProperties: null, body: body);
+            Console.WriteLine($@"[x] Sent {fileName}");
+        }
+
+        public void Dispose()
+        {
+            _channel?.Close();
+            _connection?.Close();
         }
     }
 }

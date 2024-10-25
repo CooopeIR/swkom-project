@@ -1,4 +1,6 @@
 ﻿services:
+
+
   documents-api:
     container_name: documents-api
     image: documents-api_image
@@ -10,10 +12,25 @@
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8081 # Stellt sicher, dass nur HTTP verwendet wird
+    depends_on:
+        - rabbitmq
+        - DocumentDAL
     develop:
       watch:
         - action: rebuild
           path: .
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports: 
+        - "5672:5672"
+        - "15672:15672"
+    volumes:
+        - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
 
   webui:
     container_name: webui
@@ -46,6 +63,7 @@
       - ASPNETCORE_URLS=http://+:8082
     depends_on:
       - documents-api
+      - postgres
     develop:
       watch:
         - action: rebuild
@@ -82,6 +100,7 @@
     networks:
       - postgres
     restart: unless-stopped
+
 
 networks:
   postgres:

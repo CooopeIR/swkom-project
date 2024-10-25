@@ -10,6 +10,8 @@
 
         public string? contentpath { get; set; }
 
+        public string? fileName { get; set; }
+
         public int id { get; set; }
     }
 }

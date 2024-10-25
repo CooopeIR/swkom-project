@@ -17,6 +17,8 @@ namespace SWKOM.Mappings
                     => opt.MapFrom(src => $"{src.author ?? string.Empty}"))
                 .ForMember(dest => dest.Contentpath, opt
                     => opt.MapFrom(src => $"{src.contentpath ?? string.Empty}"))
+                .ForMember(dest => dest.FileName, opt
+                    => opt.MapFrom(src => $"{src.fileName ?? string.Empty}"))
                 .ReverseMap()
                 .ForMember(dest => dest.id, opt
                     => opt.MapFrom(src => src.Id))
@@ -25,7 +27,9 @@ namespace SWKOM.Mappings
                 .ForMember(dest => dest.author, opt
                     => opt.MapFrom(src => $"{src.Author ?? string.Empty}"))
                 .ForMember(dest => dest.contentpath, opt
-                    => opt.MapFrom(src => $"{src.Contentpath ?? string.Empty}"));
+                    => opt.MapFrom(src => $"{src.Contentpath ?? string.Empty}"))
+                .ForMember(dest => dest.fileName, opt
+                => opt.MapFrom(src => $"{src.FileName ?? string.Empty}"));
         }
     }
 }

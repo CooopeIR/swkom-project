@@ -257,7 +257,7 @@ button.delete:hover {
     display: none;
     color: white;
     min-height: 50px;
-    padding: 0px 20px 20px 0px;
+    padding: 0px 20px 0px 20px;
 }
 
 
@@ -324,3 +324,11 @@ button.delete:hover {
     .form-row input:focus {
         border-bottom: 2px solid var(--secondary-color); /* Optional: Change bottom border color on focus */
     }
+
+.file-name {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333; /* Adjust color as needed */
+    text-align: center;
+    align-self: center; 
+}
