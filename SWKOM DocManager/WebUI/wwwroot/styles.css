@@ -1,12 +1,15 @@
-﻿{
+﻿*{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 :root {
-    --primary-color: #003049;
-    --secondary-color: #669bbc; /* Define your primary color here */
+    --text-color: #003049;
+    /*    --primary-color: #E7C6FF;
+*/ --primary-color: #DFE1FC;
+    --secondary-color: #c8b6ff;
+    --error-red: #FF4D4D;
 }
 
 body, html {
@@ -24,8 +27,8 @@ body {
     justify-content: center;
     align-items: flex-start; /* Align items to the top */
     font-family: "Lato", sans-serif; /* Paragraph font */
-    color: var(--primary-color); /* Dark text for readability */
-    padding-top: 15px;*/ /* Adds 20px padding to the top */
+    color: var(--text-color); /* Dark text for readability */
+    padding-top: 15px;
 }
 
 .content {
@@ -41,34 +44,41 @@ body {
 h1 {
     font-family: "Roboto Slab", serif; /* Headline font */
     font-size: 2.5rem; /* Increase size for visibility */
-    color: var(--primary-color); /* Darker color for the header */
+    color: var(--text-color); /* Darker color for the header */
 }
 
 p {
     font-family: "Lato", sans-serif;
-    color: var(--primary-color); /* Paragraph font */
+    color: var(--text-color); /* Paragraph font */
+}
+
+img.icon-white {
+    filter: brightness(0) invert(1); /* Hack to turn the icon white */
 }
 
 .document-list {
     margin-top: 10px;
-/*    padding: 10px;
-*/    gap: 15px;
+    gap: 15px;
     background-color: transparent;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    width: 60%;
-    max-height: 60vh;  Adjust this value depending on how much space you want to give it 
+    width: 100%;
+    max-height: 80vh;     
 }
 
     .document-list.scrollable {
         position: sticky; /* Keeps the div fixed in the viewport */
         bottom: 0; /* Aligns it to the bottom */
-        max-height: 500px; /* Ensures it doesn't exceed the viewport height */
+        max-height: 700px; /* Ensures it doesn't exceed the viewport height */
         overflow-y: hidden; /* Adds a scrollbar if needed */
         background-color: transparent; /* Optional: set a background color */
     }
+
+.document-list.add {
+    align-items: center;
+}
 
 #document-list {
     max-height: 500px; /* Set a maximum height for the list */
@@ -77,7 +87,7 @@ p {
     gap: 10px;
     padding: 15px;
     /*scrollbar-width: thin;*/ /* For Firefox */
-    scrollbar-color: white transparent; /* For Firefox */
+    scrollbar-color: white transparent;
 }
 
 .document-name {
@@ -85,28 +95,29 @@ p {
     font-size: 1.2rem;
     padding-left: 20px;
     justify-self: start; /* Justify text to the left */
-    color: var(--primary-color); /* Default text color */
+    color: var(--text-color) /* Default text color */
 }
 
 .document-item {
     display: grid; /* Use CSS Grid for layout */
     grid-template-columns: 3fr auto; /* Two columns: one for text and one for buttons */
     align-items: center; /* Center items vertically */
-    justify-content:center;
-    background-color: rgba(255, 255, 255, 0.9);
+    justify-content: center;
+    background-color: white;
     height: auto; /* Set a fixed height */
     min-height: 50px; /*Set min height*/
     margin: 5px 0;
     border-radius: 20px; /* Rounded corners */
     transition: transform 0.3s ease; /* Animation on hover */
     padding: 5px;
-    border-bottom: 1px solid #ccc;
 }
 
-.document-item:hover {
-    transform: scale(1.01); /* Scale up on hover */
-    background-color: #ffffff; /* Darker background on hover */
-}
+    .document-item:hover {
+        transform: scale(1.01); /* Scale up on hover */
+        filter: brightness(105%);
+        /*    background-color: #ffffff;
+*/
+    }
 
 /* Styling for button group */
 .button-group {
@@ -114,11 +125,12 @@ p {
     display: flex; /* Use flexbox for button alignment */
     gap: 10px; /* Space between buttons */
     padding-right: 20px;
+    padding-left: 20px;
 }
 
 button {
     padding: 5px 10px; /* Padding for buttons */
-    background-color: var(--secondary-color); /* Button color */
+    background-color: var(--primary-color); /* Button color */
     border: none; /* Remove default border */
     border-radius: 20px; /* Rounded corners for buttons */
     cursor: pointer;
@@ -127,18 +139,19 @@ button {
     width: fit-content;
 }
 
-button:hover {
-    background-color: #001d3d; /* Darker background on hover */
-    color: #ffffff; /* Change text color on hover */
+
+    button:hover {
+        background-color: var(--secondary-color); /* Darker background on hover */
+/*        color: #ffffff;
+*/    }
+
+
+button.delete {
+    background-color: var(--error-red); 
+    color: white;
 }
 
-
-button delete {
-    background-color: red; /* Red background for delete button */
-    color: white; /* White text color */
-}
-
-button delete:hover {
+button.delete:hover {
     background-color: darkred; /* Darker red on hover */
 }
 
@@ -149,9 +162,14 @@ button delete:hover {
 
 .container {
     text-align: center;
-    background-color: rgba(255, 255, 255);
+    background-color: #DFE1FC;
     padding: 40px;
     border-radius: 20px;
+    width: 35vw ;
+    min-width: 350px;
+    max-width: 500px;
+    justify-items: center;
+    align-items: baseline;
 }
 
 .search-bar {
@@ -159,6 +177,8 @@ button delete:hover {
     justify-content: center;
     align-items: center;
     margin-top: 10px; /* Add some space above the search bar */
+    max-width: 300px;
+
 }
 
 .search-bar input {
@@ -175,8 +195,7 @@ button delete:hover {
 .search-bar button {
     width: 50px; /* Set a fixed width for the button */
     height: 40px; /* Match the input height */
-    border: 1px solid #ccc; /* Add a border to match the input field */
-    background-color: #ccc;
+    background-color: var(--secondary-color);
     border-left: none; /* Remove the border on the left to connect with input */
     border-radius: 0 25px 25px 0; /* Rounded right corners */
     cursor: pointer;
@@ -185,6 +204,23 @@ button delete:hover {
     align-items: center;
     padding: 0; /* Remove default padding */
 }
+    .search-bar button:hover {
+        filter: brightness(110%);
+    }
+
+    .search-bar button.clear {
+        border-radius: 0;
+        background-color: var(--error-red); /* Red background for delete button */
+        transition: max-width 0.3s ease-in-out;
+        max-width: 0;
+        overflow: hidden; /* Prevents showing content */
+    }
+
+        .search-bar button.clear.show {
+            max-width: 50px; /* Adjust according to the button's width */
+        }
+
+
 
 .search-bar button img {
     width: 20px;
@@ -195,9 +231,10 @@ button delete:hover {
 .document-item.add {
     display: flex;
     flex-direction: column;
-/*    justify-content: stretch;
-*/    height: auto;
+    width: 80%;
+    height: auto;
     align-items: center;
+    justify-self: center;
 }
 
 
@@ -208,19 +245,19 @@ button delete:hover {
 }
 
 .document-item.error {
-    background-color: rgba(193, 18, 31, 0.9);
+    background-color: var(--error-red);
     display: none;
     color: white;
     min-height: 50px;
-    padding: 10px;
+    padding: 0px 20px 0px 20px;
 }
 
 .document-item.success {
-    background-color: rgba(2, 195, 154, 0.9);
+    background-color: rgba(2, 195, 154);
     display: none;
     color: white;
     min-height: 50px;
-    padding: 10px;
+    padding: 0px 20px 20px 0px;
 }
 
 
@@ -276,9 +313,9 @@ button delete:hover {
 .form-row input {
     background-color: transparent; /* Make the background transparent */
     border: none; /* Remove all borders */
-    border-bottom: 2px solid var(--primary-color); /* Add a bottom border */
+    border-bottom: 2px solid var(--text-color); /* Add a bottom border */
     outline: none; /* Remove outline on focus */
-    color: var(--primary-color); /* Text color */
+    color: var(--text-color); /* Text color */
     padding: 8px; /* Add some padding for a better appearance */
     width: 100%; /* Ensure the input takes full width */
     box-sizing: border-box; /* Include padding in the width */

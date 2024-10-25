@@ -3,6 +3,7 @@ using DocumentDAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using SWKOM.Models;
 using System.Runtime.CompilerServices;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SWKOM.Controllers
 {
@@ -42,15 +43,24 @@ namespace SWKOM.Controllers
 
 
         [HttpGet(Name = "GetAllDocuments")]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> Get([FromQuery] string? search)
         {
             var client = _httpClientFactory.CreateClient("DocumentDAL");
+
             var response = await client.GetAsync("/api/document");
 
             if (response.IsSuccessStatusCode)
             {
                 var items = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentInformation>>();
                 var documents = _mapper.Map<IEnumerable<DocumentInformation>>(items);
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    documents = documents.Where(d =>
+                        d.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        d.Author.Contains(search, StringComparison.OrdinalIgnoreCase));
+                }
+
                 return Ok(documents);
             }
             else

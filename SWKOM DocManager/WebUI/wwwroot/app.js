@@ -2,9 +2,14 @@
 const apiUrl = 'http://localhost:8081/document';
 
 // Function to fetch and display Todo items
-function fetchDocuments() {
-    console.log('Fetching all documents...');
-    fetch(apiUrl)
+function fetchDocuments(searchQuery) {
+    console.log('Fetching documents...');
+    fetchUrl = apiUrl;
+    if (searchQuery) {
+        fetchUrl = apiUrl + `/?search=${encodeURIComponent(searchQuery)}`;
+    }
+
+    fetch(fetchUrl)
         .then(response => {
             console.log(response); // Log the response
             return response.json(); // Return the parsed JSON
@@ -32,12 +37,17 @@ function fetchDocuments() {
 }
 
 
+
 document.addEventListener('DOMContentLoaded', function () {
     // Expand/collapse form logic remains the same
     const errorMessageDiv = document.getElementById('error-message');
     const successMessageDiv = document.getElementById('success-message');
     const expandBtn = document.getElementById('expand-btn');
     const form = document.getElementById('expandable-form');
+    const searchBtn = document.getElementById('search-btn');
+    const searchTerm = document.getElementById('search-term');
+    const clearBtn = document.getElementById("clear-btn");
+
 
     // Function to show a message for 5 seconds
     function showMessage(messageDiv, message) {
@@ -49,6 +59,31 @@ document.addEventListener('DOMContentLoaded', function () {
             messageDiv.style.display = 'none'; // Hide the message div
         }, 5000);
     }
+
+    searchBtn.addEventListener('click', function () {
+        let query = searchTerm.value;
+
+        if (query.length === 0)
+            showMessage(errorMessageDiv, "Search Term cannot be empty!");
+        else {
+            fetchDocuments(query);
+            clearBtn.style.display = "block";
+            setTimeout(() => {
+                clearBtn.classList.add("show"); // Add the class to trigger sliding effect
+            }, 40);
+        }
+    });
+
+    clearBtn.addEventListener("click", () => {
+        // Clear the input field
+        searchTerm.value = "";
+        fetchDocuments('');
+        // Hide the clear button with sliding effect
+        clearBtn.classList.remove("show");
+        setTimeout(() => {
+            clearBtn.style.display = "none"; // Hide after sliding closed
+        }, 300); // Match this duration with CSS transition time
+    });
 
     // Hide messages initially
     errorMessageDiv.style.display = 'none';
@@ -62,10 +97,9 @@ document.addEventListener('DOMContentLoaded', function () {
         this.textContent = isOpen ? 'Cancel' : 'Add Document';
 
         // Change the button background color based on the text
-        this.style.backgroundColor = isOpen ? '#c1121f' : '';
+        this.style.backgroundColor = isOpen ? `#FF4D4D` : '';
 
         this.style.color = isOpen ? '#ffffff' : '';
-
     });
   
         
@@ -116,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-document.addEventListener('DOMContentLoaded', fetchDocuments);
+document.addEventListener('DOMContentLoaded', fetchDocuments(''));
 
 function deleteTask(id) {
     fetch(`${apiUrl}/${id}`, {

@@ -15,15 +15,18 @@
             <h1 style="padding: 5px">DocManager</h1>
 
             <div class="search-bar">
-                <input type="text" id="search-bar" placeholder="">
-                <button type="submit">
-                    <img src="https://cdn-icons-png.flaticon.com/512/342/342359.png" alt="Search">
+                <input type="text" id="search-term" placeholder="Shrek...">
+                
+                <button id="clear-btn" class="clear" type="button" style="display: none;">
+                    <img class="icon-white" src="https://cdn-icons-png.freepik.com/256/16083/16083479.png?semt=ais_hybrid" alt="Clear" />
+                </button>
+                <button id="search-btn" type="submit">
+                    <img class="icon" src="https://cdn-icons-png.flaticon.com/512/342/342359.png" alt="Search">
                 </button>
             </div>
         </div>
-        
 
-        <div class="document-list">
+        <div class="document-list add">
             <div class="document-item add">
                 <div id="expandable-form" class="expandable">
                     <form id="my-form">
@@ -42,9 +45,9 @@
             </div>
 
             <div id="error-message" class="document-item error">
-                <img src="https://cdn-icons-png.flaticon.com/512/1304/1304038.png" alt="Error" />
                 <span class="error-message">An Error occurred!</span>
             </div>
+            
             <div id="success-message" class="document-item success">
                 <span class="error-message">Success!</span>
             </div>
