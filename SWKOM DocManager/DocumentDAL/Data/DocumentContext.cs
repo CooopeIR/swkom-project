@@ -7,32 +7,33 @@ namespace DocumentDAL.Data
     {
         public DocumentContext(DbContextOptions<DocumentContext> options) : base(options)
         {
+            //Database.EnsureCreated();
         }
 
-        public DbSet<DocumentItem>? DocumentItems { get; set; }
+        public DbSet<DocumentItem> DocumentItems { get; set; }
+        public DbSet<DocumentContent> DocumentContents { get; set; }
+        public DbSet<DocumentMetadata> DocumentMetadatas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Manuelle Konfiguration der Tabelle
-            modelBuilder.Entity<DocumentItem>(entity =>
-            {
-                entity.ToTable("documents");  // Setzt den Tabellennamen
+            modelBuilder.Entity<DocumentItem>()
+                .HasOne(d => d.DocumentContent)
+                .WithOne(dc => dc.DocumentItem)
+                .HasForeignKey<DocumentContent>(dc => dc.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasKey(e => e.id);  // Setzt den Primärschlüssel
-
-                entity.Property(e => e.title)
-                    .IsRequired()
-                    .HasMaxLength(200);  // Konfiguriert den "Name"-Spalten
-
-                entity.Property(e => e.author)
-                    .IsRequired()
-                    .HasMaxLength(80);  // Konfiguriert die "IsComplete"-Spalte
-
-                entity.Property(e => e.date);  // Konfiguriert die "IsComplete"-Spalte
-                entity.Property(e => e.contentpath);  // Konfiguriert die "IsComplete"-Spalte
-            });
+            modelBuilder.Entity<DocumentItem>()
+                .HasOne(d => d.DocumentMetadata)
+                .WithOne(dc => dc.DocumentItem)
+                .HasForeignKey<DocumentMetadata>(dc => dc.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
+        }
+        public void InitializeDatabase()
+        {
+            // This method can be called during application startup
+            Database.Migrate();
         }
     }
 }

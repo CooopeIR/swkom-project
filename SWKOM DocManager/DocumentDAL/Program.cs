@@ -37,8 +37,9 @@ using (var scope = app.Services.CreateScope())
         }
 
         // Migrations anwenden und die Datenbank erstellen/aktualisieren
-        //context.Database.Migrate(); // Für produktive Umgebungen empfohlen
         context.Database.EnsureCreated(); // Für einfache Entwicklungsszenarien
+        //context.Database.Migrate();
+
 
         Console.WriteLine("Datenbankmigrationen erfolgreich angewendet.");
         Console.WriteLine("Verbindung zur Datenbank erfolgreich.");

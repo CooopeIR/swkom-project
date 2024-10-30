@@ -3,13 +3,13 @@ using DocumentDAL.Entities;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
-using SWKOM.Models;
 using RabbitMQ.Client;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using IModel = RabbitMQ.Client.IModel;
 using System.Text;
+using SWKOM.DTO;
 
 namespace SWKOM.Controllers
 {
@@ -23,7 +23,8 @@ namespace SWKOM.Controllers
         private readonly IConnection _connection;
         private readonly IModel _channel;
 
-        public DocumentController(ILogger<DocumentController> logger, IMapper mapper, IHttpClientFactory httpClientFactory)
+        public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
+            IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _mapper = mapper;
@@ -35,13 +36,17 @@ namespace SWKOM.Controllers
             _channel = _connection.CreateModel();
 
             // Deklariere die Queue
-            _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false,
+                arguments: null);
 
         }
 
         [HttpPost(Name = "PostDocument")]
-        public async Task<ActionResult> Create(DocumentInformation documentDTO)
+        public async Task<ActionResult> Create([FromForm] DocumentItemDTO documentDTO)
         {
+
+            Console.WriteLine($"DocumentDTO: {documentDTO.Id}, {documentDTO.Author}, {documentDTO.UploadedFile},");
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -53,7 +58,7 @@ namespace SWKOM.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return CreatedAtAction(nameof(GetDocumentById), new { id = item.id }, documentDTO);
+                return CreatedAtAction(nameof(GetDocumentById), new { id = item.Id }, documentDTO);
             }
             return StatusCode((int)response.StatusCode, "Error creating Document item in DAL");
         }
@@ -68,8 +73,8 @@ namespace SWKOM.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                var items = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentInformation>>();
-                var documents = _mapper.Map<IEnumerable<DocumentInformation>>(items);
+                var items = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentItemDTO>>();
+                var documents = _mapper.Map<IEnumerable<DocumentItemDTO>>(items);
 
                 if (!string.IsNullOrEmpty(search))
                 {
@@ -95,7 +100,7 @@ namespace SWKOM.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                var item = await response.Content.ReadFromJsonAsync<DocumentInformation>();
+                var item = await response.Content.ReadFromJsonAsync<DocumentItemDTO>();
                 var dtoItem = _mapper.Map<DocumentItem>(item);
                 if (item != null)
                 {
@@ -134,6 +139,9 @@ namespace SWKOM.Controllers
         [HttpPut("{id}/upload")]
         public async Task<IActionResult> UploadFile(int id, IFormFile? documentFile)
         {
+            Console.WriteLine($"DocumentDTO:");
+
+
             if (documentFile == null || documentFile.Length == 0)
             {
                 return BadRequest("Keine Datei hochgeladen.");
@@ -148,7 +156,7 @@ namespace SWKOM.Controllers
             }
 
             // Mappe das empfangene TodoItem auf ein TodoItemDto
-            var documentItem = await response.Content.ReadFromJsonAsync<DocumentInformation>();
+            var documentItem = await response.Content.ReadFromJsonAsync<DocumentItemDTO>();
             if (documentItem == null)
             {
                 return NotFound($"Document with id {id} not found.");
@@ -156,8 +164,8 @@ namespace SWKOM.Controllers
 
             var documentItemDto = _mapper.Map<DocumentItem>(documentItem);
 
-            // Setze den Dateinamen im DTO
-            documentItemDto.FileName = documentFile.FileName;
+            //// Setze den Dateinamen im DTO
+            //documentItemDto.fileName = documentFile.FileName;
 
             // Aktualisiere das Item im DAL, nutze das DTO
             var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItemDto);

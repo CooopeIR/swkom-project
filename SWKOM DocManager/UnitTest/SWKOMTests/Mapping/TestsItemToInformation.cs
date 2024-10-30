@@ -1,7 +1,7 @@
 using AutoMapper;
 using DocumentDAL.Entities;
+using SWKOM.DTO;
 using SWKOM.Mappings;
-using SWKOM.Models;
 
 namespace UnitTest.SWKOMTests.Mapping
 {
@@ -22,14 +22,14 @@ namespace UnitTest.SWKOMTests.Mapping
             //Arrange
             DocumentItem item = new()
             {
-                title = "TestTitle",
-                author = "TestAuthor",
-                id = 1,
+                Title = "TestTitle",
+                Author = "TestAuthor",
+                Id = 1,
                 contentpath = "C://all",
             };
 
             //Expected from mapped
-            DocumentInformation expected = new()
+            DocumentItemDTO expected = new()
             {
                 Title = "TestTitle",
                 Author = "TestAuthor",
@@ -38,7 +38,7 @@ namespace UnitTest.SWKOMTests.Mapping
             };
 
             //Act
-            var actual = _mapper.Map<DocumentItem, DocumentInformation>(item);
+            var actual = _mapper.Map<DocumentItem, DocumentItemDTO>(item);
 
             //Assert
             Assert.Multiple(() =>
@@ -57,13 +57,13 @@ namespace UnitTest.SWKOMTests.Mapping
             //Arrange
             DocumentItem item = new()
             {
-                author = "TestAuthor",
-                id = 1,
+                Author = "TestAuthor",
+                Id = 1,
                 contentpath = "C://all",
             };
 
             //Expected from mapped
-            DocumentInformation expected = new()
+            DocumentItemDTO expected = new()
             {
                 Title = "",
                 Author = "TestAuthor",
@@ -72,7 +72,7 @@ namespace UnitTest.SWKOMTests.Mapping
             };
 
             //Act
-            var actual = _mapper.Map<DocumentItem, DocumentInformation>(item);
+            var actual = _mapper.Map<DocumentItem, DocumentItemDTO>(item);
 
             //Assert
             Assert.Multiple(() =>
@@ -91,13 +91,13 @@ namespace UnitTest.SWKOMTests.Mapping
             //Arrange
             DocumentItem item = new()
             {
-                title = "TestTitle",
-                id = 1,
+                Title = "TestTitle",
+                Id = 1,
                 contentpath = "C://all",
             };
 
             //Expected from mapped
-            DocumentInformation expected = new()
+            DocumentItemDTO expected = new()
             {
                 Title = "TestTitle",
                 Author = "",
@@ -106,7 +106,7 @@ namespace UnitTest.SWKOMTests.Mapping
             };
 
             //Act
-            var actual = _mapper.Map<DocumentItem, DocumentInformation>(item);
+            var actual = _mapper.Map<DocumentItem, DocumentItemDTO>(item);
 
             //Assert
             Assert.Multiple(() =>
@@ -125,13 +125,13 @@ namespace UnitTest.SWKOMTests.Mapping
             //Arrange
             DocumentItem item = new()
             {
-                title = "TestTitle",
-                author = "TestAuthor",
-                id = 1,
+                Title = "TestTitle",
+                Author = "TestAuthor",
+                Id = 1,
             };
 
             //Expected from mapped
-            DocumentInformation expected = new()
+            DocumentItemDTO expected = new()
             {
                 Title = "TestTitle",
                 Author = "TestAuthor",
@@ -140,7 +140,7 @@ namespace UnitTest.SWKOMTests.Mapping
             };
 
             //Act
-            var actual = _mapper.Map<DocumentItem, DocumentInformation>(item);
+            var actual = _mapper.Map<DocumentItem, DocumentItemDTO>(item);
 
             //Assert
             Assert.Multiple(() =>

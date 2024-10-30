@@ -1,5 +1,4 @@
-﻿services:
-
+services:
 
   documents-api:
     container_name: documents-api
@@ -62,7 +61,7 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8082
     depends_on:
-      - documents-api
+      # - documents-api
       - postgres
     develop:
       watch:

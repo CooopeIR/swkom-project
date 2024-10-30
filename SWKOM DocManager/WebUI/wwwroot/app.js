@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const errorMessageDiv = document.getElementById('error-message');
     const successMessageDiv = document.getElementById('success-message');
     const expandBtn = document.getElementById('expand-btn');
-    const form = document.getElementById('expandable-form');
+    const form = document.getElementById('my-form');
     const searchBtn = document.getElementById('search-btn');
     const searchTerm = document.getElementById('search-term');
     const clearBtn = document.getElementById("clear-btn");
@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Display the file name or a placeholder if no file is selected
         fileNameElement.textContent = file ? `${file.name}` : "No file selected";
-
     });
 
 
@@ -120,31 +119,34 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission behavior
 
-        const title = document.getElementById('title').value;
-        const author = document.getElementById('author').value;
-        const file = document.getElementById('fileupload').value;
+        // Select form input values
+        const title = document.getElementById("title").value;
+        const author = document.getElementById("author").value;
+        const fileInput = document.getElementById("fileupload");
 
-        console.log("File: ", file);
+        // Create a new FormData object
+        const formData = new FormData();
+        formData.append("title", title);               // Add title
+        formData.append("author", author);             // Add author
+        formData.append("uploadedfile", fileInput.files[0]);  // Add the file
 
-        // Create a document object to send
-        const documentData = {
-            title: title,
-            author: author,
-            document: file
-        };
+
+        // Log whether each form field is present in formData
+        console.log("Title:", formData.has("title") ? formData.get("title") : "Not provided");
+        console.log("Author:", formData.has("author") ? formData.get("author") : "Not provided");
+        console.log("File:", formData.has("fileupload") ? formData.get("fileupload").name : "No file uploaded");
+
+        const fetchOptions = {
+            method: 'POST',
+            body: formData
+        }
 
         // Send a POST request to the API
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(documentData)
-        })
+        fetch(apiUrl, fetchOptions)
             .then(response => {
                 if (response.ok) {
-                    document.getElementById('title').value = '';
-                    document.getElementById('author').value = '';
+                    document.getElementById("file-name").textContent = "";
+                    form.reset();
                     return response.json(); // Parse the JSON response
                 } else {
                     response.json().then(err => {
@@ -162,8 +164,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 showMessage(successMessageDiv, 'Document submitted successfully!');
             })
             .catch(error => {
-                // Show error message
-                showMessage(errorMessageDiv, error);
+                console.error('Submission error:', error);
+                showMessage(errorMessageDiv, error.message || 'An unknown error occurred.');
             });
     });
 });

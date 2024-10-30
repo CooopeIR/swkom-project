@@ -1,17 +1,16 @@
-﻿namespace DocumentDAL.Entities
+﻿using DocumentDAL.Data;
+
+namespace DocumentDAL.Entities
 {
     public class DocumentItem
     {
-        public DateOnly? date { get; set; }
+        public int Id { get; set; }
 
-        public string title { get; set; } = "";
+        public string Title { get; set; } = String.Empty;
 
-        public string? author { get; set; }
+        public string Author { get; set; } = String.Empty;
 
-        public string? contentpath { get; set; }
-
-        public string? fileName { get; set; }
-
-        public int id { get; set; }
+        public DocumentContent? DocumentContent { get; set; }
+        public DocumentMetadata? DocumentMetadata { get; set; }
     }
 }

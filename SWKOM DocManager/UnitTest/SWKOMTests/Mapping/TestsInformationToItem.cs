@@ -1,7 +1,7 @@
 using AutoMapper;
 using DocumentDAL.Entities;
+using SWKOM.DTO;
 using SWKOM.Mappings;
-using SWKOM.Models;
 
 namespace UnitTest.SWKOMTests.Mapping
 {
@@ -20,7 +20,7 @@ namespace UnitTest.SWKOMTests.Mapping
         public void MappingProfile_CorrectFilled()
         {
             //Arrange
-            DocumentInformation item = new()
+            DocumentItemDTO item = new()
             {
                 Title = "TestTitle",
                 Author = "TestAuthor",
@@ -31,22 +31,22 @@ namespace UnitTest.SWKOMTests.Mapping
             //Expected from mapped
             DocumentItem expected = new()
             {
-                title = "TestTitle",
-                author = "TestAuthor",
-                id = 1,
+                Title = "TestTitle",
+                Author = "TestAuthor",
+                Id = 1,
                 contentpath = "C://all",
             };
 
             //Act
-            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentItemDTO, DocumentItem>(item);
 
             //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(actual, Is.Not.Null);
-                Assert.That(actual.title, Is.EqualTo(expected.title));
-                Assert.That(actual.author, Is.EqualTo(expected.author));
-                Assert.That(actual.id, Is.EqualTo(expected.id));
+                Assert.That(actual.Title, Is.EqualTo(expected.Title));
+                Assert.That(actual.Author, Is.EqualTo(expected.Author));
+                Assert.That(actual.Id, Is.EqualTo(expected.Id));
                 Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }
@@ -56,7 +56,7 @@ namespace UnitTest.SWKOMTests.Mapping
         public void MappingProfile_TitleEmpty()
         {
             //Arrange
-            DocumentInformation item = new()
+            DocumentItemDTO item = new()
             {
                 Author = "TestAuthor",
                 Id = 1,
@@ -66,22 +66,22 @@ namespace UnitTest.SWKOMTests.Mapping
             //Expected from mapped
             DocumentItem expected = new()
             {
-                title = "",
-                author = "TestAuthor",
-                id = 1,
+                Title = "",
+                Author = "TestAuthor",
+                Id = 1,
                 contentpath = "C://all",
             };
 
             //Act
-            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentItemDTO, DocumentItem>(item);
 
             //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(actual, Is.Not.Null);
-                Assert.That(actual.title, Is.EqualTo(expected.title));
-                Assert.That(actual.author, Is.EqualTo(expected.author));
-                Assert.That(actual.id, Is.EqualTo(expected.id));
+                Assert.That(actual.Title, Is.EqualTo(expected.Title));
+                Assert.That(actual.Author, Is.EqualTo(expected.Author));
+                Assert.That(actual.Id, Is.EqualTo(expected.Id));
                 Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }
@@ -90,7 +90,7 @@ namespace UnitTest.SWKOMTests.Mapping
         public void MappingProfile_AuthorEmpty()
         {
             //Arrange
-            DocumentInformation item = new()
+            DocumentItemDTO item = new()
             {
                 Title = "TestTitle",
                 Id = 1,
@@ -100,22 +100,22 @@ namespace UnitTest.SWKOMTests.Mapping
             //Expected from mapped
             DocumentItem expected = new()
             {
-                title = "TestTitle",
-                author = "",
-                id = 1,
+                Title = "TestTitle",
+                Author = "",
+                Id = 1,
                 contentpath = "C://all",
             };
 
             //Act
-            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentItemDTO, DocumentItem>(item);
 
             //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(actual, Is.Not.Null);
-                Assert.That(actual.title, Is.EqualTo(expected.title));
-                Assert.That(actual.author, Is.EqualTo(expected.author));
-                Assert.That(actual.id, Is.EqualTo(expected.id));
+                Assert.That(actual.Title, Is.EqualTo(expected.Title));
+                Assert.That(actual.Author, Is.EqualTo(expected.Author));
+                Assert.That(actual.Id, Is.EqualTo(expected.Id));
                 Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }
@@ -124,7 +124,7 @@ namespace UnitTest.SWKOMTests.Mapping
         public void MappingProfile_ContentpathEmpty()
         {
             //ArrangeDocumentInformation item = new DocumentInformation()
-            DocumentInformation item = new()
+            DocumentItemDTO item = new()
             {
                 Title = "TestTitle",
                 Author = "TestAuthor",
@@ -134,22 +134,22 @@ namespace UnitTest.SWKOMTests.Mapping
             //Expected from mapped
             DocumentItem expected = new()
             {
-                title = "TestTitle",
-                author = "TestAuthor",
-                id = 1,
+                Title = "TestTitle",
+                Author = "TestAuthor",
+                Id = 1,
                 contentpath = "",
             };
 
             //Act
-            var actual = _mapper.Map<DocumentInformation, DocumentItem>(item);
+            var actual = _mapper.Map<DocumentItemDTO, DocumentItem>(item);
 
             //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(actual, Is.Not.Null);
-                Assert.That(actual.title, Is.EqualTo(expected.title));
-                Assert.That(actual.author, Is.EqualTo(expected.author));
-                Assert.That(actual.id, Is.EqualTo(expected.id));
+                Assert.That(actual.Title, Is.EqualTo(expected.Title));
+                Assert.That(actual.Author, Is.EqualTo(expected.Author));
+                Assert.That(actual.Id, Is.EqualTo(expected.Id));
                 Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }

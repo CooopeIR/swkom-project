@@ -25,7 +25,7 @@ namespace DocumentDAL.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
         {
-            if (string.IsNullOrWhiteSpace(item.title) || string.IsNullOrWhiteSpace(item.author))
+            if (string.IsNullOrWhiteSpace(item.Title) || string.IsNullOrWhiteSpace(item.Author))
             {
                 return BadRequest(new { message = "Document Information cannot be empty :/" });
             }
@@ -42,10 +42,10 @@ namespace DocumentDAL.Controllers
                 return NotFound();
             }
 
-            existingItem.title = item.title;
-            existingItem.author = item.author;
-            existingItem.contentpath = item.contentpath;
-            existingItem.date = item.date;
+            existingItem.Title = item.Title;
+            existingItem.Author = item.Author;
+            //existingItem.contentpath = item.contentpath;
+            //existingItem.Date = item.Date;
             await repository.UpdateAsync(existingItem);
             return NoContent();
         }

@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using SWKOM.Models;
+using SWKOM.DTO;
 
 namespace SWKOM.Validators
 {
-    public class DocumentItemDtoValidator : AbstractValidator<DocumentInformation>
+    public class DocumentItemDtoValidator : AbstractValidator<DocumentItemDTO>
     {
         public DocumentItemDtoValidator()
         {
@@ -14,6 +14,9 @@ namespace SWKOM.Validators
             RuleFor(x => x.Author)
                 .NotEmpty().WithMessage(" Author must not be empty!")
                 .MaximumLength(80).WithMessage(" Author must not exceed 80 characters!");
+
+            RuleFor(x => x.UploadedFile)
+                .NotNull().WithMessage("The UploadedFile field is required.");
         }
     }
 }

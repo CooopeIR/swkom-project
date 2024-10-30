@@ -1,5 +1,5 @@
 using FluentValidation.TestHelper;
-using SWKOM.Models;
+using SWKOM.DTO;
 using SWKOM.Validators;
 
 namespace UnitTest.SWKOMTests.Validators
@@ -18,14 +18,14 @@ namespace UnitTest.SWKOMTests.Validators
         public void DocumentItem_TitleEmpty()
         {
             //Arrange
-            var request = new DocumentInformation()
+            var request = new DocumentItemDTO()
             {
                 Title = "",
                 Author = "TestAuthor",
             };
 
             //Act
-            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
+            TestValidationResult<DocumentItemDTO> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldHaveValidationErrorFor(x => x.Title);
@@ -36,14 +36,14 @@ namespace UnitTest.SWKOMTests.Validators
         public void DocumentItem_AuthorEmpty()
         {
             //Arrange
-            var request = new DocumentInformation()
+            var request = new DocumentItemDTO()
             {
                 Title = "TestTitle",
                 Author = "",
             };
 
             //Act
-            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
+            TestValidationResult<DocumentItemDTO> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldNotHaveValidationErrorFor(x => x.Title);
@@ -54,14 +54,14 @@ namespace UnitTest.SWKOMTests.Validators
         public void DocumentItem_CorrectFilled()
         {
             //Arrange
-            var request = new DocumentInformation()
+            var request = new DocumentItemDTO()
             {
                 Title = "TestTitle",
                 Author = "TestAuthor",
             };
 
             //Act
-            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
+            TestValidationResult<DocumentItemDTO> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldNotHaveValidationErrorFor(x => x.Title);
@@ -72,14 +72,14 @@ namespace UnitTest.SWKOMTests.Validators
         public void DocumentItem_TitleTooLong()
         {
             //Arrange
-            var request = new DocumentInformation()
+            var request = new DocumentItemDTO()
             {
                 Title = "Test_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_TitleTest_Title1",
                 Author = "TestAuthor",
             };
 
             //Act
-            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
+            TestValidationResult<DocumentItemDTO> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldHaveValidationErrorFor(x => x.Title);
@@ -90,14 +90,14 @@ namespace UnitTest.SWKOMTests.Validators
         public void DocumentItem_AuthorTooLong()
         {
             //Arrange
-            var request = new DocumentInformation()
+            var request = new DocumentItemDTO()
             {
                 Title = "TestTitle",
                 Author = "TestAuthorTestAuthorTestAuthorTestAuthorTestAuthorTestAuthorTestAuthorTestAuthor1",
             };
 
             //Act
-            TestValidationResult<DocumentInformation> result = _validator.TestValidate(request);
+            TestValidationResult<DocumentItemDTO> result = _validator.TestValidate(request);
 
             //Assert
             result.ShouldNotHaveValidationErrorFor(x => x.Title);
