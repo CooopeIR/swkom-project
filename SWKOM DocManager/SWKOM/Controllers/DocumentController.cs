@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using RabbitMQ.Client;
+using SWKOM.DTO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Channels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using IModel = RabbitMQ.Client.IModel;
-using System.Text;
-using SWKOM.DTO;
 
 namespace SWKOM.Controllers
 {
@@ -195,6 +195,7 @@ namespace SWKOM.Controllers
             Console.WriteLine($@"[x] Sent {fileName}");
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public void Dispose()
         {
             _channel?.Close();
