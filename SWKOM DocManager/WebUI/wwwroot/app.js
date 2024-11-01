@@ -33,7 +33,9 @@ function fetchDocuments(searchQuery) {
                 documentList.appendChild(li);
             });
         })
-        .catch(error => console.error('Fehler beim Abrufen der Documents:', error));
+        .catch (error => {
+            console.error('Fehler beim Abrufen der Documents:', error);
+        });
 }
 
 

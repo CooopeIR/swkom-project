@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using RabbitMQ.Client;
+using Swashbuckle.AspNetCore.Annotations;
 using SWKOM.DTO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -41,6 +42,7 @@ namespace SWKOM.Controllers
 
         }
 
+        [SwaggerOperation(Summary = "Post a document to save in the database with title, author and updladed file")]
         [HttpPost(Name = "PostDocument")]
         public async Task<ActionResult> Create([FromForm] DocumentItemDTO documentDTO)
         {
@@ -63,7 +65,7 @@ namespace SWKOM.Controllers
             return StatusCode((int)response.StatusCode, "Error creating Document item in DAL");
         }
 
-
+        [SwaggerOperation(Summary = "Get all documents from the database")]
         [HttpGet(Name = "GetAllDocuments")]
         public async Task<ActionResult> Get([FromQuery] string? search)
         {
@@ -91,6 +93,7 @@ namespace SWKOM.Controllers
             }
         }
 
+        [SwaggerOperation(Summary = "Get a specific document from the database with the ID of the document")]
         [HttpGet("{id}", Name = "GetDocumentById")]
         public async Task<ActionResult> GetDocumentById(int id)
         {
@@ -111,6 +114,7 @@ namespace SWKOM.Controllers
             return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
         }
 
+        [SwaggerOperation(Summary = "Update a specific document in the database with the ID of the document (not finished)")]
         [HttpPut("{id}", Name = "UpdateDocumentById")]
         public ActionResult Put(int id)
         {
@@ -123,6 +127,7 @@ namespace SWKOM.Controllers
             return NotFound();
         }
 
+        [SwaggerOperation(Summary = "Delete a specific document from the database with the ID of the document")]
         [HttpDelete("{id}", Name = "DeleteDocumentById")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -136,6 +141,7 @@ namespace SWKOM.Controllers
             return StatusCode((int)response.StatusCode, "Error deleting Document item in DAL");
         }
 
+        [SwaggerOperation(Summary = "Update a specific document from the database with the ID of the document")]
         [HttpPut("{id}/upload")]
         public async Task<IActionResult> UploadFile(int id, IFormFile? documentFile)
         {
