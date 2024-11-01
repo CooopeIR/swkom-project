@@ -8,5 +8,6 @@ public class DocumentContent
     public byte[] Content { get; set; }
 
     public int DocumentId { get; set; }
-    public DocumentItem DocumentItem { get; set; } = null!;
+
+    //public DocumentItem DocumentItem { get; set; }
 }

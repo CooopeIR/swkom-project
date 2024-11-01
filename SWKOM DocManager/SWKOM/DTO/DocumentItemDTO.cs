@@ -4,10 +4,6 @@ namespace SWKOM.DTO;
 
 public class DocumentItemDTO
 {
-    //public DateOnly? Date { get; set; }
-    //public string? Contentpath { get; set; }
-    //public string? FileName { get; set; }
-
     public string Title { get; set; } = String.Empty;
 
     public string Author { get; set; } = String.Empty;

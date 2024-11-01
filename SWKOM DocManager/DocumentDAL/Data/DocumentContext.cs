@@ -16,17 +16,26 @@ namespace DocumentDAL.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure the relationship between DocumentItem and DocumentContent
             modelBuilder.Entity<DocumentItem>()
                 .HasOne(d => d.DocumentContent)
-                .WithOne(dc => dc.DocumentItem)
+                .WithOne()
                 .HasForeignKey<DocumentContent>(dc => dc.DocumentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Configure the relationship between DocumentItem and DocumentMetadata
             modelBuilder.Entity<DocumentItem>()
                 .HasOne(d => d.DocumentMetadata)
-                .WithOne(dc => dc.DocumentItem)
-                .HasForeignKey<DocumentMetadata>(dc => dc.DocumentId)
+                .WithOne()
+                .HasForeignKey<DocumentMetadata>(dm => dm.DocumentId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DocumentMetadata>()
+                .Property(d => d.UploadDate)
+                .HasConversion(
+                    v => v.ToUniversalTime(), // Convert to UTC when saving
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc).ToLocalTime() // Convert back to local time when reading
+                );
 
             base.OnModelCreating(modelBuilder);
         }

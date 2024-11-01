@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Query;
 namespace DocumentDAL.Controllers
 {
     [ApiController]
-    //[Route("api/document")]
     [Route("api/[controller]")]
     public class DocumentController(IDocumentItemRepository repository) : ControllerBase
     {
@@ -25,8 +24,12 @@ namespace DocumentDAL.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
         {
+
+            Console.WriteLine("PostAsync DocumentItem");
+            Console.WriteLine($"DocumentItem: {item.Title}, {item.Author} --- DocumentContent: Length: {item.DocumentContent.Content.Length}, FileName: {item.DocumentContent.FileName} --- DocumentMetaData: Date. {item.DocumentMetadata.UploadDate}");
             if (string.IsNullOrWhiteSpace(item.Title) || string.IsNullOrWhiteSpace(item.Author))
             {
+                Console.WriteLine("DocumentDAL Bad Request");
                 return BadRequest(new { message = "Document Information cannot be empty :/" });
             }
             await repository.AddAsync(item);

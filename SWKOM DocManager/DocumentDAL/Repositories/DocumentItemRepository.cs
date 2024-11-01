@@ -19,7 +19,7 @@ namespace DocumentDAL.Repositories
 
         public async Task AddAsync(DocumentItem item)
         {
-            await context.DocumentItems.AddAsync(item);
+            await context.AddAsync(item);
             await context.SaveChangesAsync();
         }
 

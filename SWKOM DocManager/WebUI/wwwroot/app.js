@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Log whether each form field is present in formData
         console.log("Title:", formData.has("title") ? formData.get("title") : "Not provided");
         console.log("Author:", formData.has("author") ? formData.get("author") : "Not provided");
-        console.log("File:", formData.has("fileupload") ? formData.get("fileupload").name : "No file uploaded");
+        console.log("File:", formData.has("uploadedfile") ? formData.get("uploadedfile").name : "No file uploaded");
 
         const fetchOptions = {
             method: 'POST',
@@ -159,8 +159,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 console.log('Document submitted successfully:', data);
                 fetchDocuments(); // Refresh the document list after successful submission
-
-                // Show success message
                 showMessage(successMessageDiv, 'Document submitted successfully!');
             })
             .catch(error => {

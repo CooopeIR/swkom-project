@@ -1,9 +1,12 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using SWKOM.BusinessLogic;
 using SWKOM.Mappings;
 using SWKOM.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
 
 // Add services to the container.
 builder.Services.AddControllers();

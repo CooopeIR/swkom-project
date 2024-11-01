@@ -10,7 +10,7 @@ namespace DocumentDAL.Entities
 
         public string Author { get; set; } = String.Empty;
 
-        public DocumentContent? DocumentContent { get; set; }
-        public DocumentMetadata? DocumentMetadata { get; set; }
+        public DocumentContent DocumentContent { get; set; }
+        public DocumentMetadata DocumentMetadata { get; set; }
     }
 }

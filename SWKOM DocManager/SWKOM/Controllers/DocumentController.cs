@@ -10,6 +10,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using IModel = RabbitMQ.Client.IModel;
 using System.Text;
 using SWKOM.DTO;
+using SWKOM.BusinessLogic;
 
 namespace SWKOM.Controllers
 {
@@ -22,13 +23,15 @@ namespace SWKOM.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
+        private readonly IDocumentProcessor _documentProcessor;
 
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor)
         {
             _logger = logger;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
+            _documentProcessor = documentProcessor;
 
             // Stelle die Verbindung zu RabbitMQ her
             var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
@@ -45,18 +48,33 @@ namespace SWKOM.Controllers
         public async Task<ActionResult> Create([FromForm] DocumentItemDTO documentDTO)
         {
 
-            Console.WriteLine($"DocumentDTO: {documentDTO.Id}, {documentDTO.Author}, {documentDTO.UploadedFile},");
+            Console.WriteLine($"DocumentDTO: {documentDTO.Title}, {documentDTO.Author}, {documentDTO.UploadedFile.FileName} / {documentDTO.UploadedFile.ContentType},");
 
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("ModelState in invalid");
                 return BadRequest(ModelState);
             }
 
+            documentDTO = await _documentProcessor.ProcessDocument(documentDTO);
+
             var client = _httpClientFactory.CreateClient("DocumentDAL");
+            Console.WriteLine(documentDTO.DocumentContentDto == null ? "DocumentContentDto is null" : "DocumentContentDto is populated");
+            Console.WriteLine(documentDTO.DocumentMetadataDto == null ? "DocumentMetadataDto is null" : "DocumentMetadataDto is populated");
+
             var item = _mapper.Map<DocumentItem>(documentDTO);
+
+            Console.WriteLine(item.DocumentContent == null ? "item Content is null" : "Item ContentDto is populated");
+            Console.WriteLine(item.DocumentMetadata == null ? "Item Metadata is null" : "Item MetadataDto is populated");
+
+
+            Console.WriteLine($"Title: {item.Title}, Author: {item.Author}, " +
+                              $"DocContent: (Type){item.DocumentContent.ContentType} (Content) {item.DocumentContent.Content} (FileName) {item.DocumentContent.FileName}" +
+                              $"DocMetaData: (FileSize) {item.DocumentMetadata.FileSize} (Date) {item.DocumentMetadata.UploadDate}");
+
             var response = await client.PostAsJsonAsync("/api/document", item);
 
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)   
             {
                 return CreatedAtAction(nameof(GetDocumentById), new { id = item.Id }, documentDTO);
             }

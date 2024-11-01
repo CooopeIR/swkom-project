@@ -7,5 +7,5 @@ public class DocumentMetadataDTO
     public DateTime UploadDate { get; set; }
     public int FileSize { get; set; }
 
-    //public DocumentItemDTO DocumentItem { get; set; }
+    //public DocumentItemDTO DocumentItemDTO { get; set; }
 }
