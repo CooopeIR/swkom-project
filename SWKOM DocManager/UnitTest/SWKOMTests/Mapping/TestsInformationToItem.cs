@@ -25,7 +25,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Title = "TestTitle",
                 Author = "TestAuthor",
                 Id = 1,
-                Contentpath = "C://all",
             };
 
             //Expected from mapped
@@ -34,7 +33,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Title = "TestTitle",
                 Author = "TestAuthor",
                 Id = 1,
-                contentpath = "C://all",
             };
 
             //Act
@@ -46,8 +44,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Assert.That(actual, Is.Not.Null);
                 Assert.That(actual.Title, Is.EqualTo(expected.Title));
                 Assert.That(actual.Author, Is.EqualTo(expected.Author));
-                Assert.That(actual.Id, Is.EqualTo(expected.Id));
-                Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }
 
@@ -60,7 +56,6 @@ namespace UnitTest.SWKOMTests.Mapping
             {
                 Author = "TestAuthor",
                 Id = 1,
-                Contentpath = "C://all",
             };
 
             //Expected from mapped
@@ -69,7 +64,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Title = "",
                 Author = "TestAuthor",
                 Id = 1,
-                contentpath = "C://all",
             };
 
             //Act
@@ -81,8 +75,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Assert.That(actual, Is.Not.Null);
                 Assert.That(actual.Title, Is.EqualTo(expected.Title));
                 Assert.That(actual.Author, Is.EqualTo(expected.Author));
-                Assert.That(actual.Id, Is.EqualTo(expected.Id));
-                Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }
 
@@ -94,7 +86,6 @@ namespace UnitTest.SWKOMTests.Mapping
             {
                 Title = "TestTitle",
                 Id = 1,
-                Contentpath = "C://all",
             };
 
             //Expected from mapped
@@ -103,7 +94,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Title = "TestTitle",
                 Author = "",
                 Id = 1,
-                contentpath = "C://all",
             };
 
             //Act
@@ -115,42 +105,6 @@ namespace UnitTest.SWKOMTests.Mapping
                 Assert.That(actual, Is.Not.Null);
                 Assert.That(actual.Title, Is.EqualTo(expected.Title));
                 Assert.That(actual.Author, Is.EqualTo(expected.Author));
-                Assert.That(actual.Id, Is.EqualTo(expected.Id));
-                Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
-            });
-        }
-
-        [Test]
-        public void MappingProfile_ContentpathEmpty()
-        {
-            //ArrangeDocumentInformation item = new DocumentInformation()
-            DocumentItemDTO item = new()
-            {
-                Title = "TestTitle",
-                Author = "TestAuthor",
-                Id = 1,
-            };
-
-            //Expected from mapped
-            DocumentItem expected = new()
-            {
-                Title = "TestTitle",
-                Author = "TestAuthor",
-                Id = 1,
-                contentpath = "",
-            };
-
-            //Act
-            var actual = _mapper.Map<DocumentItemDTO, DocumentItem>(item);
-
-            //Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(actual, Is.Not.Null);
-                Assert.That(actual.Title, Is.EqualTo(expected.Title));
-                Assert.That(actual.Author, Is.EqualTo(expected.Author));
-                Assert.That(actual.Id, Is.EqualTo(expected.Id));
-                Assert.That(actual.contentpath, Is.EqualTo(expected.contentpath));
             });
         }
     }

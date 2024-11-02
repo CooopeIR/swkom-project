@@ -1,6 +1,4 @@
 using FluentValidation.TestHelper;
-using SWKOM.Models;
-using SWKOM.Validators;
 
 namespace UnitTest.SWKOMTests.Controllers
 {
