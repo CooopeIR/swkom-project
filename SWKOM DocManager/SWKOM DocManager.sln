@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentDAL", "DocumentDAL\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{17086DB3-041F-4FD1-8550-A57187FE80CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrWorker", "OcrWorker\OcrWorker.csproj", "{BAE55853-37D9-44F3-86FB-D67C0FDDB17A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17086DB3-041F-4FD1-8550-A57187FE80CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE55853-37D9-44F3-86FB-D67C0FDDB17A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE55853-37D9-44F3-86FB-D67C0FDDB17A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE55853-37D9-44F3-86FB-D67C0FDDB17A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE55853-37D9-44F3-86FB-D67C0FDDB17A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

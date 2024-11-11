@@ -17,7 +17,7 @@ namespace SWKOM.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DocumentController : ControllerBase
+    public class DocumentController : ControllerBase, IDisposable
     {
         private readonly ILogger<DocumentController> _logger;
         private readonly IMapper _mapper;
@@ -58,6 +58,11 @@ namespace SWKOM.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (documentDTO.UploadedFile == null || documentDTO.UploadedFile.Length == 0)
+            {
+                return BadRequest("Keine Datei hochgeladen.");
+            }
+
             documentDTO = await _documentProcessor.ProcessDocument(documentDTO);
 
             var client = _httpClientFactory.CreateClient("DocumentDAL");
@@ -75,6 +80,16 @@ namespace SWKOM.Controllers
                               $"DocMetaData: (FileSize) {item.DocumentMetadata.FileSize} (Date) {item.DocumentMetadata.UploadDate}");
 
             var response = await client.PostAsJsonAsync("/api/document", item);
+
+            // Nachricht an RabbitMQ
+            try
+            {
+                SendToMessageQueue(documentDTO.UploadedFile.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Fehler beim Senden der Nachricht an RabbitMQ: {ex.Message}");
+            }
 
             if (response.IsSuccessStatusCode)
             {
