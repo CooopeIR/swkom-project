@@ -5,15 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Annotations;
+using SWKOM.BusinessLogic;
 using SWKOM.DTO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Channels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using IModel = RabbitMQ.Client.IModel;
-
-using System.Text;
-using SWKOM.DTO;
-using SWKOM.BusinessLogic;
 
 namespace SWKOM.Controllers
 {
@@ -78,7 +76,7 @@ namespace SWKOM.Controllers
 
             var response = await client.PostAsJsonAsync("/api/document", item);
 
-            if (response.IsSuccessStatusCode)   
+            if (response.IsSuccessStatusCode)
             {
                 return CreatedAtAction(nameof(GetDocumentById), new { id = item.Id }, documentDTO);
             }
