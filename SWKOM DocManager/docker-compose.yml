@@ -68,6 +68,19 @@ services:
         - action: rebuild
           path: .
 
+  ocr_worker:
+    container_name: ocr_worker
+    image: ocr_worker_image
+    build:
+      context: ./OcrWorker  
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./uploads:/app/uploads
+
   postgres:
     container_name: postgres_container
     image: postgis/postgis:17-3.4

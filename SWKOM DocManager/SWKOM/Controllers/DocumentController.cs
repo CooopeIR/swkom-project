@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using DocumentDAL.Entities;
+using FluentValidation;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using Swashbuckle.AspNetCore.Annotations;
 using SWKOM.BusinessLogic;
 using SWKOM.DTO;
+using SWKOM.Services;
+using SWKOM.Validators;
+using System.Formats.Tar;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
@@ -17,23 +22,26 @@ namespace SWKOM.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DocumentController : ControllerBase, IDisposable
+    public class DocumentController : ControllerBase
     {
         private readonly ILogger<DocumentController> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
+        //private readonly IConnection _connection;
+        //private readonly IModel _channel;
         private readonly IDocumentProcessor _documentProcessor;
+        private readonly IMessageQueueService _messageQueueService;
 
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
-            IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor)
+            IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
+            IMessageQueueService messageQueueService)
         {
             _logger = logger;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _documentProcessor = documentProcessor;
 
+            /*
             // Stelle die Verbindung zu RabbitMQ her
             var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
             _connection = factory.CreateConnection();
@@ -42,14 +50,15 @@ namespace SWKOM.Controllers
             // Deklariere die Queue
             _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false,
                 arguments: null);
+            */
 
+            _messageQueueService = messageQueueService;
         }
 
         [SwaggerOperation(Summary = "Post a document to save in the database with title, author and updladed file")]
         [HttpPost(Name = "PostDocument")]
         public async Task<ActionResult> Create([FromForm] DocumentItemDTO documentDTO)
         {
-
             Console.WriteLine($"DocumentDTO: {documentDTO.Title}, {documentDTO.Author}, {documentDTO.UploadedFile.FileName} / {documentDTO.UploadedFile.ContentType},");
 
             if (!ModelState.IsValid)
@@ -60,7 +69,14 @@ namespace SWKOM.Controllers
 
             if (documentDTO.UploadedFile == null || documentDTO.UploadedFile.Length == 0)
             {
-                return BadRequest("Keine Datei hochgeladen.");
+                //return BadRequest("Keine Datei hochgeladen.");
+                ModelState.AddModelError("taskFile", "Keine Datei hochgeladen.");
+                return BadRequest(ModelState);
+            }
+            if (!documentDTO.UploadedFile.FileName.EndsWith(".pdf"))
+            {
+                ModelState.AddModelError("taskFile", "Nur PDF-Dateien sind erlaubt.");
+                return BadRequest(ModelState);
             }
 
             documentDTO = await _documentProcessor.ProcessDocument(documentDTO);
@@ -79,23 +95,46 @@ namespace SWKOM.Controllers
                               $"DocContent: (Type){item.DocumentContent.ContentType} (Content) {item.DocumentContent.Content} (FileName) {item.DocumentContent.FileName}" +
                               $"DocMetaData: (FileSize) {item.DocumentMetadata.FileSize} (Date) {item.DocumentMetadata.UploadDate}");
 
-            var response = await client.PostAsJsonAsync("/api/document", item);
+            // Validierung mit FluentValidation
+            var validator = new DocumentItemDtoValidator();
+            var validationResult = validator.Validate(documentDTO); // Validiere das DTO
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+
+            // Mappe wieder zurück zu TodoItem, um es im DAL zu aktualisieren
+            var updatedItem = _mapper.Map<DocumentItem>(documentDTO);
+
+            // Aktualisiere das Item im DAL
+            var updateResponse = await client.PostAsJsonAsync("/api/document", item);
+            if (!updateResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)updateResponse.StatusCode, $"Fehler beim Speichern des Dateinamens für Dokument {documentDTO.Id}");
+            }
+
+            // Datei speichern (lokal im Container)
+            var filePath = Path.Combine("/app/uploads", documentDTO.UploadedFile.FileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!); // Erstelle das Verzeichnis, falls es nicht existiert
+            await using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await documentDTO.UploadedFile.CopyToAsync(stream);
+            }
 
             // Nachricht an RabbitMQ
             try
             {
-                SendToMessageQueue(documentDTO.UploadedFile.FileName);
+                //SendToMessageQueue(documentFile.FileName);
+                _messageQueueService.SendToQueue($"{documentDTO.Id}|{filePath}");
+                Console.WriteLine($@"File Path {filePath} an RabbitMQ Queue gesendet.");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Fehler beim Senden der Nachricht an RabbitMQ: {ex.Message}");
             }
 
-            if (response.IsSuccessStatusCode)
-            {
-                return CreatedAtAction(nameof(GetDocumentById), new { id = item.Id }, documentDTO);
-            }
-            return StatusCode((int)response.StatusCode, "Error creating Document item in DAL");
+            return Ok(new { message = $"Dateiname {documentDTO.UploadedFile.FileName} für Dokument {documentDTO.Id} erfolgreich gespeichert." });
         }
 
         [SwaggerOperation(Summary = "Get all documents from the database")]
@@ -151,6 +190,7 @@ namespace SWKOM.Controllers
         [HttpPut("{id}", Name = "UpdateDocumentById")]
         public ActionResult Put(int id)
         {
+
             if (id == 0)
             {
                 return NotFound();
@@ -180,10 +220,16 @@ namespace SWKOM.Controllers
         {
             Console.WriteLine($"DocumentDTO:");
 
-
             if (documentFile == null || documentFile.Length == 0)
             {
-                return BadRequest("Keine Datei hochgeladen.");
+                //return BadRequest("Keine Datei hochgeladen.");
+                ModelState.AddModelError("taskFile", "Keine Datei hochgeladen.");
+                return BadRequest(ModelState);
+            }
+            if (!documentFile.FileName.EndsWith(".pdf"))
+            {
+                ModelState.AddModelError("taskFile", "Nur PDF-Dateien sind erlaubt.");
+                return BadRequest(ModelState);
             }
 
             // Hole den Task vom DAL
@@ -195,28 +241,53 @@ namespace SWKOM.Controllers
             }
 
             // Mappe das empfangene TodoItem auf ein TodoItemDto
-            var documentItem = await response.Content.ReadFromJsonAsync<DocumentItemDTO>();
+            //var documentItem = await response.Content.ReadFromJsonAsync<DocumentItem>();
+            var documentItem = await response.Content.ReadFromJsonAsync<DocumentItem>();
             if (documentItem == null)
             {
                 return NotFound($"Document with id {id} not found.");
             }
 
-            var documentItemDto = _mapper.Map<DocumentItem>(documentItem);
+            //var documentItemDto = _mapper.Map<DocumentItem>(documentItem);
+            //Console.WriteLine($@"[PUT] Gemappter OcrText: {documentItemDto.OcrText}");
 
-            //// Setze den Dateinamen im DTO
-            //documentItemDto.fileName = documentFile.FileName;
+            // Setze den Dateinamen im DTO
+            var documentItemDto = _mapper.Map<DocumentItemDTO>(documentItem); // Mappe TodoItem auf TodoItemDto
+            documentItemDto.FileName = documentFile.FileName;
 
-            // Aktualisiere das Item im DAL, nutze das DTO
-            var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItemDto);
+            // Validierung mit FluentValidation
+            var validator = new DocumentItemDtoValidator();
+            var validationResult = validator.Validate(documentItemDto); // Validiere das DTO
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+
+            // Mappe wieder zurück zu TodoItem, um es im DAL zu aktualisieren
+            var updatedTodoItem = _mapper.Map<DocumentItem>(documentItemDto);
+
+            // Aktualisiere das Item im DAL
+            var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", updatedTodoItem);
             if (!updateResponse.IsSuccessStatusCode)
             {
                 return StatusCode((int)updateResponse.StatusCode, $"Fehler beim Speichern des Dateinamens für Dokument {id}");
             }
 
+            // Datei speichern (lokal im Container)
+            var filePath = Path.Combine("/app/uploads", documentFile.FileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!); // Erstelle das Verzeichnis, falls es nicht existiert
+            await using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await documentFile.CopyToAsync(stream);
+            }
+
             // Nachricht an RabbitMQ
             try
             {
-                SendToMessageQueue(documentFile.FileName);
+                //SendToMessageQueue(documentFile.FileName);
+                _messageQueueService.SendToQueue($"{id}|{filePath}");
+                Console.WriteLine($@"File Path {filePath} an RabbitMQ Queue gesendet.");
             }
             catch (Exception ex)
             {
@@ -226,7 +297,7 @@ namespace SWKOM.Controllers
             return Ok(new { message = $"Dateiname {documentFile.FileName} für Dokument {id} erfolgreich gespeichert." });
         }
 
-        private void SendToMessageQueue(string fileName)
+        /*private void SendToMessageQueue(string fileName)
         {
             // Sende die Nachricht in den RabbitMQ channel/queue
             var body = Encoding.UTF8.GetBytes(fileName);
@@ -239,6 +310,6 @@ namespace SWKOM.Controllers
         {
             _channel?.Close();
             _connection?.Close();
-        }
+        }*/
     }
 }
