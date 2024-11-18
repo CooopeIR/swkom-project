@@ -7,7 +7,6 @@ namespace DocumentDAL.Data
     {
         public DocumentContext(DbContextOptions<DocumentContext> options) : base(options)
         {
-            //Database.EnsureCreated();
         }
 
         public DbSet<DocumentItem> DocumentItems { get; set; }

@@ -15,7 +15,6 @@ public class DocumentProcessor : IDocumentProcessor
 
         Console.WriteLine("Processing Document");
 
-
         using var memoryStream = new MemoryStream();
         await documentItemDTO.UploadedFile.CopyToAsync(memoryStream);
         var contentBytes = memoryStream.ToArray();
