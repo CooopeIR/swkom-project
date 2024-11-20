@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using SWKOM.BusinessLogic;
 using SWKOM.Mappings;
+using SWKOM.Services;
 using SWKOM.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
+builder.Services.AddHostedService<RabbitMqListenerService>();
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

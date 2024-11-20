@@ -17,6 +17,7 @@ namespace SWKOM.Validators
 
             RuleFor(x => x.UploadedFile)
                 .NotNull().WithMessage("The UploadedFile field is required.");
+
         }
     }
 }

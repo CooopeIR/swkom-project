@@ -12,5 +12,7 @@ namespace DocumentDAL.Entities
 
         public DocumentContent DocumentContent { get; set; }
         public DocumentMetadata DocumentMetadata { get; set; }
+        public string? OcrText { get; set; }
+
     }
 }

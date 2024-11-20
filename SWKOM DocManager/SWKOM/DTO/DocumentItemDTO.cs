@@ -16,7 +16,7 @@ public class DocumentItemDTO
 
     public DocumentMetadataDTO? DocumentMetadataDto { get; set; }
 
-    public string? FileName { get; set; }
+    //public string? FileName { get; set; }
 
     public string? OcrText { get; set; }
 }

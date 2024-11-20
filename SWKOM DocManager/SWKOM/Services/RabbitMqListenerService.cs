@@ -51,6 +51,7 @@ namespace SWKOM.Services
                 throw new Exception("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen.");
             }
         }
+
         private void StartListening()
         {
             try
@@ -71,35 +72,35 @@ namespace SWKOM.Services
                             Console.WriteLine($@"Fehler: Leerer OCR-Text für Task {id}. Nachricht wird ignoriert.");
                             return;
                         }
-                        var client = _httpClientFactory.CreateClient("TodoDAL");
-                        var response = await client.GetAsync($"/api/todo/{id}");
+                        var client = _httpClientFactory.CreateClient("DocumentDAL");
+                        var response = await client.GetAsync($"/api/document/{id}");
                         if (response.IsSuccessStatusCode)
                         {
-                            var todoItem = await response.Content.ReadFromJsonAsync<TodoItem>();
-                            if (todoItem != null)
+                            var documentItem = await response.Content.ReadFromJsonAsync<DocumentItem>();
+                            if (documentItem != null)
                             {
                                 Console.WriteLine($@"[Listener] Task {id} erfolgreich abgerufen.");
                                 Console.WriteLine($@"[Listener] OCR Text für Task {id}: {extractedText}");
-                                Console.WriteLine($@"[Listener] Task vor Update: {todoItem}");
-                                todoItem.OcrText = extractedText;
-                                var updateResponse = await client.PutAsJsonAsync($"/api/todo/{id}", todoItem);
+                                Console.WriteLine($@"[Listener] Task vor Update: {documentItem}");
+                                documentItem.OcrText = extractedText;
+                                var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);
                                 if (!updateResponse.IsSuccessStatusCode)
                                 {
-                                    Console.WriteLine($@"Fehler beim Aktualisieren des Tasks mit ID {id}");
+                                    Console.WriteLine($@"Fehler beim Aktualisieren des Dokuments mit ID {id}");
                                 }
                                 else
                                 {
-                                    Console.WriteLine($@"OCR Text für Task {id} erfolgreich aktualisiert.");
+                                    Console.WriteLine($@"OCR Text für Dokument {id} erfolgreich aktualisiert.");
                                 }
                             }
                             else
                             {
-                                Console.WriteLine($@"[Listener] Task {id} nicht gefunden.");
+                                Console.WriteLine($@"[Listener] Dokument mit Id {id} nicht gefunden.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine($@"Fehler beim Abrufen des Tasks mit ID {id}: {response.StatusCode}");
+                            Console.WriteLine($@"Fehler beim Abrufen des Dokuments mit ID {id}: {response.StatusCode}");
                         }
                     }
                     else

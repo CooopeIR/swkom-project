@@ -12,32 +12,31 @@ namespace DocumentDAL.Controllers
     {
         [SwaggerOperation(Summary = "DAL: Get all documents from the database")]
         [HttpGet(Name = "GetAllDocumentsFromDB")]
-        public async Task<IEnumerable<DocumentItem>> GetAsync()
+        public async Task<IEnumerable<DocumentItem>> GetAllAsync()
         {
             return await repository.GetAllAsync();
         }
 
         [SwaggerOperation(Summary = "DAL: Get a specific document from the database with the ID of the document")]
-        [HttpGet("{id}")]
-        public async Task<DocumentItem> GetAsync(int id)
+        [HttpGet("{id}", Name= "GetDocumentById"), ]
+        public async Task<DocumentItem> GetAsyncById(int id)
         {
             return await repository.GetByIdAsync(id);
         }
 
-        [SwaggerOperation(Summary = "DAL: Post a document to save in the database with title, author and updladed file")]
+        [SwaggerOperation(Summary = "DAL: Post a document to save in the database with title, author and uploaded file")]
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
         {
-
-            Console.WriteLine("PostAsync DocumentItem");
-            Console.WriteLine($"DocumentItem: {item.Title}, {item.Author} --- DocumentContent: Length: {item.DocumentContent.Content.Length}, FileName: {item.DocumentContent.FileName} --- DocumentMetaData: Date. {item.DocumentMetadata.UploadDate}");
+            //Console.WriteLine("PostAsync DocumentItem");
+            //Console.WriteLine($"DocumentItem: {item.Title}, {item.Author} --- DocumentContent: Length: {item.DocumentContent.Content.Length}, FileName: {item.DocumentContent.FileName} --- DocumentMetaData: Date. {item.DocumentMetadata.UploadDate}");
             if (string.IsNullOrWhiteSpace(item.Title) || string.IsNullOrWhiteSpace(item.Author))
             {
                 Console.WriteLine("DocumentDAL Bad Request");
                 return BadRequest(new { message = "Document Information cannot be empty :/" });
             }
             await repository.AddAsync(item);
-            return Ok();
+            return CreatedAtAction(nameof(GetAsyncById), new { id = item.Id }, new { id = item.Id });
         }
 
         [SwaggerOperation(Summary = "DAL: Update a specific document in the database with the ID of the document (not finished)")]
@@ -52,8 +51,9 @@ namespace DocumentDAL.Controllers
 
             existingItem.Title = item.Title;
             existingItem.Author = item.Author;
-            //existingItem.contentpath = item.contentpath;
-            //existingItem.Date = item.Date;
+            existingItem.OcrText = item.OcrText;
+            existingItem.DocumentContent = item.DocumentContent;
+            existingItem.DocumentMetadata = item.DocumentMetadata;
             await repository.UpdateAsync(existingItem);
             return NoContent();
         }

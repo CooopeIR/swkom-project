@@ -17,10 +17,11 @@ namespace DocumentDAL.Repositories
             return await context.DocumentItems.FindAsync(id);
         }
 
-        public async Task AddAsync(DocumentItem item)
+        public async Task<DocumentItem> AddAsync(DocumentItem item)
         {
             await context.AddAsync(item);
             await context.SaveChangesAsync();
+            return item;
         }
 
         public async Task UpdateAsync(DocumentItem item)

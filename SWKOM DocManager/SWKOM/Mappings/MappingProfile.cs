@@ -15,6 +15,7 @@ namespace SWKOM.Mappings
                 .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.Author))
                 .ForMember(dest => dest.DocumentContentDto, opt => opt.MapFrom(src => src.DocumentContent))
                 .ForMember(dest => dest.DocumentMetadataDto, opt => opt.MapFrom(src => src.DocumentMetadata))
+                .ForMember(dest => dest.OcrText, opt => opt.MapFrom(src => src.OcrText))
                 .ReverseMap()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()); // Ignore Id for reverse mapping if needed
 

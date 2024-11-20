@@ -24,7 +24,6 @@ public class DocumentProcessor : IDocumentProcessor
             Content = contentBytes,
             FileName = documentItemDTO.UploadedFile.FileName,
             ContentType = documentItemDTO.UploadedFile.ContentType
-
         };
 
         Console.WriteLine(documentContentDTO.FileName);
@@ -41,5 +40,4 @@ public class DocumentProcessor : IDocumentProcessor
         documentItemDTO.DocumentMetadataDto = documentMetaData;
         return documentItemDTO;
     }
-
 }

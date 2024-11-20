@@ -38,8 +38,6 @@ function fetchDocuments(searchQuery) {
         });
 }
 
-
-
 document.addEventListener('DOMContentLoaded', function () {
     // Expand/collapse form logic remains the same
     const errorMessageDiv = document.getElementById('error-message');
