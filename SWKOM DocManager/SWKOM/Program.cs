@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using RabbitMQ.Client;
 using SWKOM.BusinessLogic;
 using SWKOM.Mappings;
 using SWKOM.Services;
@@ -11,8 +12,18 @@ builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
 
 // Add services to the container.
 builder.Services.AddControllers();
+// Register RabbitMQ connection factory
+builder.Services.AddSingleton<IConnectionFactory>(_ =>
+    new ConnectionFactory
+    {
+        HostName = "rabbitmq",
+        UserName = "user",
+        Password = "password"
+    });
+
 builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
 builder.Services.AddHostedService<RabbitMqListenerService>();
+
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

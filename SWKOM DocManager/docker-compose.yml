@@ -17,6 +17,8 @@ services:
       watch:
         - action: rebuild
           path: .
+    volumes:
+        - ./uploads:/app/uploads
 
   rabbitmq:
     image: rabbitmq:management
@@ -71,7 +73,7 @@ services:
     container_name: ocr_worker
     image: ocr_worker_image
     build:
-      context: ./OcrWorker  
+      context: ./OCRWorker  
       dockerfile: Dockerfile
     depends_on:
       - rabbitmq

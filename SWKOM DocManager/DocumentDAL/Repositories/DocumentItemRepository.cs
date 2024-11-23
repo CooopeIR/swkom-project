@@ -14,7 +14,11 @@ namespace DocumentDAL.Repositories
 
         public async Task<DocumentItem> GetByIdAsync(int id)
         {
-            return await context.DocumentItems.FindAsync(id);
+            return await context.DocumentItems!
+                       .Include(di => di.DocumentContent)
+                       .Include(di => di.DocumentMetadata)
+                       .FirstOrDefaultAsync(di => di.Id == id)
+                   ?? throw new Exception($"DocumentItem with ID {id} not found");
         }
 
         public async Task<DocumentItem> AddAsync(DocumentItem item)
@@ -26,7 +30,7 @@ namespace DocumentDAL.Repositories
 
         public async Task UpdateAsync(DocumentItem item)
         {
-            context.DocumentItems.Update(item);
+            context.DocumentItems!.Update(item);
             await context.SaveChangesAsync();
         }
 

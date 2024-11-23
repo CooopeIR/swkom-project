@@ -41,20 +41,31 @@ namespace DocumentDAL.Controllers
 
         [SwaggerOperation(Summary = "DAL: Update a specific document in the database with the ID of the document (not finished)")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(int id, DocumentItem item)
+        public async Task<IActionResult> PutAsync(int id, [FromBody] DocumentItem item)
         {
+            Console.WriteLine($"PutAsync empfangene ID lautet: {id}");
+
+            if (item == null)
+            {
+                Console.WriteLine("Payload is null");
+                return BadRequest(new { message = "Invalid payload" });
+            }
+
             var existingItem = await repository.GetByIdAsync(id);
             if (existingItem == null)
             {
+                Console.WriteLine("Item to update not found");
                 return NotFound();
             }
 
-            existingItem.Title = item.Title;
-            existingItem.Author = item.Author;
-            existingItem.OcrText = item.OcrText;
-            existingItem.DocumentContent = item.DocumentContent;
-            existingItem.DocumentMetadata = item.DocumentMetadata;
+            // Map updated fields
+            existingItem.Title = item.Title ?? existingItem.Title;
+            existingItem.Author = item.Author ?? existingItem.Author;
+            existingItem.OcrText = item.OcrText ?? existingItem.OcrText;
+            existingItem.DocumentContent = item.DocumentContent ?? existingItem.DocumentContent;
+            existingItem.DocumentMetadata = item.DocumentMetadata ?? existingItem.DocumentMetadata;
             await repository.UpdateAsync(existingItem);
+            Console.WriteLine($"Successfully updated document with ID {id}");
             return NoContent();
         }
 

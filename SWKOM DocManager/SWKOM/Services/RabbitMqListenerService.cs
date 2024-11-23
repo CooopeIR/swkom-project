@@ -5,6 +5,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace SWKOM.Services
 {
     public class RabbitMqListenerService : IHostedService
     {
+        private readonly IConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _channel;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -21,9 +23,10 @@ namespace SWKOM.Services
             StartListening();
             return Task.CompletedTask;
         }
-        public RabbitMqListenerService(IHttpClientFactory httpClientFactory)
+        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory)
         {
             _httpClientFactory = httpClientFactory;
+            _connectionFactory = connectionFactory;
         }
         private void ConnectToRabbitMQ()
         {
@@ -32,8 +35,10 @@ namespace SWKOM.Services
             {
                 try
                 {
-                    var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
-                    _connection = factory.CreateConnection();
+                    _connection = _connectionFactory.CreateConnection();
+                    //var connection = _connectionFactory.CreateConnection();
+                    //var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
+                    //_connection = factory.CreateConnection();
                     _channel = _connection.CreateModel();
                     _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
                     Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
@@ -61,8 +66,9 @@ namespace SWKOM.Services
                 {
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
-                    var parts = message.Split('|');
+                    var parts = message.Split('|', 2);
                     Console.WriteLine($@"[Listener] Nachricht erhalten: {message}");
+                    
                     if (parts.Length == 2)
                     {
                         var id = parts[0];
@@ -79,14 +85,19 @@ namespace SWKOM.Services
                             var documentItem = await response.Content.ReadFromJsonAsync<DocumentItem>();
                             if (documentItem != null)
                             {
-                                Console.WriteLine($@"[Listener] Task {id} erfolgreich abgerufen.");
-                                Console.WriteLine($@"[Listener] OCR Text für Task {id}: {extractedText}");
-                                Console.WriteLine($@"[Listener] Task vor Update: {documentItem}");
+                                Console.WriteLine($@"[Listener] Document {id} erfolgreich abgerufen.");
+                                Console.WriteLine($@"[Listener] OCR Text für Document {id}: {extractedText}");
+                                Console.WriteLine($@"[Listener] Document vor Update: {documentItem.Id}, {documentItem.Title}, {documentItem.Author}");
                                 documentItem.OcrText = extractedText;
+
+                                var payload = JsonSerializer.Serialize(documentItem);
+                                Console.WriteLine($"Payload: {payload}");
+
                                 var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);
-                                if (!updateResponse.IsSuccessStatusCode)
+                                if(!updateResponse.IsSuccessStatusCode)
                                 {
                                     Console.WriteLine($@"Fehler beim Aktualisieren des Dokuments mit ID {id}");
+                                    Console.WriteLine($"{updateResponse.StatusCode} - {updateResponse.Content}");
                                 }
                                 else
                                 {

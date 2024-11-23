@@ -178,19 +178,19 @@ namespace SWKOM.Controllers
             return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
         }
 
-        [SwaggerOperation(Summary = "Update a specific document in the database with the ID of the document (not finished)")]
-        [HttpPut("{id}", Name = "UpdateDocumentById")]
-        public ActionResult Put(int id)
-        {
+        //[SwaggerOperation(Summary = "Update a specific document in the database with the ID of the document (not finished)")]
+        //[HttpPut("{id}", Name = "UpdateDocumentById")]
+        //public ActionResult Put(int id)
+        //{
 
-            if (id == 0)
-            {
-                return NotFound();
-            }
+        //    if (id == 0)
+        //    {
+        //        return NotFound();
+        //    }
 
 
-            return NotFound();
-        }
+        //    return NotFound();
+        //}
 
         [SwaggerOperation(Summary = "Delete a specific document from the database with the ID of the document")]
         [HttpDelete("{id}", Name = "DeleteDocumentById")]

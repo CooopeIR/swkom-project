@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentDAL", "DocumentDAL\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{17086DB3-041F-4FD1-8550-A57187FE80CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrWorker", "OcrWorker\OcrWorker.csproj", "{3399D25F-CB87-44AF-BE36-1E7F2B1408F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRWorker", "OcrWorker\OCRWorker.csproj", "{3399D25F-CB87-44AF-BE36-1E7F2B1408F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
