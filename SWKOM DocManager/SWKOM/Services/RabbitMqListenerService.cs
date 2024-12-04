@@ -36,13 +36,11 @@ namespace SWKOM.Services
                 try
                 {
                     _connection = _connectionFactory.CreateConnection();
-                    //var connection = _connectionFactory.CreateConnection();
-                    //var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
-                    //_connection = factory.CreateConnection();
+                    
                     _channel = _connection.CreateModel();
                     _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
                     Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
-                    break; // Wenn die Verbindung klappt, verlässt es die Schleife
+                    break; 
                 }
                 catch (Exception ex)
                 {
@@ -88,6 +86,7 @@ namespace SWKOM.Services
                                 Console.WriteLine($@"[Listener] Document {id} erfolgreich abgerufen.");
                                 Console.WriteLine($@"[Listener] OCR Text für Document {id}: {extractedText}");
                                 Console.WriteLine($@"[Listener] Document vor Update: {documentItem.Id}, {documentItem.Title}, {documentItem.Author}");
+                                
                                 documentItem.OcrText = extractedText;
 
                                 var payload = JsonSerializer.Serialize(documentItem);

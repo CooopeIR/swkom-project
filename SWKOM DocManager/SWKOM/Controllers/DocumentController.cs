@@ -27,8 +27,6 @@ namespace SWKOM.Controllers
         private readonly ILogger<DocumentController> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
-        //private readonly IConnection _connection;
-        //private readonly IModel _channel;
         private readonly IDocumentProcessor _documentProcessor;
         private readonly IMessageQueueService _messageQueueService;
 
@@ -40,7 +38,6 @@ namespace SWKOM.Controllers
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _documentProcessor = documentProcessor;
-
             _messageQueueService = messageQueueService;
         }
 
@@ -130,7 +127,7 @@ namespace SWKOM.Controllers
         }
 
         [SwaggerOperation(Summary = "Get all documents from the database")]
-        [HttpGet(Name = "GetAllDocuments")]
+        [HttpGet(Name = "GetDocuments")]
         public async Task<ActionResult> Get([FromQuery] string? search)
         {
             var client = _httpClientFactory.CreateClient("DocumentDAL");

@@ -38,6 +38,7 @@ namespace DocumentDAL.Data
 
             base.OnModelCreating(modelBuilder);
         }
+
         public void InitializeDatabase()
         {
             // This method can be called during application startup

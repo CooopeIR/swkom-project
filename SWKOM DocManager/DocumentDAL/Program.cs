@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using DocumentDAL.Data;
 using DocumentDAL.Repositories;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -10,6 +13,9 @@ builder.Services.AddDbContext<DocumentContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DocumentDatabase")));
 
 builder.Services.AddScoped<IDocumentItemRepository, DocumentItemRepository>();
+builder.Services.AddScoped<IDocumentDataRepository, DocumentDataRepository>();
+builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
+
 
 var app = builder.Build();
 

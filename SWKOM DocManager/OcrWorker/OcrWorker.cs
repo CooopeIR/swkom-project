@@ -52,7 +52,6 @@ namespace OCRWorker
                 throw new Exception("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen.");
             }
         }
-
         
         public void Initialize()
         {
@@ -103,6 +102,8 @@ namespace OCRWorker
 
             _channel.BasicConsume(queue: "file_queue", autoAck: true, consumer: consumer);
         }
+
+
         //public void Start()
         //{
         //    var consumer = new EventingBasicConsumer(_channel);

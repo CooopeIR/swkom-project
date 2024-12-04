@@ -12,13 +12,21 @@ namespace DocumentDAL.Repositories
             return await context.DocumentItems.ToListAsync();
         }
 
-        public async Task<DocumentItem> GetByIdAsync(int id)
+        public async Task<DocumentItem> GetByIdAsync(int id, bool includeAll)
         {
-            return await context.DocumentItems!
-                       .Include(di => di.DocumentContent)
-                       .Include(di => di.DocumentMetadata)
-                       .FirstOrDefaultAsync(di => di.Id == id)
-                   ?? throw new Exception($"DocumentItem with ID {id} not found");
+            switch (includeAll)
+            {
+                case true:
+                    return await context.DocumentItems!
+                               .Include(di => di.DocumentContent)
+                               .Include(di => di.DocumentMetadata)
+                               .FirstOrDefaultAsync(di => di.Id == id)
+                           ?? throw new Exception($"DocumentItem with ID {id} not found");
+                default:
+                    return await context.DocumentItems
+                               .FirstOrDefaultAsync(di => di.Id == id)
+                           ?? throw new Exception($"DocumentItem with ID {id} not found");
+            }
         }
 
         public async Task<DocumentItem> AddAsync(DocumentItem item)
