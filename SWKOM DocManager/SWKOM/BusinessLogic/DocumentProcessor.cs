@@ -1,6 +1,6 @@
-﻿using System.Runtime.InteropServices.JavaScript;
-using DocumentDAL.Entities;
+﻿using DocumentDAL.Entities;
 using SWKOM.DTO;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace SWKOM.BusinessLogic;
 
@@ -8,7 +8,7 @@ public class DocumentProcessor : IDocumentProcessor
 {
     public DocumentProcessor()
     {
-        
+
     }
     public async Task<DocumentItemDTO> ProcessDocument(DocumentItemDTO documentItemDTO)
     {

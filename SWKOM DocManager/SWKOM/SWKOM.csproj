@@ -28,7 +28,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DocumentDAL\DocumentDAL.csproj" />
-		<ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
 	</ItemGroup>
 
 </Project>
