@@ -2,6 +2,9 @@
 
 namespace DocumentDAL.Entities
 {
+    /// <summary>
+    /// Structure with necessary elements for a DocumentItem element (id, title, author, DocumentContent element, DocumentMetadata element, ocr text)
+    /// </summary>
     public class DocumentItem
     {
         public int Id { get; set; }

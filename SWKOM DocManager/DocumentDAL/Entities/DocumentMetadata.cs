@@ -1,5 +1,8 @@
 ﻿namespace DocumentDAL.Entities;
 
+/// <summary>
+/// Structure with necessary elements for a DocumentMetadata element (id, upload date, filesize, document id)
+/// </summary>
 public class DocumentMetadata
 {
     public int Id { get; set; }

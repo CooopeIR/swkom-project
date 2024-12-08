@@ -1,5 +1,8 @@
 ﻿namespace DocumentDAL.Entities;
 
+/// <summary>
+/// Structure with necessary elements for a DocumentContent element (id, filename, content type, content, document id)
+/// </summary>
 public class DocumentContent
 {
     public int Id { get; set; }
