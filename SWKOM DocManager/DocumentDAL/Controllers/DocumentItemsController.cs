@@ -5,25 +5,43 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace DocumentDAL.Controllers
 {
+    /// <summary>
+    /// DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document item elements for the database
+    /// </summary>
+    /// <param name="repository"></param>
     [ApiController]
     [Route("api/[controller]")]
     public class DocumentController(IDocumentItemRepository repository) : ControllerBase
     {
-        [SwaggerOperation(Summary = "DAL: Get all documents from the database")]
+        /// <summary>
+        /// DAL: Get all document items from the database
+        /// </summary>
+        /// <returns>List of all document items from database</returns>
+        [SwaggerOperation(Summary = "DAL: Get all document items from the database")]
         [HttpGet(Name = "GetAllDocumentsFromDB")]
         public async Task<IEnumerable<DocumentItem>> GetAllAsync()
         {
             return await repository.GetAllAsync();
         }
 
-        [SwaggerOperation(Summary = "DAL: Get a specific document from the database with the ID of the document")]
-        [HttpGet("{id}", Name= "GetDocumentById"), ]
+        /// <summary>
+        /// DAL: Get a specific document item from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Document item from Database with specified id</returns>
+        [SwaggerOperation(Summary = "DAL: Get a specific document item from the database with the ID of the document")]
+        [HttpGet("{id}", Name = "GetDocumentById"),]
         public async Task<DocumentItem> GetAsyncById(int id)
         {
             return await repository.GetByIdAsync(id, false);
         }
 
-        [SwaggerOperation(Summary = "DAL: Post a document to save in the database with title, author and uploaded file")]
+        /// <summary>
+        /// DAL: Post a document item to save in the database
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>CreatedAtAction status code with assigned database id or error status code</returns>
+        [SwaggerOperation(Summary = "DAL: Post a document item to save in the database")]
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentItem item)
         {
@@ -36,7 +54,13 @@ namespace DocumentDAL.Controllers
             return CreatedAtAction(nameof(GetAsyncById), new { id = item.Id }, new { id = item.Id });
         }
 
-        [SwaggerOperation(Summary = "DAL: Update a specific document in the database with the ID of the document (not finished)")]
+        /// <summary>
+        /// DAL: Update a specific document item in the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="item"></param>
+        /// <returns>Success Status code with no content or error status code</returns>
+        [SwaggerOperation(Summary = "DAL: Update a specific document item in the database with the ID of the document")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(int id, [FromBody] DocumentItem item)
         {
@@ -67,7 +91,12 @@ namespace DocumentDAL.Controllers
             return NoContent();
         }
 
-        [SwaggerOperation(Summary = "DAL: Delete a specific document from the database with the ID of the document")]
+        /// <summary>
+        /// DAL: Delete a specific document item from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success Status code with no content or error status code</returns>
+        [SwaggerOperation(Summary = "DAL: Delete a specific document item from the database with the ID of the document")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {

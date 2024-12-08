@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SWKOM</name>
+    </assembly>
+    <members>
+        <member name="T:SWKOM.BusinessLogic.DocumentProcessor">
+            <summary>
+            DocumentProcessor class with functions to process uploaded document
+            </summary>
+        </member>
+        <member name="M:SWKOM.BusinessLogic.DocumentProcessor.#ctor">
+            <summary>
+            Constructor for DocumentProcessor class
+            </summary>
+        </member>
+        <member name="M:SWKOM.BusinessLogic.DocumentProcessor.ProcessDocument(SWKOM.DTO.DocumentItemDTO)">
+            <summary>
+            Process document function to get information (content, file name, content type, filesize uploaded date) out of uploaded document into single variables
+            </summary>
+            <param name="documentItemDTO"></param>
+            <returns>Updated DocumentItemDTO element with information in single variables</returns>
+        </member>
+        <member name="T:SWKOM.BusinessLogic.IDocumentProcessor">
+            <summary>
+            Interface IDocumentProcessor for DocumentProcessor functions; functions to process uploaded document
+            </summary>
+        </member>
+        <member name="M:SWKOM.BusinessLogic.IDocumentProcessor.ProcessDocument(SWKOM.DTO.DocumentItemDTO)">
+            <summary>
+            Interface: Process document function to get information (content, file name, content type, filesize uploaded date) out of uploaded document into single variables
+            </summary>
+            <param name="documentItemDTO"></param>
+            <returns>Updated DocumentItemDTO element with information in single variables</returns>
+        </member>
+        <member name="T:SWKOM.Controllers.DocumentController">
+            <summary>
+            Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
+            </summary>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService)">
+            <summary>
+            Constructor for DocumentController class, assigning local variables
+            </summary>
+            <param name="logger"></param>
+            <param name="mapper"></param>
+            <param name="httpClientFactory"></param>
+            <param name="documentProcessor"></param>
+            <param name="messageQueueService"></param>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.Create(SWKOM.DTO.DocumentItemDTO)">
+            <summary>
+            Post a document to save in the database with title, author and uploaded file (Pre-Processing with validation,save-request to DAL, document sent to RabbitMQ)
+            </summary>
+            <param name="documentDTO"></param>
+            <returns>Successful status code with document name and id or error status code</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.Get(System.String)">
+            <summary>
+            Get all documents from the database
+            </summary>
+            <param name="search"></param>
+            <returns>Success status code with list of DocumentItems or error status code</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.GetDocumentById(System.Int32)">
+            <summary>
+            Get a specific document from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success status code with DocumentItem with specified id or error status code</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.Delete(System.Int32)">
+            <summary>
+            Delete a specific document from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success status code for deletion of DocumentItem with specified id or error status code</returns>
+        </member>
+        <member name="T:SWKOM.DTO.DocumentContentDTO">
+            <summary>
+            Structure with necessary elements for a DocumentContentDTO element (id, filename, content type, content, document id)
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentContentDTO.Id">
+            <summary>
+            ID of DocumentContentDTO element
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentContentDTO.FileName">
+            <summary>
+            File Name of Document
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentContentDTO.ContentType">
+            <summary>
+            Content Type of Document
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentContentDTO.Content">
+            <summary>
+            Content of Document
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentContentDTO.DocumentId">
+            <summary>
+            ID of Document
+            </summary>
+        </member>
+        <member name="T:SWKOM.DTO.DocumentItemDTO">
+            <summary>
+            Structure with necessary elements for a DocumentItemDTO element (id, title, author, uploaded file, DocumentContentDto element, DocumentMetadataDto element, ocr text)
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.Id">
+            <summary>
+            ID of DocumentItem element
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.Title">
+            <summary>
+            Entered title by user
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.Author">
+            <summary>
+            Entered author by user
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.UploadedFile">
+            <summary>
+            Uploaded document
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.DocumentContentDto">
+            <summary>
+            Document Content element
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.DocumentMetadataDto">
+            <summary>
+            Document Metadata element
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentItemDTO.OcrText">
+            <summary>
+            Generated OCR Text
+            </summary>
+        </member>
+        <member name="T:SWKOM.DTO.DocumentMetadataDTO">
+            <summary>
+            Structure with necessary elements for a DocumentMetadataDTO element (id, upload date, filesize, document id)
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentMetadataDTO.Id">
+            <summary>
+            ID of DocumentMetadata element
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentMetadataDTO.UploadDate">
+            <summary>
+            Upload Date of document
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentMetadataDTO.FileSize">
+            <summary>
+            Filesize of uploaded document
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.DocumentMetadataDTO.DocumentId">
+            <summary>
+            ID of Document
+            </summary>
+        </member>
+        <member name="T:SWKOM.Mappings.MappingProfile">
+            <summary>
+            Mapping Profiles for datastructures between SWKOM and DocumentDAL
+            </summary>
+        </member>
+        <member name="M:SWKOM.Mappings.MappingProfile.#ctor">
+            <summary>
+            Mapping Profile for variables from and to DocumentItem and DocumentItemDTO, DocumentContent and DocumentContentDTO, DocumentMetadata and DocumentMetadataDTO
+            </summary>
+        </member>
+        <member name="T:SWKOM.Services.IMessageQueueService">
+            <summary>
+            Interface IMessageQueueService for MessageQueueService;
+            Connection management functions for RabbitMQ
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.IMessageQueueService.SendToQueue(System.String)">
+            <summary>
+            Interface: Send message to RabbitMQ file queue
+            </summary>
+            <param name="message">type: string</param>
+        </member>
+        <member name="T:SWKOM.Services.MessageQueueService">
+            <summary>
+            Connection management functions for RabbitMQ
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.MessageQueueService.#ctor(RabbitMQ.Client.IConnection,RabbitMQ.Client.IModel)">
+            <summary>
+            Create connection with connection details for RabbitMQ (file queue)
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.MessageQueueService.SendToQueue(System.String)">
+            <summary>
+            Send message to RabbitMQ file queue
+            </summary>
+            <param name="message">type: string</param>
+        </member>
+        <member name="M:SWKOM.Services.MessageQueueService.Dispose">
+            <summary>
+            Close connection to RabbitMQ
+            </summary>
+        </member>
+        <member name="T:SWKOM.Services.RabbitMqListenerService">
+            <summary>
+            RabbitMQ management functions (start connection, close connection, connect to RabbitMQ, start listening)
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.RabbitMqListenerService.StartAsync(System.Threading.CancellationToken)">
+            <summary>
+            Start connection and listening RabbitMQ
+            </summary>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,RabbitMQ.Client.IConnectionFactory)">
+            <summary>
+            Constructor for RabbitMqListenerService class; initialization of variables
+            </summary>
+            <param name="httpClientFactory"></param>
+            <param name="connectionFactory"></param>
+        </member>
+        <member name="M:SWKOM.Services.RabbitMqListenerService.StopAsync(System.Threading.CancellationToken)">
+            <summary>
+            Close channel and connection of RabbitMQ
+            </summary>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:SWKOM.Validators.DocumentItemDtoValidator">
+            <summary>
+            Validator with conditions for user input fields (title, author, uploaded file)
+            </summary>
+        </member>
+        <member name="M:SWKOM.Validators.DocumentItemDtoValidator.#ctor">
+            <summary>
+            Validator conditions for user input fields (title, author, uploaded file)
+            </summary>
+        </member>
+    </members>
+</doc>

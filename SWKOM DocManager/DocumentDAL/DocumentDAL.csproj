@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>bd0845b1-1af2-4bfc-93cd-b17ddef15f20</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>./DocumentDAL-Documentation.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

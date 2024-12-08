@@ -4,8 +4,14 @@ using SWKOM.DTO;
 
 namespace SWKOM.Mappings
 {
+    /// <summary>
+    /// Mapping Profiles for datastructures between SWKOM and DocumentDAL
+    /// </summary>
     public class MappingProfile : Profile
     {
+        /// <summary>
+        /// Mapping Profile for variables from and to DocumentItem and DocumentItemDTO, DocumentContent and DocumentContentDTO, DocumentMetadata and DocumentMetadataDTO
+        /// </summary>
         public MappingProfile()
         {
             // Mapping for DocumentItem and DocumentItemDTO

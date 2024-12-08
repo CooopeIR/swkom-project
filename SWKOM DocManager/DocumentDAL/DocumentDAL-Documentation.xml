@@ -1,0 +1,530 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DocumentDAL</name>
+    </assembly>
+    <members>
+        <member name="T:DocumentDAL.Controllers.DocumentContentController">
+            <summary>
+            DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document content elements for the database
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentContentController.#ctor(DocumentDAL.Repositories.IDocumentContentRepository)">
+            <summary>
+            DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document content elements for the database
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentContentController.GetAllAsync">
+            <summary>
+            DAL: Get all document contents from the database
+            </summary>
+            <returns>List of all document contents from Database</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentContentController.GetAsyncById(System.Int32)">
+            <summary>
+            DAL: Get a specific document content from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Document content from Database with specified id</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentContentController.PostAsync(DocumentDAL.Entities.DocumentContent)">
+            <summary>
+            DAL: Post a document content to save in the database with title, author and uploaded file
+            </summary>
+            <param name="item"></param>
+            <returns>CreatedAtAction status code with assigned database id or error status code</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentContentController.PutAsync(System.Int32,DocumentDAL.Entities.DocumentContent)">
+            <summary>
+            DAL: Update a specific document content in the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <param name="item"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentContentController.DeleteAsync(System.Int32)">
+            <summary>
+            DAL: Delete a specific document from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
+        <member name="T:DocumentDAL.Controllers.DocumentDataController">
+            <summary>
+            DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document metadata elements for the database
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentDataController.#ctor(DocumentDAL.Repositories.IDocumentDataRepository)">
+            <summary>
+            DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document metadata elements for the database
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentDataController.GetAllAsync">
+            <summary>
+            DAL: Get all document Metadatas from the database
+            </summary>
+            <returns>List of all document Metadatas from Database</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentDataController.GetAsyncById(System.Int32)">
+            <summary>
+            DAL: Get a specific document Metadata from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Document Metadata from Database with specified id</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentDataController.PostAsync(DocumentDAL.Entities.DocumentMetadata)">
+            <summary>
+            DAL: Post a document Metadata to save in the database
+            </summary>
+            <param name="item"></param>
+            <returns>CreatedAtAction status code with assigned database id or error status code</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentDataController.PutAsync(System.Int32,DocumentDAL.Entities.DocumentMetadata)">
+            <summary>
+            DAL: Update a specific document Metadata in the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <param name="item"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentDataController.DeleteAsync(System.Int32)">
+            <summary>
+            DAL: Delete a specific document Metadata from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
+        <member name="T:DocumentDAL.Controllers.DocumentController">
+            <summary>
+            DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document item elements for the database
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.#ctor(DocumentDAL.Repositories.IDocumentItemRepository)">
+            <summary>
+            DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document item elements for the database
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.GetAllAsync">
+            <summary>
+            DAL: Get all document items from the database
+            </summary>
+            <returns>List of all document items from database</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.GetAsyncById(System.Int32)">
+            <summary>
+            DAL: Get a specific document item from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Document item from Database with specified id</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.PostAsync(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            DAL: Post a document item to save in the database
+            </summary>
+            <param name="item"></param>
+            <returns>CreatedAtAction status code with assigned database id or error status code</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.PutAsync(System.Int32,DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            DAL: Update a specific document item in the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <param name="item"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.DeleteAsync(System.Int32)">
+            <summary>
+            DAL: Delete a specific document item from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
+        <member name="T:DocumentDAL.Data.DocumentContext">
+            <summary>
+            Document Context methods with relationships and database initialization
+            </summary>
+        </member>
+        <member name="M:DocumentDAL.Data.DocumentContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{DocumentDAL.Data.DocumentContext})">
+            <summary>
+            Constructor for DocumentContext Class
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="P:DocumentDAL.Data.DocumentContext.DocumentItems">
+            <summary>
+            DocumentItem DBSet for queries against the database
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Data.DocumentContext.DocumentContents">
+            <summary>
+            DocumentContent DBSet for queries against the database
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Data.DocumentContext.DocumentMetadatas">
+            <summary>
+            DocumentMetadata DBSet for queries against the database
+            </summary>
+        </member>
+        <member name="M:DocumentDAL.Data.DocumentContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            Specify the relationships between DocumentItem and DocumentContent, DocumentItem and DocumentMetadata
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="M:DocumentDAL.Data.DocumentContext.InitializeDatabase">
+            <summary>
+            Method for Database initialization
+            </summary>
+        </member>
+        <member name="T:DocumentDAL.Entities.DocumentContent">
+            <summary>
+            Structure with necessary elements for a DocumentContent element (id, filename, content type, content, document id)
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentContent.Id">
+            <summary>
+            ID of DocumentContent element
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentContent.FileName">
+            <summary>
+            File Name of Document
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentContent.ContentType">
+            <summary>
+            Content Type of Document
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentContent.Content">
+            <summary>
+            Content of Document
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentContent.DocumentId">
+            <summary>
+            ID of Document
+            </summary>
+        </member>
+        <member name="T:DocumentDAL.Entities.DocumentItem">
+            <summary>
+            Structure with necessary elements for a DocumentItem element (id, title, author, DocumentContent element, DocumentMetadata element, ocr text)
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentItem.Id">
+            <summary>
+            ID of DocumentItem element
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentItem.Title">
+            <summary>
+            Entered title by user
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentItem.Author">
+            <summary>
+            Entered author by user
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentItem.DocumentContent">
+            <summary>
+            Document Content element
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentItem.DocumentMetadata">
+            <summary>
+            Document Metadata element
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentItem.OcrText">
+            <summary>
+            Generated OCR Text
+            </summary>
+        </member>
+        <member name="T:DocumentDAL.Entities.DocumentMetadata">
+            <summary>
+            Structure with necessary elements for a DocumentMetadata element (id, upload date, filesize, document id)
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentMetadata.Id">
+            <summary>
+            ID of DocumentMetadata element
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentMetadata.UploadDate">
+            <summary>
+            Upload Date of document
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentMetadata.FileSize">
+            <summary>
+            Filesize of uploaded document
+            </summary>
+        </member>
+        <member name="P:DocumentDAL.Entities.DocumentMetadata.DocumentId">
+            <summary>
+            ID of Document
+            </summary>
+        </member>
+        <member name="T:DocumentDAL.Repositories.DocumentContentRepository">
+            <summary>
+            DocumentContentRepository methods for DocumentContent elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentContentRepository.#ctor(DocumentDAL.Data.DocumentContext)">
+            <summary>
+            DocumentContentRepository methods for DocumentContent elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentContentRepository.GetAllContentAsync">
+            <summary>
+            Database call to get all DocumentContent elements from database
+            </summary>
+            <returns>List of DocumentContents</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentContentRepository.GetContentByIdAsync(System.Int32)">
+            <summary>
+            Database call to get DocumentContent with specific ID
+            </summary>
+            <param name="id"></param>
+            <returns>DocumentContent of specific ID</returns>
+            <exception cref="T:System.Exception">Document Contents for Document with ID not found</exception>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentContentRepository.AddContentAsync(DocumentDAL.Entities.DocumentContent)">
+            <summary>
+            Database call to save a new DocumentContent element in database
+            </summary>
+            <param name="item"></param>
+            <returns>Added item</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentContentRepository.UpdateContentAsync(DocumentDAL.Entities.DocumentContent)">
+            <summary>
+            Database call to update DocumentContent in database with given DocumentContent item
+            </summary>
+            <param name="item">Type: DocumentContent</param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentContentRepository.DeleteContentAsync(System.Int32)">
+            <summary>
+            Database call to delete specific DocumentContent element from database with its id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="T:DocumentDAL.Repositories.DocumentDataRepository">
+            <summary>
+            DocumentDataRepository methods for DocumentMetadata elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentDataRepository.#ctor(DocumentDAL.Data.DocumentContext)">
+            <summary>
+            DocumentDataRepository methods for DocumentMetadata elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentDataRepository.GetAllMetaAsync">
+            <summary>
+            Database call to get all DocumentMetadata elements from database
+            </summary>
+            <returns>List of DocumentMetadata</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentDataRepository.GetMetaByIdAsync(System.Int32)">
+            <summary>
+            Database call to get DocumentMetadata with specific ID
+            </summary>
+            <param name="id"></param>
+            <returns>DocumentMetadata of specific ID</returns>
+            <exception cref="T:System.Exception">Document Metadata for Document with ID not found</exception>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentDataRepository.AddMetaAsync(DocumentDAL.Entities.DocumentMetadata)">
+            <summary>
+            Database call to save a new DocumentMetadata element in database
+            </summary>
+            <param name="item"></param>
+            <returns>Added item</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentDataRepository.UpdateMetaAsync(DocumentDAL.Entities.DocumentMetadata)">
+            <summary>
+            Database call to update DocumentMetadata in database with given DocumentMetadata item
+            </summary>
+            <param name="item">Type: DocumentContent</param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentDataRepository.DeleteMetaAsync(System.Int32)">
+            <summary>
+            Database call to delete specific DocumentMetadata element from database with its id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="T:DocumentDAL.Repositories.DocumentItemRepository">
+            <summary>
+            DocumentItemRepository methods for DocumentItem elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.#ctor(DocumentDAL.Data.DocumentContext)">
+            <summary>
+            DocumentItemRepository methods for DocumentItem elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.GetAllAsync">
+            <summary>
+            Database call to get all DocumentItem elements from database
+            </summary>
+            <returns>List of DocumentItem</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.GetByIdAsync(System.Int32,System.Boolean)">
+            <summary>
+            Database call to get DocumentItem with specific ID
+            </summary>
+            <param name="id"></param>
+            <param name="includeAll">type: bool</param>
+            <returns>if includeAll = true: additionally include DocumentContent and DocumentMetadata</returns>
+            <exception cref="T:System.Exception">DocumentItem with ID not found</exception>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.AddAsync(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            Database call to save a new DocumentItem element in database
+            </summary>
+            <param name="item"></param>
+            <returns>Added item</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.UpdateAsync(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            Database call to update DocumentItem in database with given DocumentItem item
+            </summary>
+            <param name="item">Type: DocumentItem</param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.DeleteAsync(System.Int32)">
+            <summary>
+            Database call to delete specific DocumentItem element from database with its id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="T:DocumentDAL.Repositories.IDocumentContentRepository">
+            <summary>
+            Interface IDocumentContentRepository for DocumentContentRepository; 
+            DocumentContentRepository methods for DocumentContent elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentContentRepository.GetAllContentAsync">
+            <summary>
+            Interface: Database call to get all DocumentContent elements from database
+            </summary>
+            <returns>List of DocumentContents</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentContentRepository.GetContentByIdAsync(System.Int32)">
+            <summary>
+            Interface: Database call to get DocumentContent with specific ID
+            </summary>
+            <param name="id"></param>
+            <returns>DocumentContent of specific ID</returns>
+            <exception cref="T:System.Exception">Document Contents for Document with ID not found</exception>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentContentRepository.AddContentAsync(DocumentDAL.Entities.DocumentContent)">
+            <summary>
+            Interface: Database call to save a new DocumentContent element in database
+            </summary>
+            <param name="item"></param>
+            <returns>Added item</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentContentRepository.UpdateContentAsync(DocumentDAL.Entities.DocumentContent)">
+            <summary>
+            Interface: Database call to update DocumentContent in database with given DocumentContent item
+            </summary>
+            <param name="item">Type: DocumentContent</param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentContentRepository.DeleteContentAsync(System.Int32)">
+            <summary>
+            Interface: Database call to delete specific DocumentContent element from database with its id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="T:DocumentDAL.Repositories.IDocumentDataRepository">
+            <summary>
+            Interface IDocumentDataRepository for DocumentDataRepository; 
+            DocumentDataRepository methods for DocumentMetadata elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentDataRepository.GetAllMetaAsync">
+            <summary>
+            Interface: Database call to get all DocumentMetadata elements from database
+            </summary>
+            <returns>List of DocumentMetadata</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentDataRepository.GetMetaByIdAsync(System.Int32)">
+            <summary>
+            Interface: Database call to get DocumentMetadata with specific ID
+            </summary>
+            <param name="id"></param>
+            <returns>DocumentMetadata of specific ID</returns>
+            <exception cref="T:System.Exception">Document Metadata for Document with ID not found</exception>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentDataRepository.AddMetaAsync(DocumentDAL.Entities.DocumentMetadata)">
+            <summary>
+            Interface: Database call to save a new DocumentMetadata element in database
+            </summary>
+            <param name="item"></param>
+            <returns>Added item</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentDataRepository.UpdateMetaAsync(DocumentDAL.Entities.DocumentMetadata)">
+            <summary>
+            Interface: Database call to update DocumentMetadata in database with given DocumentMetadata item
+            </summary>
+            <param name="item">Type: DocumentContent</param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentDataRepository.DeleteMetaAsync(System.Int32)">
+            <summary>
+            Interface: Database call to delete specific DocumentMetadata element from database with its id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="T:DocumentDAL.Repositories.IDocumentItemRepository">
+            <summary>
+            Interface IDocumentItemRepository for DocumentItemRepository; 
+            DocumentItemRepository methods for DocumentItem elements on database (get all, get by ID, add new element, update element with ID, delete element with ID)
+            </summary>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.GetAllAsync">
+            <summary>
+            Interface: Database call to get all DocumentItem elements from database
+            </summary>
+            <returns>List of DocumentItem</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.GetByIdAsync(System.Int32,System.Boolean)">
+            <summary>
+            Interface: Database call to get DocumentItem with specific ID
+            </summary>
+            <param name="id"></param>
+            <param name="includeAll">type: bool</param>
+            <returns>if includeAll = true: additionally include DocumentContent and DocumentMetadata</returns>
+            <exception cref="T:System.Exception">DocumentItem with ID not found</exception>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.AddAsync(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            Interface: Database call to save a new DocumentItem element in database
+            </summary>
+            <param name="item"></param>
+            <returns>Added item</returns>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.UpdateAsync(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            Interface: Database call to update DocumentItem in database with given DocumentItem item
+            </summary>
+            <param name="item">Type: DocumentItem</param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.DeleteAsync(System.Int32)">
+            <summary>
+            Interface: Database call to delete specific DocumentItem element from database with its id 
+            </summary>
+            <param name="id"></param>
+        </member>
+    </members>
+</doc>

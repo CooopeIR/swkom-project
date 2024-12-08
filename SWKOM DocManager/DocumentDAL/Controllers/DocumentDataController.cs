@@ -8,30 +8,48 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace DocumentDAL.Controllers
 {
+    /// <summary>
+    /// DAL: Class with GET all, GET by ID, POST, PUT, DELETE methods for document metadata elements for the database
+    /// </summary>
+    /// <param name="repository"></param>
     [ApiController]
     [Route("api/[controller]")]
     public class DocumentDataController(IDocumentDataRepository repository) : ControllerBase
     {
-        [SwaggerOperation(Summary = "DAL: Get all documents from the database")]
+        /// <summary>
+        /// DAL: Get all document Metadatas from the database
+        /// </summary>
+        /// <returns>List of all document Metadatas from Database</returns>
+        [SwaggerOperation(Summary = "DAL: Get all Document Metadatas from the database")]
         [HttpGet(Name = "GetAllMetadata")]
         public async Task<IEnumerable<DocumentMetadata>> GetAllAsync()
         {
             return await repository.GetAllMetaAsync();
         }
 
-        [SwaggerOperation(Summary = "DAL: Get a specific document from the database with the ID of the document")]
-        [HttpGet("{id}", Name= "GetMetadataById"), ]
+        /// <summary>
+        /// DAL: Get a specific document Metadata from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Document Metadata from Database with specified id</returns>
+        [SwaggerOperation(Summary = "DAL: Get a specific document Metadata from the database with the ID of the document")]
+        [HttpGet("{id}", Name = "GetMetadataById"),]
         public async Task<DocumentMetadata> GetAsyncById(int id)
         {
             return await repository.GetMetaByIdAsync(id);
         }
 
-        [SwaggerOperation(Summary = "DAL: Post a document to save in the database with title, author and uploaded file")]
+        /// <summary>
+        /// DAL: Post a document Metadata to save in the database
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>CreatedAtAction status code with assigned database id or error status code</returns>
+        [SwaggerOperation(Summary = "DAL: Post a document Metadata to save in the database")]
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentMetadata item)
         {
-            
-            if (item.FileSize == null || item.UploadDate == null)
+
+            if (item.FileSize == null)
             {
                 Console.WriteLine("DocumentDAL Bad Request");
                 return BadRequest(new { message = "Document Information cannot be empty :/" });
@@ -40,7 +58,13 @@ namespace DocumentDAL.Controllers
             return CreatedAtAction(nameof(GetAsyncById), new { id = item.Id }, new { id = item.Id });
         }
 
-        [SwaggerOperation(Summary = "DAL: Update a specific document in the database with the ID of the document (not finished)")]
+        /// <summary>
+        /// DAL: Update a specific document Metadata in the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="item"></param>
+        /// <returns>Success Status code with no content or error status code</returns>
+        [SwaggerOperation(Summary = "DAL: Update a specific document Metadata in the database with the ID of the document")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(int id, [FromBody] DocumentMetadata item)
         {
@@ -68,7 +92,12 @@ namespace DocumentDAL.Controllers
             return NoContent();
         }
 
-        [SwaggerOperation(Summary = "DAL: Delete a specific document from the database with the ID of the document")]
+        /// <summary>
+        /// DAL: Delete a specific document Metadata from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success Status code with no content or error status code</returns>
+        [SwaggerOperation(Summary = "DAL: Delete a specific document Metadata from the database with the ID of the document")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
