@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using DocumentDAL.Entities;
+using Elastic.Clients.Elasticsearch.Nodes;
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
@@ -29,17 +31,70 @@ namespace SWKOM.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IDocumentProcessor _documentProcessor;
         private readonly IMessageQueueService _messageQueueService;
+        private readonly ElasticsearchClient _searchClient;
 
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
             IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
-            IMessageQueueService messageQueueService)
+            IMessageQueueService messageQueueService, ElasticsearchClient searchClient)
         {
             _logger = logger;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _documentProcessor = documentProcessor;
             _messageQueueService = messageQueueService;
+            _searchClient = searchClient;
         }
+
+
+        // Wildcard-Search (QueryString)
+        [HttpPost("search/querystring")]
+        public async Task<IActionResult> SearchByQueryString([FromBody] string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest(new { message = "Search term cannot be empty" });
+            }
+
+            var response = await _searchClient.SearchAsync<DocumentItem>(s => s
+                .Index("documents")
+                .Query(q => q.QueryString(qs => qs.Query($"*{searchTerm}*"))));
+
+            return HandleSearchResponse(response);
+        }
+
+        // Fuzzy-Search with Match(Normalisation)
+        [HttpPost("search/fuzzy")]
+        public async Task<IActionResult> SearchByFuzzy([FromBody] string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest(new { message = "Search term cannot be empty" });
+            }
+
+            var response = await _searchClient.SearchAsync<DocumentItem>(s => s
+                .Index("documents")
+                .Query(q => q.Match(m => m
+                    .Field(f => f.OcrText)
+                    .Query(searchTerm)
+                    .Fuzziness(new Fuzziness(4)))));
+
+            return HandleSearchResponse(response);
+        }
+
+        private IActionResult HandleSearchResponse(SearchResponse<DocumentItem> response)
+        {
+            if (response.IsValidResponse)
+            {
+                if (response.Documents.Any())
+                {
+                    return Ok(response.Documents);
+                }
+                return NotFound(new { message = "No documents found matching the search term." });
+            }
+
+            return StatusCode(500, new { message = "Failed to search documents", details = response.DebugInformation });
+        }
+
 
         [SwaggerOperation(Summary = "Post a document to save in the database with title, author and uploaded file")]
         [HttpPost(Name = "PostDocument")]
@@ -79,6 +134,7 @@ namespace SWKOM.Controllers
 
             // Das verarbeitet DTO zu DAL-Item mappen
             var item = _mapper.Map<DocumentItem>(documentDTO);
+
 
 
             // Speichere das Item im DAL

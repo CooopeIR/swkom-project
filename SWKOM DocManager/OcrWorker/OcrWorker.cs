@@ -27,7 +27,7 @@ namespace OCRWorker
 
         public virtual void ConnectToRabbitMQ()
         {
-            int retries = 5;
+            int retries = 15;
             while (retries > 0)
             {
                 try
@@ -58,7 +58,7 @@ namespace OCRWorker
             ConnectToRabbitMQ();
         }
 
-
+        
         public async Task StartAsync()
         {
             var consumer = new EventingBasicConsumer(_channel);

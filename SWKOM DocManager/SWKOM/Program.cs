@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using RabbitMQ.Client;
@@ -6,7 +7,11 @@ using SWKOM.Mappings;
 using SWKOM.Services;
 using SWKOM.Validators;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+var elasticUri = builder.Configuration.GetConnectionString("ElasticSearch") ?? "http://localhost:9200";
+builder.Services.AddSingleton(new ElasticsearchClient(new Uri(elasticUri)));
 
 builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
 
@@ -20,6 +25,8 @@ builder.Services.AddSingleton<IConnectionFactory>(_ =>
         UserName = "user",
         Password = "password"
     });
+
+
 
 builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
 builder.Services.AddHostedService<RabbitMqListenerService>();

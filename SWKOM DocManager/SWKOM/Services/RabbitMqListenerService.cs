@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Elastic.Clients.Elasticsearch;
 
 namespace SWKOM.Services
 {
@@ -17,20 +18,25 @@ namespace SWKOM.Services
         private IConnection _connection;
         private IModel _channel;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ElasticsearchClient _elasticClient;
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             ConnectToRabbitMQ();
             StartListening();
             return Task.CompletedTask;
         }
-        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory)
+
+        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory, ElasticsearchClient client)
         {
             _httpClientFactory = httpClientFactory;
             _connectionFactory = connectionFactory;
+            _elasticClient = client;
         }
+
         private void ConnectToRabbitMQ()
         {
-            int retries = 5;
+            int retries = 15;
             while (retries > 0)
             {
                 try
@@ -89,8 +95,28 @@ namespace SWKOM.Services
                                 
                                 documentItem.OcrText = extractedText;
 
-                                var payload = JsonSerializer.Serialize(documentItem);
-                                Console.WriteLine($"Payload: {payload}");
+                                //var payload = JsonSerializer.Serialize(documentItem);
+                                ////Console.WriteLine($"Payload: {payload}");
+
+                                var existsResponse = await _elasticClient.Indices.ExistsAsync("documents");
+                                if (!existsResponse.Exists)
+                                {
+                                    var createResponse = await _elasticClient.Indices.CreateAsync("documents");
+                                    if (!createResponse.Acknowledged)
+                                    {
+                                        Console.WriteLine("Failed to create the index.");
+                                    }
+                                }
+
+                                var indexResponse =
+                                    await _elasticClient.IndexAsync(documentItem, i => i.Index("documents"));
+
+                                if (!indexResponse.IsValidResponse)
+                                {
+                                    Console.WriteLine($@"Fehler beim indexieren des Dokuments mit ID {id}");
+                                }
+
+                                
 
                                 var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);
                                 if(!updateResponse.IsSuccessStatusCode)

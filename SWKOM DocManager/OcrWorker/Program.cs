@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using OCRWorker.ProcessLibrary;
 using RabbitMQ.Client;
 using System;
@@ -7,8 +8,11 @@ namespace OCRWorker
 {
     class Program
     {
+        
+
         static void Main(string[] args)
         {
+
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IProcessStartInfoFactory, ProcessStartInfoFactory>() // Register ProcessStartupFactory
                 .AddSingleton<IProcessFactory, ProcessFactory>() 
