@@ -3,8 +3,14 @@ using SWKOM.DTO;
 
 namespace SWKOM.Validators
 {
+    /// <summary>
+    /// Validator with conditions for user input fields (title, author, uploaded file)
+    /// </summary>
     public class DocumentItemDtoValidator : AbstractValidator<DocumentItemDTO>
     {
+        /// <summary>
+        /// Validator conditions for user input fields (title, author, uploaded file)
+        /// </summary>
         public DocumentItemDtoValidator()
         {
             RuleFor(x => x.Title)

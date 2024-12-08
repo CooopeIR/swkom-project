@@ -8,6 +8,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<DockerfileRunArguments>-p "8080:8080" -p "8081:8081"</DockerfileRunArguments>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<DocumentationFile>./SWKOM-Documentation.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

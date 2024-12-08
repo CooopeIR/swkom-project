@@ -11,13 +11,13 @@ namespace DocumentDAL.Repositories
     public interface IDocumentItemRepository
     {
         /// <summary>
-        /// Database call to get all DocumentItem elements from database
+        /// Interface: Database call to get all DocumentItem elements from database
         /// </summary>
         /// <returns>List of DocumentItem</returns>
         Task<IEnumerable<DocumentItem>> GetAllAsync();
 
         /// <summary>
-        /// Database call to get DocumentItem with specific ID
+        /// Interface: Database call to get DocumentItem with specific ID
         /// </summary>
         /// <param name="id"></param>
         /// <param name="includeAll">type: bool</param>
@@ -26,20 +26,20 @@ namespace DocumentDAL.Repositories
         Task<DocumentItem> GetByIdAsync(int id, bool includeAll);
 
         /// <summary>
-        /// Database call to save a new DocumentItem element in database
+        /// Interface: Database call to save a new DocumentItem element in database
         /// </summary>
         /// <param name="item"></param>
         /// <returns>Added item</returns>
         Task<DocumentItem> AddAsync(DocumentItem item);
 
         /// <summary>
-        /// Database call to update DocumentItem in database with given DocumentItem item
+        /// Interface: Database call to update DocumentItem in database with given DocumentItem item
         /// </summary>
         /// <param name="item">Type: DocumentItem</param>
         Task UpdateAsync(DocumentItem item);
 
         /// <summary>
-        /// Database call to delete specific DocumentItem element from database with its id
+        /// Interface: Database call to delete specific DocumentItem element from database with its id 
         /// </summary>
         /// <param name="id"></param>
         Task DeleteAsync(int id);

@@ -1,5 +1,8 @@
 ﻿namespace SWKOM.DTO;
 
+/// <summary>
+/// Structure with necessary elements for a DocumentContentDTO element (id, filename, content type, content, document id)
+/// </summary>
 public class DocumentContentDTO
 {
     /// <summary>

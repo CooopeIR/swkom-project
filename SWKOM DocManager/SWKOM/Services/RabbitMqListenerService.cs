@@ -11,18 +11,30 @@ using System.Threading.Tasks;
 
 namespace SWKOM.Services
 {
+    /// <summary>
+    /// RabbitMQ management functions (start connection, close connection, connect to RabbitMQ, start listening)
+    /// </summary>
     public class RabbitMqListenerService : IHostedService
     {
         private readonly IConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _channel;
         private readonly IHttpClientFactory _httpClientFactory;
+        /// <summary>
+        /// Start connection and listening RabbitMQ
+        /// </summary>
+        /// <param name="cancellationToken"></param>
         public Task StartAsync(CancellationToken cancellationToken)
         {
             ConnectToRabbitMQ();
             StartListening();
             return Task.CompletedTask;
         }
+        /// <summary>
+        /// Constructor for RabbitMqListenerService class; initialization of variables
+        /// </summary>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="connectionFactory"></param>
         public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -36,11 +48,11 @@ namespace SWKOM.Services
                 try
                 {
                     _connection = _connectionFactory.CreateConnection();
-                    
+
                     _channel = _connection.CreateModel();
                     _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
                     Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
-                    break; 
+                    break;
                 }
                 catch (Exception ex)
                 {
@@ -66,7 +78,7 @@ namespace SWKOM.Services
                     var message = Encoding.UTF8.GetString(body);
                     var parts = message.Split('|', 2);
                     Console.WriteLine($@"[Listener] Nachricht erhalten: {message}");
-                    
+
                     if (parts.Length == 2)
                     {
                         var id = parts[0];
@@ -86,14 +98,14 @@ namespace SWKOM.Services
                                 Console.WriteLine($@"[Listener] Document {id} erfolgreich abgerufen.");
                                 Console.WriteLine($@"[Listener] OCR Text für Document {id}: {extractedText}");
                                 Console.WriteLine($@"[Listener] Document vor Update: {documentItem.Id}, {documentItem.Title}, {documentItem.Author}");
-                                
+
                                 documentItem.OcrText = extractedText;
 
                                 var payload = JsonSerializer.Serialize(documentItem);
                                 Console.WriteLine($"Payload: {payload}");
 
                                 var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);
-                                if(!updateResponse.IsSuccessStatusCode)
+                                if (!updateResponse.IsSuccessStatusCode)
                                 {
                                     Console.WriteLine($@"Fehler beim Aktualisieren des Dokuments mit ID {id}");
                                     Console.WriteLine($"{updateResponse.StatusCode} - {updateResponse.Content}");
@@ -125,6 +137,10 @@ namespace SWKOM.Services
                 Console.WriteLine($@"Fehler beim Starten des Listeners für OCR-Ergebnisse: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Close channel and connection of RabbitMQ
+        /// </summary>
+        /// <param name="cancellationToken"></param>
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _channel?.Close();

@@ -49,7 +49,7 @@ namespace DocumentDAL.Controllers
         public async Task<IActionResult> PostAsync(DocumentMetadata item)
         {
 
-            if (item.FileSize == null || item.UploadDate == null)
+            if (item.FileSize == null)
             {
                 Console.WriteLine("DocumentDAL Bad Request");
                 return BadRequest(new { message = "Document Information cannot be empty :/" });
