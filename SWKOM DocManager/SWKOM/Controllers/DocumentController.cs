@@ -20,6 +20,9 @@ using IModel = RabbitMQ.Client.IModel;
 
 namespace SWKOM.Controllers
 {
+    /// <summary>
+    /// Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class DocumentController : ControllerBase
@@ -30,6 +33,14 @@ namespace SWKOM.Controllers
         private readonly IDocumentProcessor _documentProcessor;
         private readonly IMessageQueueService _messageQueueService;
 
+        /// <summary>
+        /// Constructor for DocumentController class, assigning local variables
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="documentProcessor"></param>
+        /// <param name="messageQueueService"></param>
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
             IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
             IMessageQueueService messageQueueService)
@@ -41,6 +52,11 @@ namespace SWKOM.Controllers
             _messageQueueService = messageQueueService;
         }
 
+        /// <summary>
+        /// Post a document to save in the database with title, author and uploaded file (Pre-Processing with validation,save-request to DAL, document sent to RabbitMQ)
+        /// </summary>
+        /// <param name="documentDTO"></param>
+        /// <returns>Successful status code with document name and id or error status code</returns>
         [SwaggerOperation(Summary = "Post a document to save in the database with title, author and uploaded file")]
         [HttpPost(Name = "PostDocument")]
         public async Task<ActionResult> Create([FromForm] DocumentItemDTO documentDTO)
@@ -77,7 +93,7 @@ namespace SWKOM.Controllers
                 return BadRequest(validationResult.Errors);
             }
 
-            // Das verarbeitet DTO zu DAL-Item mappen
+            // Das verarbeitete DTO zu DAL-Item mappen
             var item = _mapper.Map<DocumentItem>(documentDTO);
 
 
@@ -126,6 +142,11 @@ namespace SWKOM.Controllers
             return Ok(new { message = $"Dateiname {documentDTO.UploadedFile.FileName} für Dokument {documentDTO.Id} erfolgreich gespeichert." });
         }
 
+        /// <summary>
+        /// Get all documents from the database
+        /// </summary>
+        /// <param name="search"></param>
+        /// <returns>Success status code with list of DocumentItems or error status code</returns>
         [SwaggerOperation(Summary = "Get all documents from the database")]
         [HttpGet(Name = "GetDocuments")]
         public async Task<ActionResult> Get([FromQuery] string? search)
@@ -154,6 +175,11 @@ namespace SWKOM.Controllers
             }
         }
 
+        /// <summary>
+        /// Get a specific document from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success status code with DocumentItem with specified id or error status code</returns>
         [SwaggerOperation(Summary = "Get a specific document from the database with the ID of the document")]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetDocumentById(int id)
@@ -189,6 +215,11 @@ namespace SWKOM.Controllers
         //    return NotFound();
         //}
 
+        /// <summary>
+        /// Delete a specific document from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success status code for deletion of DocumentItem with specified id or error status code</returns>
         [SwaggerOperation(Summary = "Delete a specific document from the database with the ID of the document")]
         [HttpDelete("{id}", Name = "DeleteDocumentById")]
         public async Task<ActionResult> Delete(int id)

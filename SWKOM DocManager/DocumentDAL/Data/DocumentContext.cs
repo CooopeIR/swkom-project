@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DocumentDAL.Data
 {
     /// <summary>
-    /// Document Context methods with relationships and database imnitialization
+    /// Document Context methods with relationships and database initialization
     /// </summary>
     public sealed class DocumentContext : DbContext
     {
