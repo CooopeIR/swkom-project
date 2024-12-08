@@ -13,11 +13,25 @@ namespace SWKOM.Services
         /// <summary>
         /// Create connection with connection details for RabbitMQ (file queue)
         /// </summary>
-        public MessageQueueService()
+        public MessageQueueService(IConnection? connection = null, IModel? channel = null)
         {
             var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
+            if (connection != null)
+            {
+                _connection = connection;
+            }
+            else
+            {
+                _connection = factory.CreateConnection();
+            }
+            if (channel != null)
+            {
+                _channel = channel;
+            }
+            else
+            {
+                _channel = _connection.CreateModel();
+            }
             _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
         }
         /// <summary>

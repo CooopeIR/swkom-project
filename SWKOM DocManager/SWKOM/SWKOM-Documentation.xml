@@ -198,7 +198,7 @@
             Connection management functions for RabbitMQ
             </summary>
         </member>
-        <member name="M:SWKOM.Services.MessageQueueService.#ctor">
+        <member name="M:SWKOM.Services.MessageQueueService.#ctor(RabbitMQ.Client.IConnection,RabbitMQ.Client.IModel)">
             <summary>
             Create connection with connection details for RabbitMQ (file queue)
             </summary>
