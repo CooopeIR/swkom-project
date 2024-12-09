@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRWorker", "OcrWorker\OCRWorker.csproj", "{3399D25F-CB87-44AF-BE36-1E7F2B1408F7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearch", "ElasticSearch\ElasticSearch.csproj", "{EBDD3DAD-1047-43BC-9024-BA9FB5E6A6D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{3399D25F-CB87-44AF-BE36-1E7F2B1408F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3399D25F-CB87-44AF-BE36-1E7F2B1408F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3399D25F-CB87-44AF-BE36-1E7F2B1408F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBDD3DAD-1047-43BC-9024-BA9FB5E6A6D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBDD3DAD-1047-43BC-9024-BA9FB5E6A6D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBDD3DAD-1047-43BC-9024-BA9FB5E6A6D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBDD3DAD-1047-43BC-9024-BA9FB5E6A6D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
