@@ -38,7 +38,7 @@
             Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
             </summary>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService)">
+        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
             <summary>
             Constructor for DocumentController class, assigning local variables
             </summary>
@@ -225,7 +225,7 @@
             </summary>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,RabbitMQ.Client.IConnectionFactory)">
+        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,RabbitMQ.Client.IConnectionFactory,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
             <summary>
             Constructor for RabbitMqListenerService class; initialization of variables
             </summary>

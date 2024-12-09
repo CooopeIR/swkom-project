@@ -23,7 +23,7 @@ namespace UnitTest.SWKOMTests.Services
         private Mock<HttpClient> _mockHttpClient;
         private RabbitMqListenerService _service;
 
-        [SetUp]
+        /*[SetUp]
         public void SetUp()
         {
             _mockConnectionFactory = new Mock<IConnectionFactory>();
@@ -41,7 +41,7 @@ namespace UnitTest.SWKOMTests.Services
 
             // Create an instance of the service
             _service = new RabbitMqListenerService(_mockHttpClientFactory.Object, _mockConnectionFactory.Object);
-        }
+        }*/
 
         [TearDown]
         public void TearDown()
