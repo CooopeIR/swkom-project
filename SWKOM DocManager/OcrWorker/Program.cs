@@ -21,7 +21,7 @@ namespace OCRWorker
                         UserName = "user",
                         Password = "password"
                     })
-                .AddSingleton<OcrWorker>()                                     // Register OcrWorker
+                .AddSingleton<OcrWorker>()                                    // Register OcrWorker
                 .BuildServiceProvider();
 
             // Resolve OcrWorker from the DI container

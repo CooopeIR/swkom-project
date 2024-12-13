@@ -73,7 +73,7 @@ services:
     container_name: ocr_worker
     image: ocr_worker_image
     build:
-      context: ./OCRWorker
+      context: ./OcrWorker
       dockerfile: Dockerfile
     depends_on:
       - rabbitmq
@@ -81,6 +81,18 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ./uploads:/app/uploads
+
+  indexing_worker:
+    container_name: indexing_worker
+    image: indexing_worker_image
+    build:
+      context: ./ElasticSearch
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - elasticsearch
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
 
   postgres:
     container_name: postgres_container

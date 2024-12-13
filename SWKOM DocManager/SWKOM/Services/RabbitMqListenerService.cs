@@ -21,7 +21,8 @@ namespace SWKOM.Services
         private IConnection _connection;
         private IModel _channel;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ElasticsearchClient _elasticClient;
+        private readonly IMessageQueueService _messageQueueService;
+
 
         /// <summary>
         /// Start connection and listening RabbitMQ
@@ -39,11 +40,11 @@ namespace SWKOM.Services
         /// <param name="httpClientFactory"></param>
         /// <param name="connectionFactory"></param>
 
-        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory, ElasticsearchClient client)
+        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory, IMessageQueueService messageQueueService)
         {
             _httpClientFactory = httpClientFactory;
             _connectionFactory = connectionFactory;
-            _elasticClient = client;
+            _messageQueueService = messageQueueService;
         }
 
         private void ConnectToRabbitMQ()
@@ -56,7 +57,13 @@ namespace SWKOM.Services
                     _connection = _connectionFactory.CreateConnection();
 
                     _channel = _connection.CreateModel();
+                    
+                    // Queue to consume OCR Results
                     _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                    // Queue to publish DocumentItems for Indexing Worker
+                    _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
                     Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
                     break;
                 }
@@ -85,75 +92,57 @@ namespace SWKOM.Services
                     var parts = message.Split('|', 2);
                     Console.WriteLine($@"[Listener] Nachricht erhalten: {message}");
 
-                    if (parts.Length == 2)
+                    // Make sure parsing worked, else return
+                    if (parts.Length != 2)
                     {
-                        var id = parts[0];
-                        var extractedText = parts[1];
-                        if (string.IsNullOrEmpty(extractedText))
-                        {
-                            Console.WriteLine($@"Fehler: Leerer OCR-Text für Task {id}. Nachricht wird ignoriert.");
-                            return;
-                        }
-                        var client = _httpClientFactory.CreateClient("DocumentDAL");
-                        var response = await client.GetAsync($"/api/document/{id}");
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var documentItem = await response.Content.ReadFromJsonAsync<DocumentItem>();
-                            if (documentItem != null)
-                            {
-                                Console.WriteLine($@"[Listener] Document {id} erfolgreich abgerufen.");
-                                Console.WriteLine($@"[Listener] OCR Text für Document {id}: {extractedText}");
-                                Console.WriteLine($@"[Listener] Document vor Update: {documentItem.Id}, {documentItem.Title}, {documentItem.Author}");
+                        Console.WriteLine(@"Fehler: Ungültige Nachricht empfangen.");
+                        return;
+                    }
 
-                                documentItem.OcrText = extractedText;
+                    // Extract text, return if empty text
+                    var id = parts[0];
+                    var extractedText = parts[1];
+                    if (string.IsNullOrEmpty(extractedText))
+                    {
+                        Console.WriteLine($@"Fehler: Leerer OCR-Text für Task {id}. Nachricht wird ignoriert.");
+                        return;
+                    }
 
-                                //var payload = JsonSerializer.Serialize(documentItem);
-                                ////Console.WriteLine($"Payload: {payload}");
+                    // Fetch documentItem from DAL, return if unsuccessful
+                    var client = _httpClientFactory.CreateClient("DocumentDAL");
+                    var response = await client.GetAsync($"/api/document/{id}");
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($@"Fehler beim Abrufen des Dokuments mit ID {id}: {response.StatusCode}");
+                        return;
+                    }
 
-                                var existsResponse = await _elasticClient.Indices.ExistsAsync("documents");
-                                if (!existsResponse.Exists)
-                                {
-                                    var createResponse = await _elasticClient.Indices.CreateAsync("documents");
-                                    if (!createResponse.Acknowledged)
-                                    {
-                                        Console.WriteLine("Failed to create the index.");
-                                    }
-                                }
+                    var documentItem = await response.Content.ReadFromJsonAsync<DocumentItem>();
+                    if (documentItem == null)
+                    {
+                        Console.WriteLine($@"[Listener] Dokument mit Id {id} nicht gefunden.");
+                        return;
+                    }
 
-                                var indexResponse =
-                                    await _elasticClient.IndexAsync(documentItem, i => i.Index("documents"));
+                    Console.WriteLine($@"[Listener] Document {id} erfolgreich abgerufen.");
+                    Console.WriteLine($@"[Listener] OCR Text für Document {id}: {extractedText}");
+                    Console.WriteLine($@"[Listener] Document vor Update: {documentItem.Id}, {documentItem.Title}, {documentItem.Author}");
 
-                                if (!indexResponse.IsValidResponse)
-                                {
-                                    Console.WriteLine($@"Fehler beim indexieren des Dokuments mit ID {id}");
-                                }
+                    documentItem.OcrText = extractedText;
 
-                                
+                // Send to MessageQueue Service which submits entire Document including OCR for Elastic Search Indexing Worker
+                    _messageQueueService.SendToIndexingQueue(documentItem);
 
-                                var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);
-                                if (!updateResponse.IsSuccessStatusCode)
-                                {
-                                    Console.WriteLine($@"Fehler beim Aktualisieren des Dokuments mit ID {id}");
-                                    Console.WriteLine($"{updateResponse.StatusCode} - {updateResponse.Content}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($@"OCR Text für Dokument {id} erfolgreich aktualisiert.");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine($@"[Listener] Dokument mit Id {id} nicht gefunden.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($@"Fehler beim Abrufen des Dokuments mit ID {id}: {response.StatusCode}");
-                        }
+
+                    var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);
+                    if (!updateResponse.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($@"Fehler beim Aktualisieren des Dokuments mit ID {id}");
+                        Console.WriteLine($"{updateResponse.StatusCode} - {updateResponse.Content}");
                     }
                     else
                     {
-                        Console.WriteLine(@"Fehler: Ungültige Nachricht empfangen.");
+                        Console.WriteLine($@"OCR Text für Dokument {id} erfolgreich aktualisiert.");
                     }
                 };
                 _channel.BasicConsume(queue: "ocr_result_queue", autoAck: true, consumer: consumer);
@@ -163,6 +152,7 @@ namespace SWKOM.Services
                 Console.WriteLine($@"Fehler beim Starten des Listeners für OCR-Ergebnisse: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Close channel and connection of RabbitMQ
         /// </summary>

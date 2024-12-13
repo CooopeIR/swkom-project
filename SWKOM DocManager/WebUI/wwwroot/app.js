@@ -2,12 +2,12 @@
 const apiUrl = 'http://localhost:8081/document';
 
 // Function to fetch and display Todo items
-function fetchDocuments(searchQuery) {
+function fetchDocuments() {
     console.log('Fetching documents...');
-    fetchUrl = apiUrl;
-    if (searchQuery) {
-        fetchUrl = apiUrl + `/?search=${encodeURIComponent(searchQuery)}`;
-    }
+    //fetchUrl = apiUrl;
+    //if (searchQuery) {
+    //    fetchUrl = apiUrl + `/?search=${encodeURIComponent(searchQuery)}`;
+    //}
 
     fetch(fetchUrl)
         .then(response => {
@@ -24,8 +24,8 @@ function fetchDocuments(searchQuery) {
                 li.innerHTML = `
                 <span class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</span>
                 <div class="button-group">
-                    <button class="view" onclick="viewTask(${documentFromResponse.id})">view</button>    
-                    <button class="delete" onclick="deleteTask(${documentFromResponse.id})">
+                    <button class="view" onclick="viewDocument(${documentFromResponse.id})">view</button>    
+                    <button class="delete" onclick="deleteDocument(${documentFromResponse.id})">
                             <span class="material-icons">delete</span>
                     </button>
                 </div>
@@ -36,6 +36,15 @@ function fetchDocuments(searchQuery) {
         .catch (error => {
             console.error('Fehler beim Abrufen der Documents:', error);
         });
+}
+
+function searchDocumenrts(questyString) {
+    const exactMatch = document.getElementById("exactMatchToggle").checked;
+
+    if (exactMatch) {
+        fetchUrl = apiurl + ""
+    }
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -170,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', fetchDocuments(''));
 
-function deleteTask(id) {
+function deleteDocument(id) {
     fetch(`${apiUrl}/${id}`, {
         method: 'DELETE'
     })
@@ -178,13 +187,13 @@ function deleteTask(id) {
             if (response.ok) {
                 fetchDocuments(); // Refresh the list after deletion
             } else {
-                console.error('Fehler beim Löschen der Aufgabe.');
+                console.error('Fehler beim Löschen des Dokuments.');
             }
         })
         .catch(error => console.error('Fehler:', error));
 }
 
-function viewTask(id) {
+function viewDopcument(id) {
     fetch(`${apiUrl}/${id}`, {
         method: 'GET'
     })

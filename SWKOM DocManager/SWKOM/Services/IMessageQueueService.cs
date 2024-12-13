@@ -1,4 +1,6 @@
-﻿namespace SWKOM.Services
+﻿using DocumentDAL.Entities;
+
+namespace SWKOM.Services
 {
     /// <summary>
     /// Interface IMessageQueueService for MessageQueueService;
@@ -10,6 +12,7 @@
         /// Interface: Send message to RabbitMQ file queue
         /// </summary>
         /// <param name="message">type: string</param>
-        void SendToQueue(string message);
+        void SendToFileQueue(string message);
+        void SendToIndexingQueue(DocumentItem item);
     }
 }

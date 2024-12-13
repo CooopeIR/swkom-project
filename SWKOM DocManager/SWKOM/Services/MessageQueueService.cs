@@ -1,5 +1,7 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
+using DocumentDAL.Entities;
+using System.Text.Json;
 
 namespace SWKOM.Services
 {
@@ -34,16 +36,26 @@ namespace SWKOM.Services
             }
             _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
         }
+
         /// <summary>
         /// Send message to RabbitMQ file queue
         /// </summary>
         /// <param name="message">type: string</param>
-        public void SendToQueue(string message)
+        public void SendToFileQueue(string message)
         {
             var body = Encoding.UTF8.GetBytes(message);
             _channel.BasicPublish(exchange: "", routingKey: "file_queue", basicProperties: null, body: body);
             Console.WriteLine($"[x] Sent {message}");
         }
+
+        public void SendToIndexingQueue(DocumentItem item)
+        {
+            var documentJson = JsonSerializer.Serialize(item);
+            var body = Encoding.UTF8.GetBytes(documentJson);
+            _channel.BasicPublish(exchange: "", routingKey: "indexing_queue", basicProperties: null, body: body);
+            Console.WriteLine($"[x] Sent Document with ID {item.Id} to Indexing Service");
+        }
+
         /// <summary>
         /// Close connection to RabbitMQ
         /// </summary>

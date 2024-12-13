@@ -46,14 +46,13 @@ namespace SWKOM.Controllers
         /// <param name="messageQueueService"></param>
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
             IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
-            IMessageQueueService messageQueueService, ElasticsearchClient searchClient)
+            IMessageQueueService messageQueueService)
         {
             _logger = logger;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _documentProcessor = documentProcessor;
             _messageQueueService = messageQueueService;
-            _searchClient = searchClient;
         }
 
 
@@ -152,7 +151,6 @@ namespace SWKOM.Controllers
             var item = _mapper.Map<DocumentItem>(documentDTO);
 
 
-
             // Speichere das Item im DAL
             var client = _httpClientFactory.CreateClient("DocumentDAL");
             var saveFileResponse = await client.PostAsJsonAsync("/api/document", item);
@@ -173,21 +171,17 @@ namespace SWKOM.Controllers
 
             // Datei speichern (lokal im Container) mit der Id von der Datenbank und dem Originalfile aus dem ursprünglichen documentDto
             var filePath = Path.Combine("/app/uploads", documentDTO.UploadedFile.FileName);
-            Console.WriteLine(filePath);
+            
             Directory.CreateDirectory(Path.GetDirectoryName(filePath)!); // Erstelle das Verzeichnis, falls es nicht existiert
             await using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await documentDTO.UploadedFile.CopyToAsync(stream);
             }
 
-            Console.WriteLine($"With Id: {documentDtoWithId.Id}");
-            Console.WriteLine($"Without Id: {documentDTO.Id}");
-
             // Nachricht an RabbitMQ
             try
             {
-                //SendToMessageQueue(documentFile.FileName);
-                _messageQueueService.SendToQueue($"{documentDtoWithId.Id}|{filePath}");
+                _messageQueueService.SendToFileQueue($"{documentDtoWithId.Id}|{filePath}");
                 Console.WriteLine($@"File Path {filePath} an RabbitMQ Queue gesendet.");
             }
             catch (Exception ex)

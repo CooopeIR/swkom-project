@@ -6,6 +6,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using DocumentDAL.Entities;
 using Tesseract;
 using IConnectionFactory = RabbitMQ.Client.IConnectionFactory;
 using OCRWorker.ProcessLibrary;
@@ -34,7 +37,13 @@ namespace OCRWorker
                 {
                     _connection = _connectionFactory.CreateConnection();
                     _channel = _connection.CreateModel();
+                    
+                    //Queue to read files for OCR work
                     _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                    //Queue to publish OCR results
+                    _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
                     Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
 
                     break; // Wenn die Verbindung klappt, verlässt es die Schleife
@@ -57,7 +66,6 @@ namespace OCRWorker
         {
             ConnectToRabbitMQ();
         }
-
 
         public void Start()
         {
@@ -99,54 +107,8 @@ namespace OCRWorker
                     Console.WriteLine("Fehler: Ungültige Nachricht empfangen, Split in weniger als 2 Teile.");
                 }
             };
-
             _channel.BasicConsume(queue: "file_queue", autoAck: true, consumer: consumer);
         }
-
-
-        //public void Start()
-        //{
-        //    var consumer = new EventingBasicConsumer(_channel);
-        //    consumer.Received += (model, ea) =>
-        //    {
-        //        var body = ea.Body.ToArray();
-        //        var message = Encoding.UTF8.GetString(body);
-        //        var parts = message.Split('|', 2);
-
-        //        if (parts.Length == 2)
-        //        {
-        //            var id = parts[0];
-        //            var filePath = parts[1];
-
-        //            Console.WriteLine($"[x] Received ID: {id}, FilePath: {filePath}");
-
-        //            // Stelle sicher, dass die Datei existiert
-        //            if (!File.Exists(filePath))
-        //            {
-        //                Console.WriteLine($"Fehler: Datei {filePath} nicht gefunden.");
-        //                return;
-        //            }
-
-        //            // OCR-Verarbeitung starten
-        //            var extractedText = PerformOcr(filePath);
-
-        //            if (!string.IsNullOrEmpty(extractedText))
-        //            {
-        //                // Ergebnis zurück an RabbitMQ senden
-        //                var resultBody = Encoding.UTF8.GetBytes($"{id}|{extractedText}");
-        //                _channel.BasicPublish(exchange: "", routingKey: "ocr_result_queue", basicProperties: null, body: resultBody);
-
-        //                Console.WriteLine($"[x] Sent result for ID: {id}");
-        //            }
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("Fehler: Ungültige Nachricht empfangen, Split in weniger als 2 Teile.");
-        //        }
-        //    };
-
-        //    _channel.BasicConsume(queue: "file_queue", autoAck: true, consumer: consumer);
-        //}
 
         // Getter for the channel (useful for testing)
         public IModel GetChannel()
