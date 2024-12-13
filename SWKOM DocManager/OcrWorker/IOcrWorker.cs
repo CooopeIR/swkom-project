@@ -7,7 +7,7 @@ namespace OCRWorker
         void ConnectToRabbitMQ();
         IModel GetChannel(); // To access the channel in tests
         public string PerformOcr(string filePath);
-        public Task StartAsync();
+        public void Start();
         public void Dispose();
     }
 }

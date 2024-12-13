@@ -58,15 +58,15 @@ namespace OCRWorker
             ConnectToRabbitMQ();
         }
 
-        
-        public async Task StartAsync()
+
+        public void Start()
         {
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var parts = message.Split('|');
+                var parts = message.Split('|', 2);
 
                 if (parts.Length == 2)
                 {
@@ -111,7 +111,7 @@ namespace OCRWorker
         //    {
         //        var body = ea.Body.ToArray();
         //        var message = Encoding.UTF8.GetString(body);
-        //        var parts = message.Split('|');
+        //        var parts = message.Split('|', 2);
 
         //        if (parts.Length == 2)
         //        {

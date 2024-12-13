@@ -73,7 +73,7 @@ services:
     container_name: ocr_worker
     image: ocr_worker_image
     build:
-      context: ./OCRWorker  
+      context: ./OCRWorker
       dockerfile: Dockerfile
     depends_on:
       - rabbitmq

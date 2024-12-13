@@ -8,8 +8,6 @@ namespace OCRWorker
 {
     class Program
     {
-        
-
         static void Main(string[] args)
         {
 
@@ -29,7 +27,7 @@ namespace OCRWorker
             // Resolve OcrWorker from the DI container
             var worker = serviceProvider.GetService<OcrWorker>();
             worker.Initialize();
-            worker.StartAsync();
+            worker.Start();
 
             Console.WriteLine("OCR Worker is running. Press Ctrl+C to exit.");
 
