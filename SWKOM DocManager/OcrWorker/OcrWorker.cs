@@ -8,7 +8,6 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using DocumentDAL.Entities;
 using Tesseract;
 using IConnectionFactory = RabbitMQ.Client.IConnectionFactory;
 using OCRWorker.ProcessLibrary;
