@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ElasticSearch</name>
+    </assembly>
+    <members>
+        <member name="T:ElasticSearch.IIndexingWorker">
+            <summary>
+            Interface IIndexingWorker for IndexingWorker;
+            Class with IndexingWorker and associated functions
+            </summary>
+        </member>
+        <member name="M:ElasticSearch.IIndexingWorker.ConnectToRabbitMQ">
+            <summary>
+            Tries to connect to RabbitMQ
+            </summary>
+            <exception cref="T:System.Exception">Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen</exception>
+        </member>
+        <member name="M:ElasticSearch.IIndexingWorker.GetChannel">
+            <summary>
+            Get Channel from private _channel variable; To access the channel in tests
+            </summary>
+            <returns>IModel _channel</returns>
+        </member>
+        <member name="M:ElasticSearch.IIndexingWorker.IndexDocument(ElasticSearch.Models.Document)">
+            <summary>
+            Tries to index the given document
+            </summary>
+            <param name="item">get Document item</param>
+        </member>
+        <member name="M:ElasticSearch.IIndexingWorker.Start">
+            <summary>
+            Wrapper for IndexDocument with additional needed preprocessing and exception catching
+            </summary>
+        </member>
+        <member name="M:ElasticSearch.IIndexingWorker.Dispose">
+            <summary>
+            Dispose function to close channel and connection
+            </summary>
+        </member>
+        <member name="T:ElasticSearch.IndexingWorker">
+            <summary>
+            Class with IndexingWorker and associated functions
+            </summary>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.#ctor(RabbitMQ.Client.IConnectionFactory,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
+            <summary>
+            Constructor for IndexingWorker, get elasticClient and connectionFactory
+            </summary>
+            <param name="connectionFactory"></param>
+            <param name="elasticCient"></param>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.ConnectToRabbitMQ">
+            <summary>
+            Tries to connect to RabbitMQ
+            </summary>
+            <exception cref="T:System.Exception">Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen</exception>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.Initialize">
+            <summary>
+            Start ConnectToRabbitMQ function to start connection
+            </summary>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.GetChannel">
+            <summary>
+            Get Channel from private _channel variable; To access the channel in tests
+            </summary>
+            <returns>IModel _channel</returns>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.IndexDocument(ElasticSearch.Models.Document)">
+            <summary>
+            Tries to index the given document
+            </summary>
+            <param name="item">get Document item</param>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.Start">
+            <summary>
+            Wrapper for IndexDocument with additional needed preprocessing and exception catching
+            </summary>
+        </member>
+        <member name="M:ElasticSearch.IndexingWorker.Dispose">
+            <summary>
+            Dispose function to close channel and connection
+            </summary>
+        </member>
+        <member name="T:ElasticSearch.Models.Document">
+            <summary>
+            Structure with necessary elements for a DocumentItem element (id, title, author, DocumentContent element, DocumentMetadata element, ocr text)
+            </summary>
+        </member>
+        <member name="P:ElasticSearch.Models.Document.Id">
+            <summary>
+            ID of DocumentItem element
+            </summary>
+        </member>
+        <member name="P:ElasticSearch.Models.Document.Title">
+            <summary>
+            Entered title by user
+            </summary>
+        </member>
+        <member name="P:ElasticSearch.Models.Document.Author">
+            <summary>
+            Entered author by user
+            </summary>
+        </member>
+        <member name="P:ElasticSearch.Models.Document.OcrText">
+            <summary>
+            Generated OCR Text
+            </summary>
+        </member>
+    </members>
+</doc>

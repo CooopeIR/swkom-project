@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DocumentDAL.Entities;
-using Elastic.Clients.Elasticsearch.Nodes;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Nodes;
 using FluentValidation;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +56,12 @@ namespace SWKOM.Controllers
         }
 
 
-        // Wildcard-Search (QueryString)
+        /// <summary>
+        /// Wildcard-Search (QueryString)
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with query string")]
         [HttpPost("search/querystring")]
         public async Task<IActionResult> SearchByQueryString([FromBody] string searchTerm)
         {
@@ -72,7 +77,12 @@ namespace SWKOM.Controllers
             return HandleSearchResponse(response);
         }
 
-        // Fuzzy-Search with Match(Normalisation)
+        /// <summary>
+        /// Fuzzy-Search with Match(Normalisation)
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with Fuzzy")]
         [HttpPost("search/fuzzy")]
         public async Task<IActionResult> SearchByFuzzy([FromBody] string searchTerm)
         {
@@ -91,6 +101,11 @@ namespace SWKOM.Controllers
             return HandleSearchResponse(response);
         }
 
+        /// <summary>
+        /// Checks if response is a valid response and has content (Documents)
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         private IActionResult HandleSearchResponse(SearchResponse<DocumentItem> response)
         {
             if (response.IsValidResponse)
@@ -171,7 +186,7 @@ namespace SWKOM.Controllers
 
             // Datei speichern (lokal im Container) mit der Id von der Datenbank und dem Originalfile aus dem ursprünglichen documentDto
             var filePath = Path.Combine("/app/uploads", documentDTO.UploadedFile.FileName);
-            
+
             Directory.CreateDirectory(Path.GetDirectoryName(filePath)!); // Erstelle das Verzeichnis, falls es nicht existiert
             await using (var stream = new FileStream(filePath, FileMode.Create))
             {

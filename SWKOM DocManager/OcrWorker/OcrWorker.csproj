@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>538e0b68-bdd9-480e-9212-28b6de1b6ad4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <DocumentationFile>./OcrWorker-Documentation.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

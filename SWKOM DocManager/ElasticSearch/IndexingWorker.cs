@@ -1,14 +1,17 @@
-﻿using System.Text;
-using System.Text.Json;
-using ElasticSearch.Models;
-using Elastic.Clients.Elasticsearch;
+﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Nodes;
+using ElasticSearch.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Text;
+using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ElasticSearch;
 
+/// <summary>
+/// Class with IndexingWorker and associated functions
+/// </summary>
 public class IndexingWorker : IIndexingWorker
 {
     private readonly IConnectionFactory _connectionFactory;
@@ -16,12 +19,21 @@ public class IndexingWorker : IIndexingWorker
     private IConnection _connection;
     private IModel _channel;
 
+    /// <summary>
+    /// Constructor for IndexingWorker, get elasticClient and connectionFactory
+    /// </summary>
+    /// <param name="connectionFactory"></param>
+    /// <param name="elasticCient"></param>
     public IndexingWorker(IConnectionFactory connectionFactory, ElasticsearchClient elasticCient)
     {
         _connectionFactory = connectionFactory;
         _elasticClient = elasticCient;
     }
 
+    /// <summary>
+    /// Tries to connect to RabbitMQ
+    /// </summary>
+    /// <exception cref="Exception">Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen</exception>
     public void ConnectToRabbitMQ()
     {
 
@@ -54,17 +66,27 @@ public class IndexingWorker : IIndexingWorker
         }
     }
 
+    /// <summary>
+    /// Start ConnectToRabbitMQ function to start connection
+    /// </summary>
     public void Initialize()
     {
         ConnectToRabbitMQ();
     }
 
+    /// <summary>
+    /// Get Channel from private _channel variable; To access the channel in tests
+    /// </summary>
+    /// <returns>IModel _channel</returns>
     public IModel GetChannel()
     {
         return _channel;
     }
 
-
+    /// <summary>
+    /// Tries to index the given document
+    /// </summary>
+    /// <param name="item">get Document item</param>
     public async Task IndexDocument(Document item)
     {
         var response = await _elasticClient.IndexAsync(item, i => i.Index("documents"));
@@ -75,6 +97,9 @@ public class IndexingWorker : IIndexingWorker
         }
     }
 
+    /// <summary>
+    /// Wrapper for IndexDocument with additional needed preprocessing and exception catching
+    /// </summary>
     public void Start()
     {
         var consumer = new EventingBasicConsumer(_channel);
@@ -119,6 +144,9 @@ public class IndexingWorker : IIndexingWorker
         _channel.BasicConsume(queue: "indexing_queue", autoAck: false, consumer: consumer);
     }
 
+    /// <summary>
+    /// Dispose function to close channel and connection
+    /// </summary>
     public void Dispose()
     {
         _channel?.Close();

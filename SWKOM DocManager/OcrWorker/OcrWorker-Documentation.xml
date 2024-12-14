@@ -1,0 +1,233 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OcrWorker</name>
+    </assembly>
+    <members>
+        <member name="T:OCRWorker.IOcrWorker">
+            <summary>
+            Interface IOcrWorker for OcrWorker;
+            Class with OcrWorker and associated functions
+            </summary>
+        </member>
+        <member name="M:OCRWorker.IOcrWorker.ConnectToRabbitMQ">
+            <summary>
+            Tries to connect to RabbitMQ
+            </summary>
+            <exception cref="T:System.Exception">Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen</exception>
+        </member>
+        <member name="M:OCRWorker.IOcrWorker.GetChannel">
+            <summary>
+            Getter for the channel (useful for testing); To access the channel in tests
+            </summary>
+            <returns>IModel _channel</returns>
+        </member>
+        <member name="M:OCRWorker.IOcrWorker.PerformOcr(System.String)">
+            <summary>
+            OCR Processing: gets filePath, tries to get text out of document and returns text as string
+            </summary>
+            <param name="filePath"></param>
+            <returns>Text from documents</returns>
+        </member>
+        <member name="M:OCRWorker.IOcrWorker.Start">
+            <summary>
+            Wrapper for OCR Processing with additional needed pre- and postprocessing
+            </summary>
+        </member>
+        <member name="M:OCRWorker.IOcrWorker.Dispose">
+            <summary>
+            Dispose function to close channel and connection
+            </summary>
+        </member>
+        <member name="T:OCRWorker.OcrWorker">
+            <summary>
+            Class with OcrWorker and associated functions
+            </summary>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.#ctor(OCRWorker.ProcessLibrary.IProcessFactory,RabbitMQ.Client.IConnectionFactory)">
+            <summary>
+            Constructor for OcrWorker, get processFactory and connectionFactory
+            </summary>
+            <param name="processFactory"></param>
+            <param name="connectionFactory"></param>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.ConnectToRabbitMQ">
+            <summary>
+            Tries to connect to RabbitMQ
+            </summary>
+            <exception cref="T:System.Exception">Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen</exception>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.Initialize">
+            <summary>
+            Start ConnectToRabbitMQ function to start connection
+            </summary>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.Start">
+            <summary>
+            Wrapper for OCR Processing with additional needed pre- and postprocessing
+            </summary>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.GetChannel">
+            <summary>
+            Getter for the channel (useful for testing); To access the channel in tests
+            </summary>
+            <returns>IModel _channel</returns>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.PerformOcr(System.String)">
+            <summary>
+            OCR Processing: gets filePath, tries to get text out of document and returns text as string
+            </summary>
+            <param name="filePath"></param>
+            <returns>Text from documents</returns>
+        </member>
+        <member name="M:OCRWorker.OcrWorker.Dispose">
+            <summary>
+            Dispose function to close channel and connection
+            </summary>
+        </member>
+        <member name="T:OCRWorker.ProcessLibrary.IProcess">
+            <summary>
+            This interface is required to abstract the Process Class for Mocking purposes. Without it, the Unit Testing would be difficult
+            </summary>
+        </member>
+        <member name="P:OCRWorker.ProcessLibrary.IProcess.StandardOutput">
+            <summary>
+            Wrapper for _process.StandardOutput
+            </summary>
+        </member>
+        <member name="P:OCRWorker.ProcessLibrary.IProcess.StartInfo">
+            <summary>
+            Getter and Setter for _process.StartInfo
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.IProcess.GetOutput">
+            <summary>
+            For reading standard output, for example
+            </summary>
+            <returns>read from current position to end and returns it</returns>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.IProcess.Start">
+            <summary>
+            Start process with _process.Start
+            </summary>
+            <returns>true if process is started or false if no new process is started</returns>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.IProcess.WaitForExit">
+            <summary>
+            Call function _process.WaitForExit to wait for process to exit
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.IProcess.Kill">
+            <summary>
+            Ensure process is killed when done
+            </summary>
+        </member>
+        <member name="T:OCRWorker.ProcessLibrary.IProcessFactory">
+            <summary>
+            Interface IProcessFactory for ProcessFactory; 
+            ProcessFactory Class with function to create a new IProcess; for Unit Testing purposes
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.IProcessFactory.CreateProcess(System.String,System.String)">
+            <summary>
+            Interface; Uses IProcessStartInfoFactory to set newly created ProcessStartInfo, 
+            creates and returns new ProcessWrapper with ProcessStartInfo
+            </summary>
+            <param name="fileName"></param>
+            <param name="arguments"></param>
+            <returns>Created IProcess</returns>
+        </member>
+        <member name="T:OCRWorker.ProcessLibrary.ProcessFactory">
+            <summary>
+            ProcessFactory Class with function to create a new IProcess; for Unit Testing purposes
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessFactory.#ctor(OCRWorker.ProcessLibrary.IProcessStartInfoFactory)">
+            <summary>
+            Constructor for ProcessFactory class
+            </summary>
+            <param name="psifactory">Sets private ProcessStartInfoFactory to given IProcessStartInfoFactory value</param>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessFactory.CreateProcess(System.String,System.String)">
+            <summary>
+            Uses IProcessStartInfoFactory to set newly created ProcessStartInfo, 
+            creates and returns new ProcessWrapper with ProcessStartInfo
+            </summary>
+            <param name="fileName"></param>
+            <param name="arguments"></param>
+            <returns>Created IProcess</returns>
+        </member>
+        <member name="T:OCRWorker.ProcessLibrary.IProcessStartInfoFactory">
+            <summary>
+            Interface IProcessStartInfoFactory for ProcessStartInfoFactory;
+            Class with function to create ProcessStartInfo element and returns it
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.IProcessStartInfoFactory.Create(System.String,System.String)">
+            <summary>
+            Interface; Create new ProcessStartInfo, fills it with given values 
+            (additional RedirectStandardOutput and CreateNoWindow =true, UseShellExecute=false) and returns it
+            </summary>
+            <param name="fileName">string fileName</param>
+            <param name="arguments">string arguments</param>
+            <returns>Created and filled ProcessStartInfo</returns>
+        </member>
+        <member name="T:OCRWorker.ProcessLibrary.ProcessStartInfoFactory">
+            <summary>
+            Class with function to create ProcessStartInfo element and returns it
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessStartInfoFactory.Create(System.String,System.String)">
+            <summary>
+            Create new ProcessStartInfo, fills it with given values 
+            (additional RedirectStandardOutput and CreateNoWindow =true, UseShellExecute=false) and returns it
+            </summary>
+            <param name="fileName">string fileName</param>
+            <param name="arguments">string arguments</param>
+            <returns>Created and filled ProcessStartInfo</returns>
+        </member>
+        <member name="T:OCRWorker.ProcessLibrary.ProcessWrapper">
+            <summary>
+            ProcessWrapper Class with functions for easier access
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessWrapper.#ctor(System.Diagnostics.ProcessStartInfo)">
+            <summary>
+            Constructor for ProcessWrapper class
+            </summary>
+            <param name="startInfo">Gets ProcessStartInfo startinfo, makes new Process with given startInfo</param>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessWrapper.GetOutput">
+            <summary>
+            For reading standard output, for example
+            </summary>
+            <returns>read from current position to end and returns it</returns>
+        </member>
+        <member name="P:OCRWorker.ProcessLibrary.ProcessWrapper.StandardOutput">
+            <summary>
+            Wrapper for _process.StandardOutput
+            </summary>
+        </member>
+        <member name="P:OCRWorker.ProcessLibrary.ProcessWrapper.StartInfo">
+            <summary>
+            Getter and Setter for _process.StartInfo
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessWrapper.Start">
+            <summary>
+            Start process with _process.Start
+            </summary>
+            <returns>true if process is started or false if no new process is started</returns>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessWrapper.WaitForExit">
+            <summary>
+            Call function _process.WaitForExit to wait for process to exit
+            </summary>
+        </member>
+        <member name="M:OCRWorker.ProcessLibrary.ProcessWrapper.Kill">
+            <summary>
+            Ensure process is killed when done
+            </summary>
+        </member>
+    </members>
+</doc>
