@@ -12,6 +12,8 @@ namespace SWKOM.Services
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
+
+
         /// <summary>
         /// Create connection with connection details for RabbitMQ (file queue)
         /// </summary>
@@ -35,7 +37,10 @@ namespace SWKOM.Services
                 _channel = _connection.CreateModel();
             }
             _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false,
+                arguments: null);
         }
+
 
         /// <summary>
         /// Send message to RabbitMQ file queue
