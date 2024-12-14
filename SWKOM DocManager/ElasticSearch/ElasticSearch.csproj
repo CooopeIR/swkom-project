@@ -7,6 +7,8 @@
     <UserSecretsId>ba6dd956-00c5-4080-8147-721f136fe740</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<DockerfileContext>.</DockerfileContext>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<DocumentationFile>./ElasticSearch-Documentation.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

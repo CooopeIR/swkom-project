@@ -1,6 +1,6 @@
-﻿using RabbitMQ.Client;
+﻿using DocumentDAL.Entities;
+using RabbitMQ.Client;
 using System.Text;
-using DocumentDAL.Entities;
 using System.Text.Json;
 
 namespace SWKOM.Services
@@ -48,6 +48,10 @@ namespace SWKOM.Services
             Console.WriteLine($"[x] Sent {message}");
         }
 
+        /// <summary>
+        /// Send DocumentItem to Indexing queue
+        /// </summary>
+        /// <param name="item"></param>
         public void SendToIndexingQueue(DocumentItem item)
         {
             var documentJson = JsonSerializer.Serialize(item);

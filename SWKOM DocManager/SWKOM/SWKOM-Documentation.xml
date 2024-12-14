@@ -38,7 +38,7 @@
             Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
             </summary>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
+        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService)">
             <summary>
             Constructor for DocumentController class, assigning local variables
             </summary>
@@ -47,6 +47,27 @@
             <param name="httpClientFactory"></param>
             <param name="documentProcessor"></param>
             <param name="messageQueueService"></param>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.SearchByQueryString(System.String)">
+            <summary>
+            Wildcard-Search (QueryString)
+            </summary>
+            <param name="searchTerm"></param>
+            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.SearchByFuzzy(System.String)">
+            <summary>
+            Fuzzy-Search with Match(Normalisation)
+            </summary>
+            <param name="searchTerm"></param>
+            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.HandleSearchResponse(Elastic.Clients.Elasticsearch.SearchResponse{DocumentDAL.Entities.DocumentItem})">
+            <summary>
+            Checks if response is a valid response and has content (Documents)
+            </summary>
+            <param name="response"></param>
+            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         </member>
         <member name="M:SWKOM.Controllers.DocumentController.Create(SWKOM.DTO.DocumentItemDTO)">
             <summary>
@@ -187,11 +208,17 @@
             Connection management functions for RabbitMQ
             </summary>
         </member>
-        <member name="M:SWKOM.Services.IMessageQueueService.SendToQueue(System.String)">
+        <member name="M:SWKOM.Services.IMessageQueueService.SendToFileQueue(System.String)">
             <summary>
             Interface: Send message to RabbitMQ file queue
             </summary>
             <param name="message">type: string</param>
+        </member>
+        <member name="M:SWKOM.Services.IMessageQueueService.SendToIndexingQueue(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            Interface: Send DocumentItem to Indexing queue
+            </summary>
+            <param name="item"></param>
         </member>
         <member name="T:SWKOM.Services.MessageQueueService">
             <summary>
@@ -203,11 +230,17 @@
             Create connection with connection details for RabbitMQ (file queue)
             </summary>
         </member>
-        <member name="M:SWKOM.Services.MessageQueueService.SendToQueue(System.String)">
+        <member name="M:SWKOM.Services.MessageQueueService.SendToFileQueue(System.String)">
             <summary>
             Send message to RabbitMQ file queue
             </summary>
             <param name="message">type: string</param>
+        </member>
+        <member name="M:SWKOM.Services.MessageQueueService.SendToIndexingQueue(DocumentDAL.Entities.DocumentItem)">
+            <summary>
+            Send DocumentItem to Indexing queue
+            </summary>
+            <param name="item"></param>
         </member>
         <member name="M:SWKOM.Services.MessageQueueService.Dispose">
             <summary>
@@ -225,7 +258,7 @@
             </summary>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,RabbitMQ.Client.IConnectionFactory,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
+        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,RabbitMQ.Client.IConnectionFactory,SWKOM.Services.IMessageQueueService)">
             <summary>
             Constructor for RabbitMqListenerService class; initialization of variables
             </summary>
