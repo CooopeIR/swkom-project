@@ -23,11 +23,11 @@ public class IndexingWorker : IIndexingWorker
     /// Constructor for IndexingWorker, get elasticClient and connectionFactory
     /// </summary>
     /// <param name="connectionFactory"></param>
-    /// <param name="elasticCient"></param>
-    public IndexingWorker(IConnectionFactory connectionFactory, ElasticsearchClient elasticCient)
+    /// <param name="elasticClient"></param>
+    public IndexingWorker(IConnectionFactory connectionFactory, ElasticsearchClient elasticClient)
     {
         _connectionFactory = connectionFactory;
-        _elasticClient = elasticCient;
+        _elasticClient = elasticClient;
     }
 
     /// <summary>
@@ -89,7 +89,10 @@ public class IndexingWorker : IIndexingWorker
     /// <param name="item">get Document item</param>
     public async Task IndexDocument(Document item)
     {
+        Console.WriteLine($"Indexing Document {item.Id}");
         var response = await _elasticClient.IndexAsync(item, i => i.Index("documents"));
+
+        Console.WriteLine($"Result: {response.Result}, Index: {response.Index}" );
 
         if (response.IsValidResponse)
         {
@@ -105,7 +108,7 @@ public class IndexingWorker : IIndexingWorker
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += async (model, ea) =>
         {
-            await Task.Run(() =>
+            await Task.Run( async () =>
             {
                 try
                 {
@@ -119,7 +122,7 @@ public class IndexingWorker : IIndexingWorker
                     Console.WriteLine(
                         $"  [Indexing Worker]  Deserialized Document with Id {documentItem.Id} and Title {documentItem.Title}");
 
-                    IndexDocument(documentItem);
+                    await IndexDocument(documentItem);
 
                     // Acknowledge the message on successful processing
                     _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);

@@ -17,6 +17,7 @@ builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
 
 // Add services to the container.
 builder.Services.AddControllers();
+
 // Register RabbitMQ connection factory
 builder.Services.AddSingleton<IConnectionFactory>(_ =>
     new ConnectionFactory
@@ -24,10 +25,12 @@ builder.Services.AddSingleton<IConnectionFactory>(_ =>
         HostName = "rabbitmq",
         UserName = "user",
         Password = "password"
-    });
+    }
+);
 
 
 builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
+
 builder.Services.AddHostedService<RabbitMqListenerService>();
 
 

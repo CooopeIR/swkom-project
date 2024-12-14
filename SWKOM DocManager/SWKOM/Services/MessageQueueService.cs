@@ -1,7 +1,9 @@
 ﻿using DocumentDAL.Entities;
+using Microsoft.AspNetCore.Connections;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
+using IConnectionFactory = RabbitMQ.Client.IConnectionFactory;
 
 namespace SWKOM.Services
 {
@@ -10,36 +12,81 @@ namespace SWKOM.Services
     /// </summary>
     public class MessageQueueService : IMessageQueueService, IDisposable
     {
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
+        private IConnection _connection;
+        private IModel _channel;
+        private readonly IConnectionFactory _connectionFactory;
+
+        public IConnection Connection => _connection;
 
 
         /// <summary>
         /// Create connection with connection details for RabbitMQ (file queue)
         /// </summary>
-        public MessageQueueService(IConnection? connection = null, IModel? channel = null)
+        //public MessageQueueService(IConnection? connection = null, IModel? channel = null)
+        //{
+        //    var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
+        //    if (connection != null)
+        //    {
+        //        _connection = connection;
+        //    }
+        //    else
+        //    {
+        //        _connection = factory.CreateConnection();
+        //    }
+        //    if (channel != null)
+        //    {
+        //        _channel = channel;
+        //    }
+        //    else
+        //    {
+        //        _channel = _connection.CreateModel();
+        //    }
+        //    _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+        //    _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false,
+        //        arguments: null);
+        //}
+
+        public MessageQueueService(IConnectionFactory connectionFactory)
         {
-            var factory = new ConnectionFactory() { HostName = "rabbitmq", UserName = "user", Password = "password" };
-            if (connection != null)
-            {
-                _connection = connection;
-            }
-            else
-            {
-                _connection = factory.CreateConnection();
-            }
-            if (channel != null)
-            {
-                _channel = channel;
-            }
-            else
-            {
-                _channel = _connection.CreateModel();
-            }
-            _channel.QueueDeclare(queue: "file_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-            _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false,
-                arguments: null);
+            _connectionFactory = connectionFactory;
+            ConnectToRabbitMQ();
         }
+
+        public Task ConnectToRabbitMQ()
+        {
+            int retries = 15;
+            while (retries > 0)
+            {
+                try
+                {
+                    _connection = _connectionFactory.CreateConnection();
+
+                    _channel = _connection.CreateModel();
+
+                    // Queue to consume OCR Results
+                    _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                    // Queue to publish DocumentItems for Indexing Worker
+                    _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                    Console.WriteLine("[MsgService] Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[MsgService] Fehler beim Verbinden mit RabbitMQ: {ex.Message}. Versuche es in 5 Sekunden erneut...");
+                    Thread.Sleep(5000);
+                    retries--;
+                }
+            }
+            if (_connection == null || !_connection.IsOpen)
+            {
+                throw new Exception("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen.");
+            }
+            return Task.CompletedTask;
+        }
+
+        
 
 
         /// <summary>

@@ -17,9 +17,9 @@ namespace SWKOM.Services
     /// </summary>
     public class RabbitMqListenerService : IHostedService
     {
-        private readonly IConnectionFactory _connectionFactory;
-        private IConnection _connection;
-        private IModel _channel;
+        //private readonly IConnectionFactory _connectionFactory;
+        private IConnection? _connection = null;
+        private IModel? _channel = null;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IMessageQueueService _messageQueueService;
 
@@ -28,65 +28,104 @@ namespace SWKOM.Services
         /// Start connection and listening RabbitMQ
         /// </summary>
         /// <param name="cancellationToken"></param>
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            ConnectToRabbitMQ();
+            await Initialize();
             StartListening();
-            return Task.CompletedTask;
         }
+
         /// <summary>
         /// Constructor for RabbitMqListenerService class; initialization of variables
         /// </summary>
         /// <param name="httpClientFactory"></param>
         /// <param name="connectionFactory"></param>
 
-        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IConnectionFactory connectionFactory, IMessageQueueService messageQueueService)
+        public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IMessageQueueService messageQueueService)
         {
             _httpClientFactory = httpClientFactory;
-            _connectionFactory = connectionFactory;
+            //_connectionFactory = connectionFactory;
             _messageQueueService = messageQueueService;
         }
 
-        private void ConnectToRabbitMQ()
+        //private void ConnectToRabbitMQ()
+        //{
+        //    int retries = 15;
+        //    while (retries > 0)
+        //    {
+        //        try
+        //        {
+        //            _connection = _connectionFactory.CreateConnection();
+
+        //            _channel = _connection.CreateModel();
+                    
+        //            // Queue to consume OCR Results
+        //            _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+        //            // Queue to publish DocumentItems for Indexing Worker
+        //            _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+        //            Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
+        //            break;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Console.WriteLine($"Fehler beim Verbinden mit RabbitMQ: {ex.Message}. Versuche es in 5 Sekunden erneut...");
+        //            Thread.Sleep(5000);
+        //            retries--;
+        //        }
+        //    }
+        //    if (_connection == null || !_connection.IsOpen)
+        //    {
+        //        throw new Exception("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen.");
+        //    }
+        //}
+
+        private Task Initialize()
         {
-            int retries = 15;
+            int retries = 10;
             while (retries > 0)
             {
                 try
                 {
-                    _connection = _connectionFactory.CreateConnection();
+                    if (_connection == null)
+                    {
+                        _connection = _messageQueueService.Connection;
+                        _channel = _connection.CreateModel();
+                    }
 
-                    _channel = _connection.CreateModel();
-                    
                     // Queue to consume OCR Results
                     _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-                    // Queue to publish DocumentItems for Indexing Worker
+                    //            // Queue to publish DocumentItems for Indexing Worker
                     _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-
-                    Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
+                    Console.WriteLine("[Listener] Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
                     break;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Fehler beim Verbinden mit RabbitMQ: {ex.Message}. Versuche es in 5 Sekunden erneut...");
-                    Thread.Sleep(5000);
+                    Console.WriteLine($"[Listener] Fehler beim Verbinden mit RabbitMQ: {ex.Message}. Versuche es in 5 Sekunden erneut...");
+                    Thread.Sleep(10000);
                     retries--;
                 }
             }
-            if (_connection == null || !_connection.IsOpen)
+            if (_connection is not { IsOpen: true })
             {
                 throw new Exception("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen.");
             }
+            return Task.CompletedTask;
         }
 
-        private void StartListening()
+        private async Task StartListening()
         {
             try
             {
+                if (!_connection.IsOpen || !_channel.IsOpen)
+                    await Initialize();
+
                 var consumer = new EventingBasicConsumer(_channel);
                 consumer.Received += async (model, ea) =>
                 {
+
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
                     var parts = message.Split('|', 2);

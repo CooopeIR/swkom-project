@@ -9,7 +9,7 @@ function fetchDocuments() {
     //    fetchUrl = apiUrl + `/?search=${encodeURIComponent(searchQuery)}`;
     //}
 
-    fetch(fetchUrl)
+    fetch(apiUrl)
         .then(response => {
             console.log(response); // Log the response
             return response.json(); // Return the parsed JSON

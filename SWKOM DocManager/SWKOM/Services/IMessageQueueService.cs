@@ -1,4 +1,5 @@
 ﻿using DocumentDAL.Entities;
+using RabbitMQ.Client;
 
 namespace SWKOM.Services
 {
@@ -8,6 +9,10 @@ namespace SWKOM.Services
     /// </summary>
     public interface IMessageQueueService
     {
+        public IConnection Connection { get; }
+
+        public Task ConnectToRabbitMQ();
+
         /// <summary>
         /// Interface: Send message to RabbitMQ file queue
         /// </summary>

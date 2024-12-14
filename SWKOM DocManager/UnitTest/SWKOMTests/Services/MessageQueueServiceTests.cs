@@ -11,6 +11,7 @@ namespace UnitTest.SWKOMTests.Services
     {
         private Mock<IConnection> _mockConnection;
         private Mock<IModel> _mockChannel;
+        private Mock<IConnectionFactory> _mockFactory;
         private MessageQueueService _service;
 
         [SetUp]
@@ -19,10 +20,14 @@ namespace UnitTest.SWKOMTests.Services
             // Arrange mocks
             _mockConnection = new Mock<IConnection>();
             _mockChannel = new Mock<IModel>();
+            _mockFactory = new Mock<IConnectionFactory>();
 
             // Set default behavior for IsOpen
             _mockChannel.Setup(c => c.IsOpen).Returns(true);
             _mockConnection.Setup(c => c.IsOpen).Returns(true);
+
+            // Set up the factory to return the mock connection
+            _mockFactory.Setup(f => f.CreateConnection()).Returns(_mockConnection.Object);
 
             // Set up the connection to return the mock channel
             _mockConnection.Setup(c => c.CreateModel()).Returns(_mockChannel.Object);
