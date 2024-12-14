@@ -61,6 +61,7 @@ namespace SWKOM.Controllers
         /// </summary>
         /// <param name="searchTerm"></param>
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with query string")]
         [HttpPost("search/querystring")]
         public async Task<IActionResult> SearchByQueryString([FromBody] string searchTerm)
         {
@@ -81,6 +82,7 @@ namespace SWKOM.Controllers
         /// </summary>
         /// <param name="searchTerm"></param>
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with Fuzzy")]
         [HttpPost("search/fuzzy")]
         public async Task<IActionResult> SearchByFuzzy([FromBody] string searchTerm)
         {
