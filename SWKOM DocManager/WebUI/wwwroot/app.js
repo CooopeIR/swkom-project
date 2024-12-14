@@ -47,6 +47,7 @@ function searchDocumenrts(questyString) {
 
 }
 
+//Listener functions after Site is loaded
 document.addEventListener('DOMContentLoaded', function () {
     // Expand/collapse form logic remains the same
     const errorMessageDiv = document.getElementById('error-message');
@@ -57,10 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchTerm = document.getElementById('search-term');
     const clearBtn = document.getElementById("clear-btn");
 
+    //Open window for file upload - file selection
     document.getElementById("upload-btn").addEventListener("click", () => {
         document.getElementById("fileupload").click();
     });
 
+    //Show specific message for successfully uploaded file
     document.getElementById("fileupload").addEventListener("change", (event) => {
         showMessage(successMessageDiv, "File uploaded successfully!");
 
@@ -83,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     }
 
+    //Search Button; Get search term from search term input field and send filter request with searchTerm
     searchBtn.addEventListener('click', function () {
         let query = searchTerm.value;
 
@@ -97,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    //Clear Button; Clear search term input field and refresh shown / listed documents
     clearBtn.addEventListener("click", () => {
         // Clear the input field
         searchTerm.value = "";
@@ -112,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
     errorMessageDiv.style.display = 'none';
     successMessageDiv.style.display = 'none';
 
+    //Expand Button; open and closes formular with input fields (for document addition)
     expandBtn.addEventListener('click', function () {
         const form = document.getElementById(this.dataset.target);
         const isOpen = form.classList.toggle('open'); // Toggle the 'open' class
@@ -124,7 +130,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         this.style.color = isOpen ? '#ffffff' : '';
     });
-  
+
+    //Submit Button; get Data from input fields and post these to REST container
     form.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission behavior
 
@@ -179,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', fetchDocuments(''));
 
+//Delete function to delete a single document with ID of clicked document button
 function deleteDocument(id) {
     fetch(`${apiUrl}/${id}`, {
         method: 'DELETE'
@@ -193,7 +201,7 @@ function deleteDocument(id) {
         .catch(error => console.error('Fehler:', error));
 }
 
-function viewDopcument(id) {
+function viewDocument(id) {
     fetch(`${apiUrl}/${id}`, {
         method: 'GET'
     })
