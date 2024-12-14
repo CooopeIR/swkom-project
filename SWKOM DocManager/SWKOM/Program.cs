@@ -27,7 +27,6 @@ builder.Services.AddSingleton<IConnectionFactory>(_ =>
     });
 
 
-
 builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
 builder.Services.AddHostedService<RabbitMqListenerService>();
 
