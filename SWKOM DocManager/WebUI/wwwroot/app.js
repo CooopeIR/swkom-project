@@ -86,7 +86,6 @@ function searchDocuments(queryString) {
         })
         .then(data => {
             constructDocumentList(data);
-            showMessage(successMessageDiv, "Search successful")
         })
         .catch (error => {
             console.error('Fehler beim Abrufen der Documents:', error);
