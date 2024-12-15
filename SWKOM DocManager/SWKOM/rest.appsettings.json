@@ -10,5 +10,8 @@
     "HostName": "rabbitmq",
     "UserName": "user",
     "Password": "password"
+  },
+  "ConnectionStrings": {
+    "ElasticSearch": "http://host.docker.internal:9200"
   }
 }

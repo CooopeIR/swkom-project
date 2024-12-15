@@ -10,7 +10,7 @@ using SWKOM.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var elasticUri = builder.Configuration.GetConnectionString("ElasticSearch") ?? "http://localhost:9200";
+var elasticUri = builder.Configuration.GetConnectionString("ElasticSearch") ?? "http://host.docker.internal:9200";
 builder.Services.AddSingleton(new ElasticsearchClient(new Uri(elasticUri)));
 
 builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
@@ -28,9 +28,7 @@ builder.Services.AddSingleton<IConnectionFactory>(_ =>
     }
 );
 
-
 builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
-
 builder.Services.AddHostedService<RabbitMqListenerService>();
 
 

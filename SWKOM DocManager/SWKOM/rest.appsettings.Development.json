@@ -4,5 +4,8 @@
       "Default": "Information",
       "Microsoft.AspNetCore": "Warning"
     }
+  },
+  "ConnectionStrings": {
+    "ElasticSearch": "http://host.docker.internal:9200"
   }
 }

@@ -16,9 +16,14 @@ using SWKOM.Validators;
 using System.Formats.Tar;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Channels;
+using System.Xml;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using IModel = RabbitMQ.Client.IModel;
+using SearchRequest = SWKOM.DTO.SearchRequest;
 
 namespace SWKOM.Controllers
 {
@@ -46,15 +51,40 @@ namespace SWKOM.Controllers
         /// <param name="messageQueueService"></param>
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
             IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
-            IMessageQueueService messageQueueService)
+            IMessageQueueService messageQueueService, ElasticsearchClient searchClient)
         {
             _logger = logger;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _documentProcessor = documentProcessor;
             _messageQueueService = messageQueueService;
+            _searchClient = searchClient;
         }
 
+        private async Task ensureDocumentIndex()
+        {
+            var indexExistsResponse = await _searchClient.Indices.ExistsAsync("documents");
+
+            if (!indexExistsResponse.Exists)
+            {
+                var createIndexResponse = await _searchClient.Indices.CreateAsync<Document>("documents", c => c
+                    .Mappings(m => m
+                        .Properties(p => p
+                            .LongNumber(t => t.Id)
+                            .Text(t => t.Title)
+                            .Text(t => t.Author)
+                            .Text(t => t.OcrText)
+                        )
+                    )
+                );
+
+                if (!createIndexResponse.IsValidResponse)
+                {
+                    // Handle error in index creation
+                    Console.WriteLine("Index creation failed: " + createIndexResponse.DebugInformation);
+                }
+            }
+        }
 
         /// <summary>
         /// Wildcard-Search (QueryString)
@@ -63,16 +93,62 @@ namespace SWKOM.Controllers
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with query string")]
         [HttpPost("search/querystring")]
-        public async Task<IActionResult> SearchByQueryString([FromBody] string searchTerm)
+        public async Task<IActionResult> SearchByQueryString([FromBody] SearchRequest request)
         {
+            if (request == null)
+            {
+                return BadRequest("Request body cannot be null.");
+            }
+
+            await ensureDocumentIndex();
+
+            var pingResponse = await _searchClient.PingAsync();
+            if (!pingResponse.IsValidResponse)
+            {
+                Console.WriteLine($"Ping failed: {pingResponse.DebugInformation}");
+                return StatusCode(500, "Elasticsearch is unavailable");
+            }
+
+            // Access the properties from the request object
+            var searchTerm = request.SearchTerm;
+            var includeOcr = request.IncludeOcr;
+
+            Console.WriteLine(_searchClient.ElasticsearchClientSettings.DefaultIndex);
+            Console.WriteLine(_searchClient.ElasticsearchClientSettings.NodePool);
+
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
                 return BadRequest(new { message = "Search term cannot be empty" });
             }
 
-            var response = await _searchClient.SearchAsync<DocumentItem>(s => s
+            //string[] fields = includeOcr ? ["title", "author"] : ["ocrtext"];
+
+            //var response = await _searchClient.SearchAsync<Document>(s => s
+            //    .Index("documents")
+            //    .Query(q => q
+            //        .QueryString(qs => qs.Query($"*{searchTerm}*"))
+            //    ));
+
+            var fields = new Field[]
+            {
+                "title",
+                "author"
+            }.Concat(includeOcr ? new Field[] { "ocrText" } : Array.Empty<Field>()).ToArray();
+
+            var response = await _searchClient.SearchAsync<Document>(s => s
                 .Index("documents")
-                .Query(q => q.QueryString(qs => qs.Query($"*{searchTerm}*"))));
+                .Query(q => q
+                    .QueryString(qs => qs
+                        .Query($"*{searchTerm}*")
+                        .Fields(fields)
+                    )
+                )
+            );
+
+            // Log the response from Elasticsearch
+            Console.WriteLine("Elasticsearch Response: ");
+            Console.WriteLine(JsonSerializer.Serialize(response));
+            Console.WriteLine(JsonSerializer.Serialize(response.Documents));
 
             return HandleSearchResponse(response);
         }
@@ -84,37 +160,87 @@ namespace SWKOM.Controllers
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with Fuzzy")]
         [HttpPost("search/fuzzy")]
-        public async Task<IActionResult> SearchByFuzzy([FromBody] string searchTerm)
+        public async Task<IActionResult> SearchByFuzzy([FromBody] SearchRequest request)
         {
+            if (request == null)
+            {
+                return BadRequest("Request body cannot be null.");
+            }
+
+            await ensureDocumentIndex();
+
+            // Access the properties from the request object
+            var searchTerm = request.SearchTerm;
+            var includeOcr = request.IncludeOcr;
+
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
                 return BadRequest(new { message = "Search term cannot be empty" });
             }
 
-            var response = await _searchClient.SearchAsync<DocumentItem>(s => s
+            // Log the received request parameters
+            Console.WriteLine("Search Term: " + searchTerm);
+            Console.WriteLine("Include OCR: " + includeOcr);
+
+            // Log Elasticsearch Client settings (general configuration details)
+            Console.WriteLine("Elasticsearch Client Settings: ");
+            Console.WriteLine(_searchClient.ElasticsearchClientSettings.DefaultIndex);
+            Console.WriteLine(_searchClient.ElasticsearchClientSettings.NodePool);
+
+
+            //string[] fields = includeOcr ? ["title", "author"] : ["ocrtext"];
+
+            var fields = new Field[]
+            {
+                "title^3",
+                "author^2"
+            }.Concat(includeOcr ? new Field[] { "ocrText" } : Array.Empty<Field>()).ToArray();
+
+            var response = await _searchClient.SearchAsync<Document>(search => search
                 .Index("documents")
-                .Query(q => q.Match(m => m
-                    .Field(f => f.OcrText)
-                    .Query(searchTerm)
-                    .Fuzziness(new Fuzziness(4)))));
+                .Query(q => q
+                    .MultiMatch(mm => mm
+                        .Query(searchTerm)
+                        .Fields(fields)
+                        .Fuzziness(new Fuzziness(2))
+                        .Type(TextQueryType.BestFields)
+                    )
+                )
+                .Size(10)
+            );
+
+            // Log the response from Elasticsearch
+            Console.WriteLine("Elasticsearch Response: ");
+            Console.WriteLine(JsonSerializer.Serialize(response));
+            Console.WriteLine(JsonSerializer.Serialize(response.Documents));
+
+            Console.WriteLine(response);
 
             return HandleSearchResponse(response);
         }
+
 
         /// <summary>
         /// Checks if response is a valid response and has content (Documents)
         /// </summary>
         /// <param name="response"></param>
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
-        private IActionResult HandleSearchResponse(SearchResponse<DocumentItem> response)
+        private IActionResult HandleSearchResponse(SearchResponse<Document> response)
         {
+            Console.WriteLine(response.Documents);
             if (response.IsValidResponse)
             {
-                if (response.Documents.Any())
-                {
-                    return Ok(response.Documents);
-                }
-                return NotFound(new { message = "No documents found matching the search term." });
+                // Handle errors
+                var debugInfo = response.DebugInformation;
+                //var error = response.ServerError.Error;
+                Console.WriteLine(debugInfo);
+
+                if (!response.Documents.Any())
+                    return NotFound(new { message = "No documents found matching the search term." });
+
+                var searchResults = _mapper.Map<List<DocumentItemDTO>>(response.Documents);
+
+                return Ok(searchResults);
             }
 
             return StatusCode(500, new { message = "Failed to search documents", details = response.DebugInformation });

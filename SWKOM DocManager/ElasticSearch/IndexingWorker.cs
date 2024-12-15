@@ -90,9 +90,15 @@ public class IndexingWorker : IIndexingWorker
     public async Task IndexDocument(Document item)
     {
         Console.WriteLine($"Indexing Document {item.Id}");
+
+        //await _elasticClient.IndexAsync(item, i => i.Index("documents"));
+
+        //Console.WriteLine($"Indices: {_elasticClient.Indices}");
+
         var response = await _elasticClient.IndexAsync(item, i => i.Index("documents"));
 
-        Console.WriteLine($"Result: {response.Result}, Index: {response.Index}" );
+        Console.WriteLine($"Result: {response.Result}, Index: {response.Index}, CallDwetailsd: {response.ApiCallDetails}, Success: {response.IsSuccess()}" );
+
 
         if (response.IsValidResponse)
         {

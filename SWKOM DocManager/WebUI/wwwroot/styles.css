@@ -163,7 +163,7 @@ button.delete:hover {
 .container {
     text-align: center;
     background-color: #DFE1FC;
-    padding: 40px;
+    padding: 25px;
     border-radius: 20px;
     width: 35vw ;
     min-width: 350px;
@@ -177,8 +177,8 @@ button.delete:hover {
     justify-content: center;
     align-items: center;
     margin-top: 10px; /* Add some space above the search bar */
+    margin-bottom: 10px; /* Add some space above the search bar */
     max-width: 300px;
-
 }
 
 .search-bar input {

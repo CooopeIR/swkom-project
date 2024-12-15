@@ -1,13 +1,38 @@
 ﻿//const apiUrl = 'http://host.docker.internal:8081/document';
-const apiUrl = 'http://localhost:8081/document';
+const apiUrl = 'http://localhost:8081/document/';
+
+
+function constructDocumentList(data) {
+
+    const documentList = document.getElementById('document-list');
+    documentList.innerHTML = ''; // Clear the list before appending new items
+
+    if (!data || data.length === 0) {
+        const errorMessageDiv = document.getElementById('error-message');
+        showMessage(errorMessageDiv, "No documents found");
+        return;
+    }
+    
+    data.forEach(documentFromResponse => {
+        // Create list item with delete and toggle complete buttons
+        const li = document.createElement('div');
+        li.classList.add('document-item');
+        li.innerHTML = `
+        <span class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</span>
+        <div class="button-group">
+            <button class="view" onclick="viewDocument(${documentFromResponse.id})">view</button>    
+            <button class="delete" onclick="deleteDocument(${documentFromResponse.id})">
+                    <span class="material-icons">delete</span>
+            </button>
+        </div>
+        `;
+        documentList.appendChild(li);
+    });
+}
 
 // Function to fetch and display Todo items
 function fetchDocuments() {
     console.log('Fetching documents...');
-    //fetchUrl = apiUrl;
-    //if (searchQuery) {
-    //    fetchUrl = apiUrl + `/?search=${encodeURIComponent(searchQuery)}`;
-    //}
 
     fetch(apiUrl)
         .then(response => {
@@ -15,36 +40,68 @@ function fetchDocuments() {
             return response.json(); // Return the parsed JSON
         })
         .then(data => {
-            const documentList = document.getElementById('document-list');
-            documentList.innerHTML = ''; // Clear the list before appending new items
-            data.forEach(documentFromResponse => {
-                // Create list item with delete and toggle complete buttons
-                const li = document.createElement('div');
-                li.classList.add('document-item');
-                li.innerHTML = `
-                <span class="document-name">${documentFromResponse.title} from ${documentFromResponse.author}</span>
-                <div class="button-group">
-                    <button class="view" onclick="viewDocument(${documentFromResponse.id})">view</button>    
-                    <button class="delete" onclick="deleteDocument(${documentFromResponse.id})">
-                            <span class="material-icons">delete</span>
-                    </button>
-                </div>
-                `;
-                documentList.appendChild(li);
-            });
+            constructDocumentList(data);
         })
         .catch (error => {
             console.error('Fehler beim Abrufen der Documents:', error);
         });
 }
 
-function searchDocumenrts(questyString) {
+function searchDocuments(queryString) {
     const exactMatch = document.getElementById("exactMatchToggle").checked;
+    const includeOcr = document.getElementById("includeOcrToggle").checked;
+    //const includeOcr = true;
+    const errorMessageDiv = document.getElementById('error-message');
+    const successMessageDiv = document.getElementById('success-message');
 
-    if (exactMatch) {
-        fetchUrl = apiurl + ""
+    console.log(`SearchTerm: ${queryString} Exact: ${exactMatch} InlcudeOCR: ${includeOcr}`)
+
+    const fetchOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Ensures the body is treated as JSON
+        },
+        body: JSON.stringify({
+            SearchTerm: queryString, // Use the variable value
+            IncludeOcr: includeOcr  // Use the variable value
+        })
     }
 
+    let endpoint = exactMatch ? "search/querystring" : "search/fuzzy";
+    let fetchUrl = new URL(endpoint, apiUrl);
+
+    console.log(fetchUrl.toString());
+
+    fetch(fetchUrl, fetchOptions)
+        .then(response => {
+            if (response.ok) {
+                console.log(response); // Log the response
+                return response.json(); // Parse the JSON response
+            } else {
+                response.json().then(err => {
+                    console.log(err);
+                    showMessage(errorMessageDiv, err.message);
+                });
+            }
+        })
+        .then(data => {
+            constructDocumentList(data);
+            showMessage(successMessageDiv, "Search successful")
+        })
+        .catch (error => {
+            console.error('Fehler beim Abrufen der Documents:', error);
+        });
+}
+
+// Function to show a message for 5 seconds
+function showMessage(messageDiv, message) {
+    messageDiv.style.display = 'flex'; // Show the message div
+    messageDiv.querySelector('span').textContent = message; // Set the message content
+
+    // Hide the message after 5 seconds
+    setTimeout(() => {
+        messageDiv.style.display = 'none'; // Hide the message div
+    }, 5000);
 }
 
 //Listener functions after Site is loaded
@@ -74,26 +131,14 @@ document.addEventListener('DOMContentLoaded', function () {
         fileNameElement.textContent = file ? `${file.name}` : "No file selected";
     });
 
-
-    // Function to show a message for 5 seconds
-    function showMessage(messageDiv, message) {
-        messageDiv.style.display = 'flex'; // Show the message div
-        messageDiv.querySelector('span').textContent = message; // Set the message content
-
-        // Hide the message after 5 seconds
-        setTimeout(() => {
-            messageDiv.style.display = 'none'; // Hide the message div
-        }, 5000);
-    }
-
     //Search Button; Get search term from search term input field and send filter request with searchTerm
     searchBtn.addEventListener('click', function () {
         let query = searchTerm.value;
-
+        
         if (query.length === 0)
             showMessage(errorMessageDiv, "Search Term cannot be empty!");
         else {
-            fetchDocuments(query);
+            searchDocuments(query);
             clearBtn.style.display = "block";
             setTimeout(() => {
                 clearBtn.classList.add("show"); // Add the class to trigger sliding effect
@@ -188,7 +233,7 @@ document.addEventListener('DOMContentLoaded', fetchDocuments(''));
 
 //Delete function to delete a single document with ID of clicked document button
 function deleteDocument(id) {
-    fetch(`${apiUrl}/${id}`, {
+    fetch(`${apiUrl}${id}`, {
         method: 'DELETE'
     })
         .then(response => {
@@ -202,7 +247,7 @@ function deleteDocument(id) {
 }
 
 function viewDocument(id) {
-    fetch(`${apiUrl}/${id}`, {
+    fetch(`${apiUrl}${id}`, {
         method: 'GET'
     })
         .then(response => {

@@ -41,6 +41,11 @@ namespace SWKOM.Mappings
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadDate))
                 .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.FileSize))
                 .ReverseMap();
+
+            CreateMap<Document, DocumentItemDTO>()
+                .ForMember(dest => dest.UploadedFile, opt => opt.Ignore())
+                .ForMember(dest => dest.DocumentContentDto, opt => opt.Ignore())
+                .ForMember(dest => dest.DocumentMetadataDto, opt => opt.Ignore());
         }
     }
 }

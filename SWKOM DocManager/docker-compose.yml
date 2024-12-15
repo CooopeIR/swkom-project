@@ -94,6 +94,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
 
+
   postgres:
     container_name: postgres_container
     image: postgis/postgis:17-3.4
@@ -126,7 +127,7 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
     container_name: elasticsearch
     ports:
       - "9200:9200"
@@ -139,7 +140,7 @@ services:
       - elastic
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.16.0
+    image: docker.elastic.co/kibana/kibana:8.16.1
     container_name: kibana
     ports:
       - "5601:5601"
