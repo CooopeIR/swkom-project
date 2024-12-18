@@ -16,6 +16,9 @@ namespace SWKOM.Services
         private IModel _channel;
         private readonly IConnectionFactory _connectionFactory;
 
+        /// <summary>
+        /// IConnection Connection to set and get private _connection variable
+        /// </summary>
         public IConnection Connection => _connection;
 
 
@@ -52,6 +55,11 @@ namespace SWKOM.Services
             ConnectToRabbitMQ();
         }
 
+        /// <summary>
+        /// Tries to open a connection to RabbitMQ, creates queues for ocr_result_queue and indexing_queue
+        /// </summary>
+        /// <returns>Task.CompletedTask</returns>
+        /// <exception cref="Exception">Connection failure with RabbitMQ</exception>
         public Task ConnectToRabbitMQ()
         {
             int retries = 15;
@@ -86,7 +94,7 @@ namespace SWKOM.Services
             return Task.CompletedTask;
         }
 
-        
+
 
 
         /// <summary>

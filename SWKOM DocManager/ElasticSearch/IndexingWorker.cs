@@ -97,7 +97,7 @@ public class IndexingWorker : IIndexingWorker
 
         var response = await _elasticClient.IndexAsync(item, i => i.Index("documents"));
 
-        Console.WriteLine($"Result: {response.Result}, Index: {response.Index}, CallDwetailsd: {response.ApiCallDetails}, Success: {response.IsSuccess()}" );
+        Console.WriteLine($"Result: {response.Result}, Index: {response.Index}, CallDwetailsd: {response.ApiCallDetails}, Success: {response.IsSuccess()}");
 
 
         if (response.IsValidResponse)
@@ -114,7 +114,7 @@ public class IndexingWorker : IIndexingWorker
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += async (model, ea) =>
         {
-            await Task.Run( async () =>
+            await Task.Run(async () =>
             {
                 try
                 {

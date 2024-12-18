@@ -48,7 +48,7 @@
             Constructor for IndexingWorker, get elasticClient and connectionFactory
             </summary>
             <param name="connectionFactory"></param>
-            <param name="elasticCient"></param>
+            <param name="elasticClient"></param>
         </member>
         <member name="M:ElasticSearch.IndexingWorker.ConnectToRabbitMQ">
             <summary>

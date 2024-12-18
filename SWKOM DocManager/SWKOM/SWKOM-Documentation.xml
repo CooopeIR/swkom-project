@@ -38,31 +38,32 @@
             Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
             </summary>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService)">
+        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
             <summary>
             Constructor for DocumentController class, assigning local variables
             </summary>
-            <param name="logger"></param>
-            <param name="mapper"></param>
-            <param name="httpClientFactory"></param>
-            <param name="documentProcessor"></param>
-            <param name="messageQueueService"></param>
+            <param name="logger">ILogger(DocumentController) logger</param>
+            <param name="mapper">IMapper mapper</param>
+            <param name="httpClientFactory">IHttpClientFactory httpClientFactory</param>
+            <param name="documentProcessor">IDocumentProcessor documentProcessor</param>
+            <param name="messageQueueService">IMessageQueueService messageQueueService</param>
+            <param name="searchClient">ElasticsearchClient searchClient</param>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.SearchByQueryString(System.String)">
+        <member name="M:SWKOM.Controllers.DocumentController.SearchByQueryString(SWKOM.DTO.SearchRequest)">
             <summary>
             Wildcard-Search (QueryString)
             </summary>
-            <param name="searchTerm"></param>
+            <param name="request"></param>
             <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.SearchByFuzzy(System.String)">
+        <member name="M:SWKOM.Controllers.DocumentController.SearchByFuzzy(SWKOM.DTO.SearchRequest)">
             <summary>
             Fuzzy-Search with Match(Normalisation)
             </summary>
-            <param name="searchTerm"></param>
+            <param name="request">SearchRequest request</param>
             <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.HandleSearchResponse(Elastic.Clients.Elasticsearch.SearchResponse{DocumentDAL.Entities.DocumentItem})">
+        <member name="M:SWKOM.Controllers.DocumentController.HandleSearchResponse(Elastic.Clients.Elasticsearch.SearchResponse{SWKOM.DTO.Document})">
             <summary>
             Checks if response is a valid response and has content (Documents)
             </summary>
@@ -96,6 +97,31 @@
             </summary>
             <param name="id"></param>
             <returns>Success status code for deletion of DocumentItem with specified id or error status code</returns>
+        </member>
+        <member name="T:SWKOM.DTO.Document">
+            <summary>
+            Structure with necessary elements for a DocumentItem element (id, title, author, DocumentContent element, DocumentMetadata element, ocr text)
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.Document.Id">
+            <summary>
+            ID of DocumentItem element
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.Document.Title">
+            <summary>
+            Entered title by user
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.Document.Author">
+            <summary>
+            Entered author by user
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.Document.OcrText">
+            <summary>
+            Generated OCR Text
+            </summary>
         </member>
         <member name="T:SWKOM.DTO.DocumentContentDTO">
             <summary>
@@ -192,6 +218,21 @@
             ID of Document
             </summary>
         </member>
+        <member name="T:SWKOM.DTO.SearchRequest">
+            <summary>
+            string SearchTerm and bool IncludeOcr for searching
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.SearchRequest.SearchTerm">
+            <summary>
+            string SearchTerm with getter and setter
+            </summary>
+        </member>
+        <member name="P:SWKOM.DTO.SearchRequest.IncludeOcr">
+            <summary>
+            bool IncludeOcr with getter and setter
+            </summary>
+        </member>
         <member name="T:SWKOM.Mappings.MappingProfile">
             <summary>
             Mapping Profiles for datastructures between SWKOM and DocumentDAL
@@ -207,6 +248,18 @@
             Interface IMessageQueueService for MessageQueueService;
             Connection management functions for RabbitMQ
             </summary>
+        </member>
+        <member name="P:SWKOM.Services.IMessageQueueService.Connection">
+            <summary>
+            IConnection Connection to set and get private _connection variable
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.IMessageQueueService.ConnectToRabbitMQ">
+            <summary>
+            Interface: Tries to open a connection to RabbitMQ, creates queues for ocr_result_queue and indexing_queue
+            </summary>
+            <returns>Task.CompletedTask</returns>
+            <exception cref="T:System.Exception">Connection failure with RabbitMQ</exception>
         </member>
         <member name="M:SWKOM.Services.IMessageQueueService.SendToFileQueue(System.String)">
             <summary>
@@ -225,10 +278,22 @@
             Connection management functions for RabbitMQ
             </summary>
         </member>
-        <member name="M:SWKOM.Services.MessageQueueService.#ctor(RabbitMQ.Client.IConnection,RabbitMQ.Client.IModel)">
+        <member name="P:SWKOM.Services.MessageQueueService.Connection">
+            <summary>
+            IConnection Connection to set and get private _connection variable
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.MessageQueueService.#ctor(RabbitMQ.Client.IConnectionFactory)">
             <summary>
             Create connection with connection details for RabbitMQ (file queue)
             </summary>
+        </member>
+        <member name="M:SWKOM.Services.MessageQueueService.ConnectToRabbitMQ">
+            <summary>
+            Tries to open a connection to RabbitMQ, creates queues for ocr_result_queue and indexing_queue
+            </summary>
+            <returns>Task.CompletedTask</returns>
+            <exception cref="T:System.Exception">Connection failure with RabbitMQ</exception>
         </member>
         <member name="M:SWKOM.Services.MessageQueueService.SendToFileQueue(System.String)">
             <summary>
@@ -258,12 +323,12 @@
             </summary>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,RabbitMQ.Client.IConnectionFactory,SWKOM.Services.IMessageQueueService)">
+        <member name="M:SWKOM.Services.RabbitMqListenerService.#ctor(System.Net.Http.IHttpClientFactory,SWKOM.Services.IMessageQueueService)">
             <summary>
             Constructor for RabbitMqListenerService class; initialization of variables
             </summary>
-            <param name="httpClientFactory"></param>
-            <param name="connectionFactory"></param>
+            <param name="httpClientFactory">IHttpClientFactory httpClientFactory</param>
+            <param name="messageQueueService">IMessageQueueService messageQueueService</param>
         </member>
         <member name="M:SWKOM.Services.RabbitMqListenerService.StopAsync(System.Threading.CancellationToken)">
             <summary>

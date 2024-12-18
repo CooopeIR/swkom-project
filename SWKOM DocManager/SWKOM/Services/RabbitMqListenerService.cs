@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DocumentDAL.Entities;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -8,7 +9,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Elastic.Clients.Elasticsearch;
 
 namespace SWKOM.Services
 {
@@ -37,9 +37,8 @@ namespace SWKOM.Services
         /// <summary>
         /// Constructor for RabbitMqListenerService class; initialization of variables
         /// </summary>
-        /// <param name="httpClientFactory"></param>
-        /// <param name="connectionFactory"></param>
-
+        /// <param name="httpClientFactory">IHttpClientFactory httpClientFactory</param>
+        /// <param name="messageQueueService">IMessageQueueService messageQueueService</param>
         public RabbitMqListenerService(IHttpClientFactory httpClientFactory, IMessageQueueService messageQueueService)
         {
             _httpClientFactory = httpClientFactory;
@@ -57,7 +56,7 @@ namespace SWKOM.Services
         //            _connection = _connectionFactory.CreateConnection();
 
         //            _channel = _connection.CreateModel();
-                    
+
         //            // Queue to consume OCR Results
         //            _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
@@ -169,7 +168,7 @@ namespace SWKOM.Services
 
                     documentItem.OcrText = extractedText;
 
-                // Send to MessageQueue Service which submits entire Document including OCR for Elastic Search Indexing Worker
+                    // Send to MessageQueue Service which submits entire Document including OCR for Elastic Search Indexing Worker
                     _messageQueueService.SendToIndexingQueue(documentItem);
 
 

@@ -2,10 +2,12 @@
 using DocumentDAL.Entities;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Nodes;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,8 +21,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
 using System.Xml;
-using Elastic.Clients.Elasticsearch.QueryDsl;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using IModel = RabbitMQ.Client.IModel;
 using SearchRequest = SWKOM.DTO.SearchRequest;
@@ -44,11 +44,12 @@ namespace SWKOM.Controllers
         /// <summary>
         /// Constructor for DocumentController class, assigning local variables
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="mapper"></param>
-        /// <param name="httpClientFactory"></param>
-        /// <param name="documentProcessor"></param>
-        /// <param name="messageQueueService"></param>
+        /// <param name="logger">ILogger(DocumentController) logger</param>
+        /// <param name="mapper">IMapper mapper</param>
+        /// <param name="httpClientFactory">IHttpClientFactory httpClientFactory</param>
+        /// <param name="documentProcessor">IDocumentProcessor documentProcessor</param>
+        /// <param name="messageQueueService">IMessageQueueService messageQueueService</param>
+        /// <param name="searchClient">ElasticsearchClient searchClient</param>
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
             IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
             IMessageQueueService messageQueueService, ElasticsearchClient searchClient)
@@ -61,7 +62,7 @@ namespace SWKOM.Controllers
             _searchClient = searchClient;
         }
 
-        private async Task ensureDocumentIndex()
+        private async Task EnsureDocumentIndex()
         {
             var indexExistsResponse = await _searchClient.Indices.ExistsAsync("documents");
 
@@ -89,7 +90,7 @@ namespace SWKOM.Controllers
         /// <summary>
         /// Wildcard-Search (QueryString)
         /// </summary>
-        /// <param name="searchTerm"></param>
+        /// <param name="request"></param>
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with query string")]
         [HttpPost("search/querystring")]
@@ -100,7 +101,7 @@ namespace SWKOM.Controllers
                 return BadRequest("Request body cannot be null.");
             }
 
-            await ensureDocumentIndex();
+            await EnsureDocumentIndex();
 
             var pingResponse = await _searchClient.PingAsync();
             if (!pingResponse.IsValidResponse)
@@ -156,7 +157,7 @@ namespace SWKOM.Controllers
         /// <summary>
         /// Fuzzy-Search with Match(Normalisation)
         /// </summary>
-        /// <param name="searchTerm"></param>
+        /// <param name="request">SearchRequest request</param>
         /// <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         [SwaggerOperation(Summary = "Search in OCR-Text of uploaded files with given search term with Fuzzy")]
         [HttpPost("search/fuzzy")]
@@ -167,7 +168,7 @@ namespace SWKOM.Controllers
                 return BadRequest("Request body cannot be null.");
             }
 
-            await ensureDocumentIndex();
+            await EnsureDocumentIndex();
 
             // Access the properties from the request object
             var searchTerm = request.SearchTerm;
