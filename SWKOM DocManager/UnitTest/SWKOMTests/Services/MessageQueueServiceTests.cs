@@ -33,7 +33,7 @@ namespace UnitTest.SWKOMTests.Services
             _mockConnection.Setup(c => c.CreateModel()).Returns(_mockChannel.Object);
 
             // Inject mocks into MessageQueueService
-            _service = new MessageQueueService(_mockConnection.Object, _mockChannel.Object);
+            _service = new MessageQueueService(_mockFactory.Object);
         }
 
         [TearDown]

@@ -125,5 +125,25 @@ namespace UnitTest.DocumentDALTests.Repositories
             // Assert: No exception should be thrown
             Assert.Pass("Method should not throw an exception when trying to delete a non-existing record.");
         }
+
+        [Test]
+        public async Task UpdateContentAsync_ShouldNotThrowException_WhenIdDoesNotExist()
+        {
+            // Arrange
+            var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
+            var newContent = new DocumentContent { DocumentId = 3, Content = contentBytes1 };
+            var contentBytes2 = Encoding.UTF8.GetBytes("New Test Content updated");
+            newContent.Content = contentBytes2;
+            var result = await _repository.AddContentAsync(newContent);
+
+            // Act
+            await _repository.UpdateContentAsync(newContent);
+            var addedContent = await _context.DocumentContents.FindAsync(3);
+
+            // Assert
+            Assert.IsNotNull(addedContent);
+            Assert.AreEqual(3, addedContent.DocumentId);
+            Assert.AreEqual(contentBytes2, addedContent.Content);
+        }
     }
 }

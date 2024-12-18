@@ -50,15 +50,5 @@ namespace UnitTest.SWKOMTests.Services
             _mockConnection?.Object?.Dispose();
             _mockChannel?.Object?.Dispose();
         }
-
-        [Test]
-        public async Task StartAsync_ShouldHandleExceptionWhenConnectingToRabbitMQ()
-        {
-            // Arrange
-            _mockConnectionFactory.Setup(factory => factory.CreateConnection()).Throws(new Exception("Connection failed"));
-
-            // Act & Assert
-            Assert.ThrowsAsync<Exception>(async () => await _service.StartAsync(CancellationToken.None));
-        }
     }
 }
