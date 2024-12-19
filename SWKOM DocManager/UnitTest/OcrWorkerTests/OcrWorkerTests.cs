@@ -64,7 +64,7 @@ namespace UnitTest.OCRWorkerTests
             var ex = Assert.Throws<Exception>(() => _ocrWorker.ConnectToRabbitMQ());
             Assert.That(ex.Message, Is.EqualTo("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen."));
         }
-
+        /*
         public class DefaultProcessStartInfoFactory : IProcessStartInfoFactory
         {
             public ProcessStartInfo Create(string fileName, string arguments)
@@ -81,7 +81,7 @@ namespace UnitTest.OCRWorkerTests
             }
         }
 
-        /*[Test]
+        [Test]
         public void PerformOcr_ShouldExtractTextFromFile()
         {
             // Arrange

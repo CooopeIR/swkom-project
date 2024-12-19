@@ -236,7 +236,7 @@ namespace SWKOM.Controllers
                 //var error = response.ServerError.Error;
                 Console.WriteLine(debugInfo);
 
-                if (response.Documents.Count == 0)
+                if (!response.Documents.Any())
                     return NotFound(new { message = "No documents found matching the search term." });
 
                 var searchResults = _mapper.Map<List<DocumentItemDTO>>(response.Documents);

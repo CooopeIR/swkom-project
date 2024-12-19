@@ -86,8 +86,7 @@ namespace UnitTest.OcrWorkerTests.ProcessLibrary
             processWrapper.WaitForExit();
 
             // Assert
-            Assert.IsFalse(string.IsNullOrEmpty(output));
-            Console.WriteLine(output); // Zeigt die tatsächliche Ausgabe
+            Assert.That(string.IsNullOrEmpty(output), Is.False);
         }
     }
 }

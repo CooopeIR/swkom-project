@@ -26,9 +26,6 @@ namespace UnitTest.DocumentDALTests.Repositories
             _context = new DocumentContext(options);
             _repository = new DocumentDataRepository(_context);
 
-            var contentBytes1 = Encoding.UTF8.GetBytes("Test Content 1");
-            var contentBytes2 = Encoding.UTF8.GetBytes("Test Content 2");
-
             // Seed the database with test data
             DateTime now = DateTime.Now;
             DateTime now2 = DateTime.Now;
@@ -42,6 +39,7 @@ namespace UnitTest.DocumentDALTests.Repositories
         [TearDown]
         public void TearDown()
         {
+            _context.Database.EnsureDeleted();
             _context.Dispose();
         }
 
@@ -79,9 +77,12 @@ namespace UnitTest.DocumentDALTests.Repositories
             var result = await _repository.GetMetaByIdAsync(1);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.DocumentId);
-            Assert.AreEqual(5, result.FileSize);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.DocumentId, Is.EqualTo(1));
+                Assert.That(result.FileSize, Is.EqualTo(5));
+            });
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace UnitTest.DocumentDALTests.Repositories
         {
             // Act & Assert
             var ex = Assert.ThrowsAsync<Exception>(async () => await _repository.GetMetaByIdAsync(99));
-            Assert.AreEqual("Document Metadata for Document with ID 99 not found", ex.Message);
+            Assert.That(ex.Message, Is.EqualTo("Document Metadata for Document with ID 99 not found"));
         }
 
         [Test]
@@ -103,9 +104,12 @@ namespace UnitTest.DocumentDALTests.Repositories
             var addedContent = await _context.DocumentMetadatas.FindAsync(3);
 
             // Assert
-            Assert.IsNotNull(addedContent);
-            Assert.AreEqual(3, addedContent.DocumentId);
-            Assert.AreEqual(15, addedContent.FileSize);
+            Assert.Multiple(() =>
+            {
+                Assert.That(addedContent, Is.Not.Null);
+                Assert.That(addedContent.DocumentId, Is.EqualTo(3));
+                Assert.That(addedContent.FileSize, Is.EqualTo(15));
+            });
         }
 
         [Test]
@@ -116,7 +120,7 @@ namespace UnitTest.DocumentDALTests.Repositories
             var deletedContent = await _context.DocumentContents.FindAsync(1);
 
             // Assert
-            Assert.IsNull(deletedContent);
+            Assert.That(deletedContent, Is.Null);
         }
 
         [Test]
@@ -133,18 +137,21 @@ namespace UnitTest.DocumentDALTests.Repositories
         public async Task UpdateMetadataAsync_ShouldNotThrowException_WhenIdDoesNotExist()
         {
             // Arrange
-            var newContent = new DocumentMetadata { Id = 6, DocumentId = 6, FileSize = 20 };
+            var newContent = new DocumentMetadata { DocumentId = 3, FileSize = 20 };
             var result = await _repository.AddMetaAsync(newContent);
             newContent.FileSize = 25;
 
             // Act
             await _repository.UpdateMetaAsync(newContent);
-            var addedContent = await _context.DocumentMetadatas.FindAsync(6);
+            var addedContent = await _context.DocumentMetadatas.FindAsync(3);
 
             // Assert
-            Assert.IsNotNull(addedContent);
-            Assert.AreEqual(6, addedContent.Id);
-            Assert.AreEqual(25, addedContent.FileSize);
+            Assert.Multiple(() =>
+            {
+                Assert.That(addedContent, Is.Not.Null);
+                Assert.That(addedContent.Id, Is.EqualTo(3));
+                Assert.That(addedContent.FileSize, Is.EqualTo(25));
+            });
         }
     }
 }

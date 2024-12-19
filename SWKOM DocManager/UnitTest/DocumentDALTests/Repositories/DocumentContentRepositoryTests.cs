@@ -1,6 +1,7 @@
 ﻿using DocumentDAL.Data;
 using DocumentDAL.Entities;
 using DocumentDAL.Repositories;
+
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -40,6 +41,7 @@ namespace UnitTest.DocumentDALTests.Repositories
         [TearDown]
         public void TearDown()
         {
+            _context.Database.EnsureDeleted();
             _context.Dispose();
         }
 
@@ -75,9 +77,12 @@ namespace UnitTest.DocumentDALTests.Repositories
             var result = await _repository.GetContentByIdAsync(1);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.DocumentId);
-            Assert.AreEqual(contentBytes1, result.Content);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.DocumentId, Is.EqualTo(1));
+                Assert.That(result.Content, Is.EqualTo(contentBytes1));
+            });
         }
 
         [Test]
@@ -85,7 +90,7 @@ namespace UnitTest.DocumentDALTests.Repositories
         {
             // Act & Assert
             var ex = Assert.ThrowsAsync<Exception>(async () => await _repository.GetContentByIdAsync(99));
-            Assert.AreEqual("Document Contents for Document with ID 99 not found", ex.Message);
+            Assert.That(ex.Message, Is.EqualTo("Document Contents for Document with ID 99 not found"));
         }
 
         [Test]
@@ -100,9 +105,12 @@ namespace UnitTest.DocumentDALTests.Repositories
             var addedContent = await _context.DocumentContents.FindAsync(3);
 
             // Assert
-            Assert.IsNotNull(addedContent);
-            Assert.AreEqual(3, addedContent.DocumentId);
-            Assert.AreEqual(contentBytes1, addedContent.Content);
+            Assert.Multiple(() =>
+            {
+                Assert.That(addedContent, Is.Not.Null);
+                Assert.That(addedContent.DocumentId, Is.EqualTo(3));
+                Assert.That(addedContent.Content, Is.EqualTo(contentBytes1));
+            });
         }
 
         [Test]
@@ -113,7 +121,7 @@ namespace UnitTest.DocumentDALTests.Repositories
             var deletedContent = await _context.DocumentContents.FindAsync(1);
 
             // Assert
-            Assert.IsNull(deletedContent);
+            Assert.That(deletedContent, Is.Null);
         }
 
         [Test]
@@ -132,18 +140,21 @@ namespace UnitTest.DocumentDALTests.Repositories
             // Arrange
             var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
             var newContent = new DocumentContent { DocumentId = 3, Content = contentBytes1 };
+            var result = await _repository.AddContentAsync(newContent);
             var contentBytes2 = Encoding.UTF8.GetBytes("New Test Content updated");
             newContent.Content = contentBytes2;
-            var result = await _repository.AddContentAsync(newContent);
 
             // Act
             await _repository.UpdateContentAsync(newContent);
             var addedContent = await _context.DocumentContents.FindAsync(3);
 
             // Assert
-            Assert.IsNotNull(addedContent);
-            Assert.AreEqual(3, addedContent.DocumentId);
-            Assert.AreEqual(contentBytes2, addedContent.Content);
+            Assert.Multiple(() =>
+            {
+                Assert.That(addedContent, Is.Not.Null);
+                Assert.That(addedContent.DocumentId, Is.EqualTo(3));
+                Assert.That(addedContent.Content, Is.EqualTo(contentBytes2));
+            });
         }
     }
 }
