@@ -1,6 +1,6 @@
 ﻿using SWKOM.DTO;
 
-namespace SWKOM.BusinessLogic;
+namespace SWKOM.Services;
 
 /// <summary>
 /// Interface IDocumentProcessor for DocumentProcessor functions; functions to process uploaded document

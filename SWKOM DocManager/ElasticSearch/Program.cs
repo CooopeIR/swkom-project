@@ -15,7 +15,7 @@ namespace ElasticSearch
                 .Build();
 
             // Retrieve the ElasticSearch connection string
-            var elasticUri = configuration.GetConnectionString("ElasticSearch") ?? "http://localhost:9200";
+            var elasticUri = configuration.GetConnectionString("ElasticSearch") ?? "http://host.docker.internal:9200";
 
             // Set up the service collection
             var serviceProvider = new ServiceCollection()

@@ -1,8 +1,6 @@
-﻿using DocumentDAL.Entities;
-using SWKOM.DTO;
-using System.Runtime.InteropServices.JavaScript;
+﻿using SWKOM.DTO;
 
-namespace SWKOM.BusinessLogic;
+namespace SWKOM.Services;
 
 /// <summary>
 /// DocumentProcessor class with functions to process uploaded document

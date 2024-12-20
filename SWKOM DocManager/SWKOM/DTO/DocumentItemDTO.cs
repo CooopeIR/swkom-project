@@ -22,7 +22,7 @@ public class DocumentItemDTO
     /// <summary>
     /// Uploaded document
     /// </summary>
-    public IFormFile UploadedFile { get; set; }
+    public IFormFile? UploadedFile { get; set; }
     /// <summary>
     /// Document Content element
     /// </summary>

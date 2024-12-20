@@ -29,11 +29,11 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Versuche, eine Verbindung zur Datenbank herzustellen...");
 
         // Warte, bis die Datenbank bereit ist (mit einem maximalen Zeitlimit)
-        int retries = 20; // Maximal 10 Sekunden warten
+        int retries = 20; // Maximal 50 Sekunden warten
         while (!context.Database.CanConnect() && retries > 0)
         {
             Console.WriteLine("Datenbank ist noch nicht bereit, warte...");
-            Thread.Sleep(1000); // Warte 1 Sekunde
+            Thread.Sleep(2500); // Warte 2.5 Sekunden
             retries--;
         }
 

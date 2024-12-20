@@ -6,6 +6,6 @@
     }
   },
   "ConnectionStrings": {
-    "ElasticSearch": "http://host.docker.internal:9200"
+    "ElasticSearch": "http://elasticsearch:9200"
   }
 }

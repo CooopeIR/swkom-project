@@ -1,6 +1,6 @@
-﻿//const apiUrl = 'http://host.docker.internal:8081/document';
-const apiUrl = 'http://localhost:8081/document/';
-
+﻿const baseUrl = 'http://localhost:8081/';
+const documentUrl = baseUrl + 'document/';
+const searchUrl = baseUrl + 'search/';
 
 function constructDocumentList(data) {
 
@@ -32,9 +32,11 @@ function constructDocumentList(data) {
 
 // Function to fetch and display Todo items
 function fetchDocuments() {
-    console.log('Fetching documents...');
+    console.log('Fetching documents');
 
-    fetch(apiUrl)
+    let fetchUrl = new URL(documentUrl);
+
+    fetch(fetchUrl)
         .then(response => {
             console.log(response); // Log the response
             return response.json(); // Return the parsed JSON
@@ -67,8 +69,8 @@ function searchDocuments(queryString) {
         })
     }
 
-    let endpoint = exactMatch ? "search/querystring" : "search/fuzzy";
-    let fetchUrl = new URL(endpoint, apiUrl);
+    let searchEndpoint = exactMatch ? "querystring" : "fuzzy";
+    let fetchUrl = new URL(searchEndpoint, searchUrl);
 
     console.log(fetchUrl.toString());
 
@@ -149,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
     clearBtn.addEventListener("click", () => {
         // Clear the input field
         searchTerm.value = "";
-        fetchDocuments('');
+        fetchDocuments();
         // Hide the clear button with sliding effect
         clearBtn.classList.remove("show");
         setTimeout(() => {
@@ -201,6 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
             body: formData
         }
 
+        let fetchUrl = new URL(documentUrl);
+
         // Send a POST request to the API
         fetch(apiUrl, fetchOptions)
             .then(response => {
@@ -228,11 +232,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-document.addEventListener('DOMContentLoaded', fetchDocuments(''));
+document.addEventListener('DOMContentLoaded', fetchDocuments());
 
 //Delete function to delete a single document with ID of clicked document button
 function deleteDocument(id) {
-    fetch(`${apiUrl}${id}`, {
+
+    let fetchUrl = new URL(id, documentUrl);
+
+    fetch(fetchUrl, {
         method: 'DELETE'
     })
         .then(response => {
@@ -246,7 +253,9 @@ function deleteDocument(id) {
 }
 
 function viewDocument(id) {
-    fetch(`${apiUrl}${id}`, {
+    let fetchUrl = new URL(id, documentUrl);
+
+    fetch(fetchUrl, {
         method: 'GET'
     })
         .then(response => {

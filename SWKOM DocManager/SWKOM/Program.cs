@@ -2,21 +2,22 @@ using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using RabbitMQ.Client;
-using SWKOM.BusinessLogic;
-using SWKOM.Mappings;
 using SWKOM.Services;
+using SWKOM.Mappings;
 using SWKOM.Validators;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 var elasticUri = builder.Configuration.GetConnectionString("ElasticSearch") ?? "http://host.docker.internal:9200";
-builder.Services.AddSingleton(new ElasticsearchClient(new Uri(elasticUri)));
 
-builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
-
-// Add services to the container.
-builder.Services.AddControllers();
+// Register ElasticsearchClient
+builder.Services.AddSingleton<ElasticsearchClient>(sp =>
+{
+    var settings = new ElasticsearchClientSettings(new Uri(elasticUri))
+        .DefaultIndex("documents");
+    return new ElasticsearchClient(settings);
+});
 
 // Register RabbitMQ connection factory
 builder.Services.AddSingleton<IConnectionFactory>(_ =>
@@ -28,9 +29,15 @@ builder.Services.AddSingleton<IConnectionFactory>(_ =>
     }
 );
 
+// Register Services
+builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<IDocumentProcessor, DocumentProcessor>();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddSingleton<IMessageQueueService, MessageQueueService>();
 builder.Services.AddHostedService<RabbitMqListenerService>();
 
+// Add services to the container.
+builder.Services.AddControllers();
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -45,7 +52,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowWebUI",
         policy =>
         {
-            policy.WithOrigins("http://host.docker.internal") // Remove trailing slash
+            policy.WithOrigins("http://webui") // Remove trailing slash
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowAnyOrigin();
@@ -65,13 +72,9 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddHttpClient("DocumentDAL", client =>
 {
-    client.BaseAddress = new Uri("http://host.docker.internal:8082");
-    //client.BaseAddress = new Uri("http://localhost:8082");
-
-    //client.DefaultRequestHeaders.Accept.Clear();
-    //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    client.BaseAddress = new Uri("http://document_dal:8082");
+    //client.BaseAddress = new Uri("http://host.docker.internal:8082");
 });
-
 
 var app = builder.Build();
 
@@ -84,7 +87,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowWebUI");
 
-//app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.Urls.Add("http://*:8081"); // Stelle sicher, dass die App nur HTTP verwendet
 app.UseAuthorization();

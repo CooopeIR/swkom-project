@@ -31,7 +31,7 @@ namespace SWKOM.Services
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await Initialize();
-            StartListening();
+            await StartListening();
         }
 
         /// <summary>
@@ -45,40 +45,6 @@ namespace SWKOM.Services
             //_connectionFactory = connectionFactory;
             _messageQueueService = messageQueueService;
         }
-
-        //private void ConnectToRabbitMQ()
-        //{
-        //    int retries = 15;
-        //    while (retries > 0)
-        //    {
-        //        try
-        //        {
-        //            _connection = _connectionFactory.CreateConnection();
-
-        //            _channel = _connection.CreateModel();
-
-        //            // Queue to consume OCR Results
-        //            _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-
-        //            // Queue to publish DocumentItems for Indexing Worker
-        //            _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-
-        //            Console.WriteLine("Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
-        //            break;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine($"Fehler beim Verbinden mit RabbitMQ: {ex.Message}. Versuche es in 5 Sekunden erneut...");
-        //            Thread.Sleep(5000);
-        //            retries--;
-        //        }
-        //    }
-        //    if (_connection == null || !_connection.IsOpen)
-        //    {
-        //        throw new Exception("Konnte keine Verbindung zu RabbitMQ herstellen, alle Versuche fehlgeschlagen.");
-        //    }
-        //}
-
         private Task Initialize()
         {
             int retries = 10;
@@ -89,14 +55,14 @@ namespace SWKOM.Services
                     if (_connection == null)
                     {
                         _connection = _messageQueueService.Connection;
-                        _channel = _connection.CreateModel();
+                        _channel = _connection?.CreateModel();
                     }
 
                     // Queue to consume OCR Results
-                    _channel.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+                    _channel?.QueueDeclare(queue: "ocr_result_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-                    //            // Queue to publish DocumentItems for Indexing Worker
-                    _channel.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+                    // Queue to publish DocumentItems for Indexing Worker
+                    _channel?.QueueDeclare(queue: "indexing_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
                     Console.WriteLine("[Listener] Erfolgreich mit RabbitMQ verbunden und Queue erstellt.");
                     break;
                 }
@@ -118,7 +84,7 @@ namespace SWKOM.Services
         {
             try
             {
-                if (!_connection.IsOpen || !_channel.IsOpen)
+                if (_channel != null && _connection != null && (!_connection.IsOpen || !_channel.IsOpen))
                     await Initialize();
 
                 var consumer = new EventingBasicConsumer(_channel);
@@ -168,8 +134,8 @@ namespace SWKOM.Services
 
                     documentItem.OcrText = extractedText;
 
-                    // Send to MessageQueue Service which submits entire Document including OCR for Elastic Search Indexing Worker
-                    _messageQueueService.SendToIndexingQueue(documentItem);
+                    // Send to MessageQueue Service which submits entire Document including OCR for ElasticSearch Indexing Worker
+                    await _messageQueueService.SendToIndexingQueue(documentItem);
 
 
                     var updateResponse = await client.PutAsJsonAsync($"/api/document/{id}", documentItem);

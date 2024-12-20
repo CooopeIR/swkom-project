@@ -38,7 +38,7 @@
             Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
             </summary>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
+        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService,SWKOM.Services.IFileService)">
             <summary>
             Constructor for DocumentController class, assigning local variables
             </summary>
@@ -47,28 +47,7 @@
             <param name="httpClientFactory">IHttpClientFactory httpClientFactory</param>
             <param name="documentProcessor">IDocumentProcessor documentProcessor</param>
             <param name="messageQueueService">IMessageQueueService messageQueueService</param>
-            <param name="searchClient">ElasticsearchClient searchClient</param>
-        </member>
-        <member name="M:SWKOM.Controllers.DocumentController.SearchByQueryString(SWKOM.DTO.SearchRequest)">
-            <summary>
-            Wildcard-Search (QueryString)
-            </summary>
-            <param name="request"></param>
-            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
-        </member>
-        <member name="M:SWKOM.Controllers.DocumentController.SearchByFuzzy(SWKOM.DTO.SearchRequest)">
-            <summary>
-            Fuzzy-Search with Match(Normalisation)
-            </summary>
-            <param name="request">SearchRequest request</param>
-            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
-        </member>
-        <member name="M:SWKOM.Controllers.DocumentController.HandleSearchResponse(Elastic.Clients.Elasticsearch.SearchResponse{SWKOM.DTO.Document})">
-            <summary>
-            Checks if response is a valid response and has content (Documents)
-            </summary>
-            <param name="response"></param>
-            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+            <param name="fileService"></param>
         </member>
         <member name="M:SWKOM.Controllers.DocumentController.Create(SWKOM.DTO.DocumentItemDTO)">
             <summary>
@@ -97,6 +76,34 @@
             </summary>
             <param name="id"></param>
             <returns>Success status code for deletion of DocumentItem with specified id or error status code</returns>
+        </member>
+        <member name="T:SWKOM.Controllers.SearchController">
+            <summary>
+            Controller which handles search requests (fuzzy search, querystring search => allow for 2 errors or exact match)
+            Optional: Search also in OCR Text of indexed documents
+            </summary>
+        </member>
+        <member name="M:SWKOM.Controllers.SearchController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.SearchController},AutoMapper.IMapper,SWKOM.Services.ISearchService)">
+            <summary>
+            Search Controller constructor, which assigns logger, mapper and searchService from Dependency Injection
+            </summary>
+            <param name="logger"></param>
+            <param name="mapper"></param>
+            <param name="searchService"></param>
+        </member>
+        <member name="M:SWKOM.Controllers.SearchController.SearchByQueryString(SWKOM.DTO.SearchRequest)">
+            <summary>
+            Wildcard-Search (QueryString)
+            </summary>
+            <param name="request"></param>
+            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.SearchController.SearchByFuzzy(SWKOM.DTO.SearchRequest)">
+            <summary>
+            Fuzzy-Search with Match(Normalisation)
+            </summary>
+            <param name="request">SearchRequest request</param>
+            <returns>ActionResult: 200 OK or 404 not found or 500 failed to search documents</returns>
         </member>
         <member name="T:SWKOM.DTO.Document">
             <summary>
@@ -243,6 +250,62 @@
             Mapping Profile for variables from and to DocumentItem and DocumentItemDTO, DocumentContent and DocumentContentDTO, DocumentMetadata and DocumentMetadataDTO
             </summary>
         </member>
+        <member name="T:SWKOM.Services.FileService">
+            <summary>
+            Service which handles File Upload, Download and Deletion from MinIO Microservice
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.FileService.#ctor">
+            <summary>
+            Constructor, which instantiates a new MinIO Client for file operations
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.FileService.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Uploads a file to MinIO Microservice
+            </summary>
+            <param name="file"></param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:SWKOM.Services.FileService.DownloadFileAsync(System.String)">
+            <summary>
+            Downloads a file from MinIO Microservice asynchrono
+            </summary>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SWKOM.Services.FileService.DeleteFileAsync(System.String)">
+            <summary>
+            Deletes a file from MinIO Microservice
+            </summary>
+            <param name="fileName"></param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:SWKOM.Services.IFileService">
+            <summary>
+            Interface for FileService, making sure Upload, Download and Delete Methods are provided
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.IFileService.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Upload a IFormFile which was submitted from a Form on the Web to MinIO Microservice
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SWKOM.Services.IFileService.DownloadFileAsync(System.String)">
+            <summary>
+            Download a File from MinIO Microservice asynchronously
+            </summary>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SWKOM.Services.IFileService.DeleteFileAsync(System.String)">
+            <summary>
+            Delete a File from MinIO Microservice asynchronously
+            </summary>
+            <param name="fileName"></param>
+        </member>
         <member name="T:SWKOM.Services.IMessageQueueService">
             <summary>
             Interface IMessageQueueService for MessageQueueService;
@@ -273,6 +336,25 @@
             </summary>
             <param name="item"></param>
         </member>
+        <member name="T:SWKOM.Services.ISearchService">
+            <summary>
+            Interface for Search Service, making sure FuzzySearch and QueryStringSearch methods are implemented
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.ISearchService.FuzzySearchAsync(SWKOM.DTO.SearchRequest)">
+            <summary>
+            Method to FuzzySearch in ElasticSearch indexed documents
+            </summary>
+            <param name="searchTerm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SWKOM.Services.ISearchService.QueryStringSearchAsync(SWKOM.DTO.SearchRequest)">
+            <summary>
+            Method to Exact Match Search in ElasticSearch indexed documents
+            </summary>
+            <param name="searchTerm"></param>
+            <returns></returns>
+        </member>
         <member name="T:SWKOM.Services.MessageQueueService">
             <summary>
             Connection management functions for RabbitMQ
@@ -285,8 +367,9 @@
         </member>
         <member name="M:SWKOM.Services.MessageQueueService.#ctor(RabbitMQ.Client.IConnectionFactory)">
             <summary>
-            Create connection with connection details for RabbitMQ (file queue)
+            Constructor for MessageQueueService, which initializes a Connection to RabbitMQ. This connection is shared across other servcies, e.g. RabbitMQListenerService
             </summary>
+            <param name="connectionFactory"></param>
         </member>
         <member name="M:SWKOM.Services.MessageQueueService.ConnectToRabbitMQ">
             <summary>
@@ -335,6 +418,31 @@
             Close channel and connection of RabbitMQ
             </summary>
             <param name="cancellationToken"></param>
+        </member>
+        <member name="T:SWKOM.Services.SearchService">
+            <summary>
+            Service to Search for documents in ElasticSearch Microservice
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.SearchService.#ctor(Elastic.Clients.Elasticsearch.ElasticsearchClient)">
+            <summary>
+            Constructor for SearchService assigning searchClient from Dependency Injection
+            </summary>
+            <param name="searchClient"></param>
+        </member>
+        <member name="M:SWKOM.Services.SearchService.FuzzySearchAsync(SWKOM.DTO.SearchRequest)">
+            <summary>
+            Fuzzy Searching through all documents indexed in ElasticSearch
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SWKOM.Services.SearchService.QueryStringSearchAsync(SWKOM.DTO.SearchRequest)">
+            <summary>
+            Exact Match Searching through all documents indexed in ElasticSearch
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
         </member>
         <member name="T:SWKOM.Validators.DocumentItemDtoValidator">
             <summary>

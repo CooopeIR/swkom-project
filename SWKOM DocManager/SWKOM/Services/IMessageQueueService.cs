@@ -12,7 +12,7 @@ namespace SWKOM.Services
         /// <summary>
         /// IConnection Connection to set and get private _connection variable
         /// </summary>
-        public IConnection Connection { get; }
+        public IConnection? Connection { get; }
 
         /// <summary>
         /// Interface: Tries to open a connection to RabbitMQ, creates queues for ocr_result_queue and indexing_queue
@@ -25,11 +25,11 @@ namespace SWKOM.Services
         /// Interface: Send message to RabbitMQ file queue
         /// </summary>
         /// <param name="message">type: string</param>
-        void SendToFileQueue(string message);
+        Task SendToFileQueue(string message);
         /// <summary>
         /// Interface: Send DocumentItem to Indexing queue
         /// </summary>
         /// <param name="item"></param>
-        void SendToIndexingQueue(DocumentItem item);
+        Task SendToIndexingQueue(DocumentItem item);
     }
 }
