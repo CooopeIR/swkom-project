@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using DocumentDAL.Entities;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Ingest;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using SWKOM.DTO;
 using SWKOM.Services;
 using SWKOM.Validators;
+using Document = SWKOM.DTO.Document;
 
 
 namespace SWKOM.Controllers
@@ -22,6 +25,8 @@ namespace SWKOM.Controllers
         private readonly IDocumentProcessor _documentProcessor;
         private readonly IMessageQueueService _messageQueueService;
         private readonly IFileService _fileService;
+        private readonly ElasticsearchClient _searchClient;
+
 
         /// <summary>
         /// Constructor for DocumentController class, assigning local variables
@@ -34,7 +39,7 @@ namespace SWKOM.Controllers
         /// <param name="fileService"></param>
         public DocumentController(ILogger<DocumentController> logger, IMapper mapper,
             IHttpClientFactory httpClientFactory, IDocumentProcessor documentProcessor,
-            IMessageQueueService messageQueueService, IFileService fileService)
+            IMessageQueueService messageQueueService, IFileService fileService, ElasticsearchClient searchClient)
         {
             _logger = logger;
             _mapper = mapper;
@@ -42,6 +47,7 @@ namespace SWKOM.Controllers
             _documentProcessor = documentProcessor;
             _messageQueueService = messageQueueService;
             _fileService = fileService;
+            _searchClient = searchClient;
         }
 
 
@@ -140,28 +146,22 @@ namespace SWKOM.Controllers
         /// <returns>Success status code with list of DocumentItems or error status code</returns>
         [SwaggerOperation(Summary = "Get all documents from the database")]
         [HttpGet(Name = "GetDocuments")]
-        public async Task<ActionResult> Get([FromQuery] string? search)
+        public async Task<IActionResult> Get()
         {
             var client = _httpClientFactory.CreateClient("DocumentDAL");
 
             var response = await client.GetAsync("/api/document");
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var items = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentItemDTO>>();
-                var documents = _mapper.Map<IEnumerable<DocumentItemDTO>>(items);
-
-                if (!string.IsNullOrEmpty(search))
-                {
-                    documents = documents.Where(d =>
-                        d.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        d.Author.Contains(search, StringComparison.OrdinalIgnoreCase));
-                }
-
-                return Ok(documents);
+                return StatusCode((int)response.StatusCode, "Error retrieving documents.");
             }
-            return StatusCode((int)response.StatusCode, "Error retrieving documents.");
-            
+
+            var items = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentItem>>();
+            var sortedItems = items.OrderBy(item => item.Id);
+            var documents = _mapper.Map<IEnumerable<DocumentItemDTO>>(sortedItems);
+
+            return Ok(documents);
         }
 
         /// <summary>
@@ -179,11 +179,10 @@ namespace SWKOM.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
-
             }
 
-            var item = await response.Content.ReadFromJsonAsync<DocumentItemDTO>();
-            var dtoItem = _mapper.Map<DocumentItem>(item);
+            var item = await response.Content.ReadFromJsonAsync<DocumentItem>();
+            var dtoItem = _mapper.Map<DocumentItemDTO>(item);
 
             if (item == null)
             {
@@ -193,6 +192,64 @@ namespace SWKOM.Controllers
             return Ok(dtoItem);
         }
 
+        /// <summary>
+        /// Get a specific document from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success status code with DocumentItem with specified id or error status code</returns>
+        [SwaggerOperation(Summary = "Get a specific document from the database with the ID of the document")]
+        [HttpGet("view/{id}")]
+        public async Task<IActionResult> GetFullDocumentById(int id)
+        {
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var response = await client.GetAsync($"/api/document/view/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
+            }
+
+            var item = await response.Content.ReadFromJsonAsync<DocumentItem>();
+            var dtoItem = _mapper.Map<DocumentItemDTO>(item);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(dtoItem);
+        }
+
+        /// <summary>
+        /// Get a specific document from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success status code for deletion of DocumentItem with specified id or error status code</returns>
+        [SwaggerOperation(Summary = "Get a file from MinIO to display")]
+        [HttpGet("file/{id}")]
+        public async Task<IActionResult> GetFile(int id)
+        {
+            // Fetch document metadata from the DAL
+            var client = _httpClientFactory.CreateClient("DocumentDAL");
+            var response = await client.GetAsync($"/api/documentcontent/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode, "Error fetching Document item in DAL");
+            }
+
+            var item = await response.Content.ReadFromJsonAsync<DocumentContent>();
+            if (item == null)
+                return NotFound($"DocumentContents for id {id} not found");
+
+            if (string.IsNullOrEmpty(item.FileName))
+                return NotFound("FileName is missing.");
+
+            // Fetch the file from MinIO
+            var fileResult = await _fileService.DownloadFileAsync(item.FileName);
+
+            // Return the file stream as a response
+            return File(fileResult.FileStream, fileResult.ContentType, fileResult.FileDownloadName);
+        }
 
         /// <summary>
         /// Delete a specific document from the database with the ID of the document
@@ -203,14 +260,62 @@ namespace SWKOM.Controllers
         [HttpDelete("{id}", Name = "DeleteDocumentById")]
         public async Task<ActionResult> Delete(int id)
         {
-            var client = _httpClientFactory.CreateClient("DocumentDAL");
-            var response = await client.DeleteAsync($"/api/document/{id}");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
+                // Fetch document metadata from the DAL
+                var client = _httpClientFactory.CreateClient("DocumentDAL");
+                var contentResponse = await client.GetAsync($"/api/documentcontent/{id}");
+
+                if (!contentResponse.IsSuccessStatusCode)
+                {
+                    return StatusCode((int)contentResponse.StatusCode, "Error fetching Document item in DAL");
+                }
+
+                var item = await contentResponse.Content.ReadFromJsonAsync<DocumentContent>();
+                if (item == null)
+                    return NotFound($"DocumentContents for id {id} not found");
+
+                if (string.IsNullOrEmpty(item.FileName))
+                    return NotFound("FileName is missing.");
+
+                // Delete the file from MinIO
+                await _fileService.DeleteFileAsync(item.FileName);
+
+                // Perform the delete operation on Elasticsearch
+                var elasticResponse = await _searchClient.DeleteAsync<Document>(id, d => d.Index("documents"));
+
+                if (elasticResponse.IsValidResponse)
+                {
+                    Console.WriteLine($"Document with ID {id} successfully deleted.");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to delete document with ID {id}: {elasticResponse.DebugInformation}");
+                }
+
+                // Delete the document item from the DAL
+                var response = await client.DeleteAsync($"/api/document/{id}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode((int)response.StatusCode, "Error deleting Document item in DAL");
+                }
+
                 return Ok(nameof(Delete));
             }
-            return StatusCode((int)response.StatusCode, "Error deleting Document item in DAL");
+            catch (HttpRequestException httpEx)
+            {
+                // Handle errors related to HTTP requests
+                Console.WriteLine($"HTTP error: {httpEx.Message}");
+                return StatusCode(500, "An error occurred while processing the request.");
+            }
+            catch (Exception ex)
+            {
+                // Handle any other unexpected exceptions
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.");
+            }
+
         }
     }
 }

@@ -42,6 +42,7 @@ namespace SWKOM.Mappings
                 .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.FileSize))
                 .ReverseMap();
 
+            // Specific Mapping for Search, making sure the Content and Metadata objects are not needed on Mapping while Searching
             CreateMap<Document, DocumentItemDTO>()
                 .ForMember(dest => dest.UploadedFile, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentContentDto, opt => opt.Ignore())

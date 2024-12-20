@@ -39,8 +39,10 @@
 
         <div class="document-list add">
             <div class="document-item add">
-                <div id="expandable-form" class="expandable">
-                    <form id="my-form" method="post" enctype="multipart/form-data">
+                <div id="form-loading-spinner" class="loading-spinner" style="display:none;"></div>
+
+                <div id="expandable-form" class="expandable-form">
+                    <form id="my-form" class="my-form" method="post" enctype="multipart/form-data">
                         <div class="form-row">
                             <label for="title">Title</label>
                             <input type="text" id="title" name="title">
@@ -52,7 +54,7 @@
 
                         <div style="display:flex; flex-direction:column;">
                             <input type="file" id="fileupload" name="fileupload" hidden />
-                            <button  type="button" id="upload-btn">Upload File</button>
+                            <button type="button" id="upload-btn">Upload File</button>
                             <p id="file-name" class="file-name"></p>
                         </div>
                         <button type="submit">Submit</button>
@@ -64,14 +66,16 @@
             <div id="error-message" class="document-item error">
                 <span class="error-message">An Error occurred!</span>
             </div>
-            
+
             <div id="success-message" class="document-item success">
                 <span class="error-message">Success!</span>
             </div>
-            
+
         </div>
         
         <div class="document-list scrollable">
+            <div id="doc-loading-spinner" class="loading-spinner" style="display:none;"></div>
+
             <div id="document-list">
 
             </div>

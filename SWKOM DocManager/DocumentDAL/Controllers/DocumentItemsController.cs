@@ -33,7 +33,7 @@ namespace DocumentDAL.Controllers
         [HttpGet("{id}", Name = "GetDocumentById"),]
         public async Task<DocumentItem> GetAsyncById(int id)
         {
-            return await repository.GetByIdAsync(id, false);
+            return await repository.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace DocumentDAL.Controllers
                 return BadRequest(new { message = "Invalid payload" });
             }
 
-            var existingItem = await repository.GetByIdAsync(id, false);
+            var existingItem = await repository.GetByIdAsync(id);
             if (existingItem == null)
             {
                 Console.WriteLine("Item to update not found");
@@ -100,7 +100,7 @@ namespace DocumentDAL.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var item = await repository.GetByIdAsync(id, false);
+            var item = await repository.GetByIdAsync(id);
             if (item == null)
             {
                 return NotFound();
@@ -108,6 +108,20 @@ namespace DocumentDAL.Controllers
 
             await repository.DeleteAsync(id);
             return NoContent();
+        }
+
+        /// <summary>
+        /// DAL: Delete a specific document item from the database with the ID of the document
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Success Status code with no content or error status code</returns>
+        [SwaggerOperation(Summary =
+            "DAL: Delete a specific document item from the database with the ID of the document")]
+        [HttpGet("view/{id}")]
+        public async Task<IActionResult> ViewDocumentAsync(int id)
+        {
+            var item = await repository.GetFullDocumentAsync(id);
+            return Ok(item);
         }
     }
 }

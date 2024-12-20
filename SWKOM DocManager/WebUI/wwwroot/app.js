@@ -34,6 +34,9 @@ function constructDocumentList(data) {
 function fetchDocuments() {
     console.log('Fetching documents');
 
+    document.getElementById('document-list').style.display = 'none';
+    document.getElementById('doc-loading-spinner').style.display = 'block';
+
     let fetchUrl = new URL(documentUrl);
 
     fetch(fetchUrl)
@@ -43,8 +46,12 @@ function fetchDocuments() {
         })
         .then(data => {
             constructDocumentList(data);
+            document.getElementById('document-list').style.display = 'block';
+            document.getElementById('doc-loading-spinner').style.display = 'none';
         })
-        .catch (error => {
+        .catch(error => {
+            document.getElementById('document-list').style.display = 'block';
+            document.getElementById('doc-loading-spinner').style.display = 'none';
             console.error('Fehler beim Abrufen der Documents:', error);
         });
 }
@@ -57,6 +64,9 @@ function searchDocuments(queryString) {
     const successMessageDiv = document.getElementById('success-message');
 
     console.log(`SearchTerm: ${queryString} Exact: ${exactMatch} InlcudeOCR: ${includeOcr}`)
+
+    document.getElementById('document-list').style.display = 'none';
+    document.getElementById('doc-loading-spinner').style.display = 'block';
 
     const fetchOptions = {
         method: 'POST',
@@ -87,9 +97,13 @@ function searchDocuments(queryString) {
             }
         })
         .then(data => {
+            document.getElementById('document-list').style.display = 'block';
+            document.getElementById('doc-loading-spinner').style.display = 'none';
             constructDocumentList(data);
         })
-        .catch (error => {
+        .catch(error => {
+            document.getElementById('document-list').style.display = 'block';
+            document.getElementById('doc-loading-spinner').style.display = 'none';
             console.error('Fehler beim Abrufen der Documents:', error);
         });
 }
@@ -181,6 +195,9 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission behavior
 
+        document.getElementById('expandable-form').style.display = 'none';
+        document.getElementById('form-loading-spinner').style.display = 'block';
+
         // Select form input values
         const title = document.getElementById("title").value;
         const author = document.getElementById("author").value;
@@ -222,10 +239,14 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(data => {
                 console.log('Document submitted successfully:', data);
+                document.getElementById('expandable-form').style.display = 'block';
+                document.getElementById('form-loading-spinner').style.display = 'none';
                 fetchDocuments(); // Refresh the document list after successful submission
                 showMessage(successMessageDiv, 'Document submitted successfully!');
             })
             .catch(error => {
+                document.getElementById('expandable-form').style.display = 'block';
+                document.getElementById('form-loading-spinner').style.display = 'none';
                 console.error('Submission error:', error);
                 showMessage(errorMessageDiv, error.message || 'An unknown error occurred.');
             });
@@ -253,21 +274,5 @@ function deleteDocument(id) {
 }
 
 function viewDocument(id) {
-    let fetchUrl = new URL(id, documentUrl);
-
-    fetch(fetchUrl, {
-        method: 'GET'
-    })
-        .then(response => {
-            if (response.ok) {
-                fetchDocuments(); // Refresh the list after deletion
-                return response.json(); // Return the parsed JSON
-            } else {
-                console.error('Fehler beim Holen der Dokument Daten.');
-            }
-        })
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => console.error('Fehler:', error));
+    window.location.href = `view-document.html?id=${id}`;
 }

@@ -13,17 +13,20 @@ public class FileService : IFileService
 {
     private readonly IMinioClient _minioClient;
     private const string BucketName = "uploads";
+    private readonly ILogger<FileService> _logger;
+
 
     /// <summary>
     /// Constructor, which instantiates a new MinIO Client for file operations
     /// </summary>
-    public FileService()
+    public FileService(ILogger<FileService> logger)
     {
         _minioClient = new MinioClient()
             .WithEndpoint("minio", 9000)
             .WithCredentials("minioadmin", "minioadmin")
             .WithSSL(false)
             .Build();
+        _logger = logger;
     }
 
     /// <summary>
@@ -48,32 +51,94 @@ public class FileService : IFileService
             .WithObjectSize(file.Length));
     }
 
+    ///// <summary>
+    ///// Downloads a file from MinIO Microservice asynchrono
+    ///// </summary>
+    ///// <param name="fileName"></param>
+    ///// <returns></returns>
+    //public async Task<FileStreamResult> DownloadFileAsync(string fileName)
+    //{
+    //    var memoryStream = new MemoryStream();
+
+    //    await _minioClient.GetObjectAsync(new GetObjectArgs()
+    //        .WithBucket(BucketName)
+    //        .WithObject(fileName)
+    //        .WithCallbackStream(async stream =>
+    //        {
+    //            await stream.CopyToAsync(memoryStream);
+    //        }));
+
+    //    memoryStream.Position = 0;
+
+    //    // Get the correct content type based on the file extension
+    //    var contentType = GetContentType(fileName);
+
+    //    return new FileStreamResult(memoryStream, contentType)
+    //    {
+    //        FileDownloadName = fileName
+    //    };
+    //}
+
     /// <summary>
-    /// Downloads a file from MinIO Microservice asynchrono
+    /// Downloads a file from MinIO Microservice asynchronously with enhanced error handling.
     /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
+    /// <param name="fileName">The name of the file to download.</param>
+    /// <returns>A FileStreamResult that contains the file stream for download.</returns>
     public async Task<FileStreamResult> DownloadFileAsync(string fileName)
     {
-        var memoryStream = new MemoryStream();
-
-        await _minioClient.GetObjectAsync(new GetObjectArgs()
-            .WithBucket(BucketName)
-            .WithObject(fileName)
-            .WithCallbackStream(async stream =>
-            {
-                await stream.CopyToAsync(memoryStream);
-            }));
-
-        memoryStream.Position = 0;
-
-        // Get the correct content type based on the file extension
-        var contentType = GetContentType(fileName);
-
-        return new FileStreamResult(memoryStream, contentType)
+        if (string.IsNullOrEmpty(fileName))
         {
-            FileDownloadName = fileName
-        };
+            throw new ArgumentException("File name cannot be null or empty", nameof(fileName));
+        }
+
+        var memoryStream = new MemoryStream();
+        try
+        {
+            // Attempt to download the file from MinIO
+            var args = new GetObjectArgs()
+                .WithBucket(BucketName)
+                .WithObject(fileName)
+                .WithCallbackStream(async stream =>
+                {
+                    await stream.CopyToAsync(memoryStream);
+                });
+
+            await _minioClient.GetObjectAsync(args);
+            
+            memoryStream.Position = 0;
+
+            // Get the correct content type based on the file extension
+            var contentType = GetContentType(fileName);
+
+            return new FileStreamResult(memoryStream, contentType)
+            {
+                FileDownloadName = fileName
+            };
+        }
+        catch (MinioException minioEx)
+        {
+            // Handle specific MinIO exceptions
+            _logger.LogError($"Error downloading file from MinIO: {minioEx.Message}", minioEx);
+            throw new InvalidOperationException("Error downloading file from MinIO.", minioEx);
+        }
+        catch (IOException ioEx)
+        {
+            // Handle IO exceptions (e.g., stream errors)
+            _logger.LogError($"IO error during file download: {ioEx.Message}", ioEx);
+            throw new InvalidOperationException("Error during file download processing.", ioEx);
+        }
+        catch (TimeoutException timeoutEx)
+        {
+            // Handle timeout exceptions (if any)
+            _logger.LogError($"File download timed out: {timeoutEx.Message}", timeoutEx);
+            throw new TimeoutException("The file download operation timed out.", timeoutEx);
+        }
+        catch (Exception ex)
+        {
+            // Handle any other unexpected exceptions
+            _logger.LogError($"Unexpected error during file download: {ex.Message}", ex);
+            throw new ApplicationException("An unexpected error occurred during the file download.", ex);
+        }
     }
 
     private string GetContentType(string fileName)
@@ -91,7 +156,7 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="fileName"></param>
     /// <exception cref="Exception"></exception>
-    public async void DeleteFileAsync(string fileName)
+    public async Task DeleteFileAsync(string fileName)
     {
         try
         {

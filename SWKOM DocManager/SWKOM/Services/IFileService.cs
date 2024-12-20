@@ -25,6 +25,6 @@ namespace SWKOM.Services
         /// Delete a File from MinIO Microservice asynchronously
         /// </summary>
         /// <param name="fileName"></param>
-        public void DeleteFileAsync(string fileName);
+        public Task DeleteFileAsync(string fileName);
     }
 }

@@ -12,14 +12,10 @@
     --error-red: #FF4D4D;
 }
 
-body, html {
-    overflow-y: hidden;
-    height: 100%; /* Ensures full viewport height */
-    margin: 0px;
-    padding: 0px;
-}
 
 body {
+    overflow-y: auto;
+    height: 100%;
     background-image: url("https://images.pexels.com/photos/3359003/pexels-photo-3359003.jpeg"); /* Replace with your image path */
     background-size: cover;
     background-position: center;
@@ -262,33 +258,32 @@ button.delete:hover {
 
 
 /* Form styling inside the expandable content */
-#expandable-form {
+.expandable-form {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease-out, 0.5s ease;
     width: 90%;
 }
 
-
-    #expandable-form.open {
-        max-height: 300px; /* Adjust as needed */
+ 
+    .expandable-form.open {
+        max-height: 500px; /* Adjust as needed */
         padding: 20px; /* Add padding to the content */
         width: 90%;
     }
 
-#my-form {
+.my-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
-/*    padding: 10px;
-*//**/    justify-content: center;
+    justify-content: center;
 }
 
-    #my-form button {
+    .my-form button {
         align-self: center; /* This centers the button horizontally */
     }
 
-    #expand-btn {
+    .expand-btn {
         justify-self: center;
         align-self: center;
     }
@@ -332,3 +327,40 @@ button.delete:hover {
     text-align: center;
     align-self: center; 
 }
+
+/* Spinner Style */
+.loading-spinner {
+    display: inline-block; /* Allows the spinner to flow with other elements */
+    justify-self: center;
+    align-self: center;
+    margin: 5px; /* Add some space around the spinner */
+    width: 50px;
+    height: 50px;
+    border: 8px solid var(--text-color);
+    border-top: 5px solid var(--secondary-color);
+    border-radius: 50%; /* Perfect circle */
+    animation: spin 1s linear infinite;
+}
+
+/* Animation for the spinner */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+#document-view {
+    width: 100%; /* Full width of the parent container */
+    height: 80vh; /* 80% of the viewport height */
+}
+
+#pdf-viewer {
+    width: 100%; /* Full width of the container */
+    height: 100%; /* Full height of the container */
+    border: none; /* Remove default iframe border */
+}
+

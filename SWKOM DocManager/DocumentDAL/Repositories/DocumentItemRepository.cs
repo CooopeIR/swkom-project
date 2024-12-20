@@ -26,21 +26,11 @@ namespace DocumentDAL.Repositories
         /// <param name="includeAll">type: bool</param>
         /// <returns>if includeAll = true: additionally include DocumentContent and DocumentMetadata</returns>
         /// <exception cref="Exception">DocumentItem with ID not found</exception>
-        public async Task<DocumentItem> GetByIdAsync(int id, bool includeAll)
+        public async Task<DocumentItem> GetByIdAsync(int id)
         {
-            switch (includeAll)
-            {
-                case true:
-                    return await context.DocumentItems!
-                               .Include(di => di.DocumentContent)
-                               .Include(di => di.DocumentMetadata)
-                               .FirstOrDefaultAsync(di => di.Id == id)
-                           ?? throw new Exception($"DocumentItem with ID {id} not found");
-                default:
-                    return await context.DocumentItems
-                               .FirstOrDefaultAsync(di => di.Id == id)
-                           ?? throw new Exception($"DocumentItem with ID {id} not found");
-            }
+            return await context.DocumentItems
+                       .FirstOrDefaultAsync(di => di.Id == id)
+                   ?? throw new Exception($"DocumentItem with ID {id} not found");
         }
 
         /// <summary>
@@ -77,6 +67,26 @@ namespace DocumentDAL.Repositories
                 context.DocumentItems.Remove(item);
                 await context.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        /// Fetches a Document including all of its subtypes
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task<DocumentItem> GetFullDocumentAsync(int id)
+        {
+            var documentItem = await context.DocumentItems
+                .Include(d => d.DocumentContent)    // Include DocumentContent
+                .Include(d => d.DocumentMetadata)   // Include DocumentMetadata
+                .Where(d => d.Id == id)     // Filter by Id
+                .FirstOrDefaultAsync(); // Fetch the first match (or null if not found)
+
+            if(documentItem == null)
+                throw new Exception($"DocumentItem with ID {id} not found");
+                
+            return documentItem;
         }
     }
 }

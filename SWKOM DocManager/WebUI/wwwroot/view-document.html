@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocManager</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+
+<body>
+    <div class="content">
+        <div class="container">
+            <h1 style="padding: 5px">DocManager</h1>
+            <button id="back-btn" style="background-color: var(--secondary-color);">
+                Back
+            </button>
+        </div>
+
+
+        <div class="document-list add" id="document-information">
+            <div class="document-item add">
+
+                <div id="details-loading-spinner" class="loading-spinner" style="display:none;"></div>
+
+                <div id="expandable-meta-form" class="expandable-form">
+                    <form class="my-form" method="post" enctype="multipart/form-data">
+                        <h2>Document Information</h2>
+
+                        <div class="form-row">
+                            <label for="id">Id</label>
+                            <input type="text" id="id" name="id">
+                        </div>
+                        <div class="form-row">
+                            <label for="title">Title</label>
+                            <input type="text" id="title" name="title">
+                        </div>
+                        <div class="form-row">
+                            <label for="author">Author</label>
+                            <input type="text" id="author" name="author">
+                        </div>
+                        <div class="form-row">
+                            <label for="filename">Filename</label>
+                            <input type="text" id="filename" name="filename">
+                        </div>
+                        <div class="form-row">
+                            <label for="date-uploaded">Day Uploaded</label>
+                            <input type="date" id="date-uploaded" name="date-uploaded">
+                        </div>
+                        <div class="form-row">
+                            <label for="content-type">Content Type</label>
+                            <input type="text" id="content-type" name="content-type">
+                        </div>
+                        <div class="form-row">
+                            <label for="file-size">File Size</label>
+                            <input type="text" id="file-size" name="file-size">
+                        </div>
+                    </form>
+                </div>
+                <button id="expand-meta-btn" data-target="expandable-meta-form">Show Meta Data</button>
+            </div>
+
+            <div id="error-message" class="document-item error">
+                <span class="error-message">An Error occurred!</span>
+            </div>
+
+            <div id="success-message" class="document-item success">
+                <span class="error-message">Success!</span>
+            </div>
+
+            <div class="document-item add">
+                <div id="ocr-loading-spinner" class="loading-spinner" style="display:none;"></div>
+
+                <div id="expandable-ocr-form" class="expandable-form">
+                    <h2>OCR Text</h2>
+
+                    <form class="my-form" method="post" enctype="multipart/form-data">
+                        <p id="ocr-text" name="ocr-text">
+
+                        </p>
+                    </form>
+                </div>
+                <button id="expand-ocr-btn" data-target="expandable-ocr-form">Show OCR Text</button>
+            </div>
+        </div>
+
+        <div id="doc-loading-spinner" class="loading-spinner" style="display:none;"></div>
+
+        <div id="document-view">
+            <h2 style="color: white">Document</h2>
+            <iframe id="pdf-viewer" width="100%" height="1000px"></iframe>
+        </div>
+    </div>
+
+    <script src="view-document.js"></script>
+</body>
+</html>

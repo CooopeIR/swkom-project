@@ -23,7 +23,7 @@ namespace DocumentDAL.Repositories
         /// <param name="includeAll">type: bool</param>
         /// <returns>if includeAll = true: additionally include DocumentContent and DocumentMetadata</returns>
         /// <exception cref="Exception">DocumentItem with ID not found</exception>
-        Task<DocumentItem> GetByIdAsync(int id, bool includeAll);
+        Task<DocumentItem> GetByIdAsync(int id);
 
         /// <summary>
         /// Interface: Database call to save a new DocumentItem element in database
@@ -43,5 +43,8 @@ namespace DocumentDAL.Repositories
         /// </summary>
         /// <param name="id"></param>
         Task DeleteAsync(int id);
+
+        Task<DocumentItem> GetFullDocumentAsync(int id);
+
     }
 }
