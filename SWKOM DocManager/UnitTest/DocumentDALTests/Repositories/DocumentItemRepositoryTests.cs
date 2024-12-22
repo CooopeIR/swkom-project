@@ -71,7 +71,7 @@ namespace UnitTest.DocumentDALTests.Repositories
             // Arrange
 
             // Act
-            var result = await _repository.GetByIdAsync(1, false);
+            var result = await _repository.GetByIdAsync(1);
 
             // Assert
             Assert.Multiple(() =>
@@ -87,34 +87,7 @@ namespace UnitTest.DocumentDALTests.Repositories
         public async Task GetItemByIdAsyncReducedData_ShouldThrowException_WhenIdDoesNotExist()
         {
             // Act & Assert
-            var ex = Assert.ThrowsAsync<Exception>(async () => await _repository.GetByIdAsync(99, false));
-            Assert.That(ex.Message, Is.EqualTo("DocumentItem with ID 99 not found"));
-        }
-
-        [Test]
-        public async Task GetItemByIdAsyncAllData_ShouldReturnDocumentItem_WhenIdExists()
-        {
-            // Arrange
-            var newContent = new DocumentItem { Id = 4, Title = "Title Test 4", DocumentContent = null, DocumentMetadata = null };
-
-            // Act
-            var result = await _repository.GetByIdAsync(1, true);
-
-            // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null, "Document Item");
-                Assert.That(result.Title, Is.EqualTo("Title Test 1"));
-                Assert.That(result.DocumentContent, Is.Null, "Document Content");
-                Assert.That(result.DocumentMetadata, Is.Null, "Document Metadata");
-            });
-        }
-
-        [Test]
-        public async Task GetItemByIdAsyncAllData_ShouldThrowException_WhenIdDoesNotExist()
-        {
-            // Act & Assert
-            var ex = Assert.ThrowsAsync<Exception>(async () => await _repository.GetByIdAsync(99, true));
+            var ex = Assert.ThrowsAsync<Exception>(async () => await _repository.GetByIdAsync(99));
             Assert.That(ex.Message, Is.EqualTo("DocumentItem with ID 99 not found"));
         }
 

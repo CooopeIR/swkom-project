@@ -4,41 +4,12 @@
         <name>SWKOM</name>
     </assembly>
     <members>
-        <member name="T:SWKOM.BusinessLogic.DocumentProcessor">
-            <summary>
-            DocumentProcessor class with functions to process uploaded document
-            </summary>
-        </member>
-        <member name="M:SWKOM.BusinessLogic.DocumentProcessor.#ctor">
-            <summary>
-            Constructor for DocumentProcessor class
-            </summary>
-        </member>
-        <member name="M:SWKOM.BusinessLogic.DocumentProcessor.ProcessDocument(SWKOM.DTO.DocumentItemDTO)">
-            <summary>
-            Process document function to get information (content, file name, content type, filesize uploaded date) out of uploaded document into single variables
-            </summary>
-            <param name="documentItemDTO"></param>
-            <returns>Updated DocumentItemDTO element with information in single variables</returns>
-        </member>
-        <member name="T:SWKOM.BusinessLogic.IDocumentProcessor">
-            <summary>
-            Interface IDocumentProcessor for DocumentProcessor functions; functions to process uploaded document
-            </summary>
-        </member>
-        <member name="M:SWKOM.BusinessLogic.IDocumentProcessor.ProcessDocument(SWKOM.DTO.DocumentItemDTO)">
-            <summary>
-            Interface: Process document function to get information (content, file name, content type, filesize uploaded date) out of uploaded document into single variables
-            </summary>
-            <param name="documentItemDTO"></param>
-            <returns>Updated DocumentItemDTO element with information in single variables</returns>
-        </member>
         <member name="T:SWKOM.Controllers.DocumentController">
             <summary>
             Document Controller of SWKOM (REST Service) methods (create, get, get by id, delete)
             </summary>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.BusinessLogic.IDocumentProcessor,SWKOM.Services.IMessageQueueService,SWKOM.Services.IFileService)">
+        <member name="M:SWKOM.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Controllers.DocumentController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory,SWKOM.Services.IDocumentProcessor,SWKOM.Services.IMessageQueueService,SWKOM.Services.IFileService,Elastic.Clients.Elasticsearch.ElasticsearchClient)">
             <summary>
             Constructor for DocumentController class, assigning local variables
             </summary>
@@ -56,7 +27,7 @@
             <param name="documentDTO"></param>
             <returns>Successful status code with document name and id or error status code</returns>
         </member>
-        <member name="M:SWKOM.Controllers.DocumentController.Get(System.String)">
+        <member name="M:SWKOM.Controllers.DocumentController.Get">
             <summary>
             Get all documents from the database
             </summary>
@@ -69,6 +40,20 @@
             </summary>
             <param name="id"></param>
             <returns>Success status code with DocumentItem with specified id or error status code</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.GetFullDocumentById(System.Int32)">
+            <summary>
+            Get a specific document from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success status code with DocumentItem with specified id or error status code</returns>
+        </member>
+        <member name="M:SWKOM.Controllers.DocumentController.GetFile(System.Int32)">
+            <summary>
+            Get a specific document from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success status code for deletion of DocumentItem with specified id or error status code</returns>
         </member>
         <member name="M:SWKOM.Controllers.DocumentController.Delete(System.Int32)">
             <summary>
@@ -250,12 +235,29 @@
             Mapping Profile for variables from and to DocumentItem and DocumentItemDTO, DocumentContent and DocumentContentDTO, DocumentMetadata and DocumentMetadataDTO
             </summary>
         </member>
+        <member name="T:SWKOM.Services.DocumentProcessor">
+            <summary>
+            DocumentProcessor class with functions to process uploaded document
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.DocumentProcessor.#ctor">
+            <summary>
+            Constructor for DocumentProcessor class
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.DocumentProcessor.ProcessDocument(SWKOM.DTO.DocumentItemDTO)">
+            <summary>
+            Process document function to get information (content, file name, content type, filesize uploaded date) out of uploaded document into single variables
+            </summary>
+            <param name="documentItemDTO"></param>
+            <returns>Updated DocumentItemDTO element with information in single variables</returns>
+        </member>
         <member name="T:SWKOM.Services.FileService">
             <summary>
             Service which handles File Upload, Download and Deletion from MinIO Microservice
             </summary>
         </member>
-        <member name="M:SWKOM.Services.FileService.#ctor">
+        <member name="M:SWKOM.Services.FileService.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Services.FileService})">
             <summary>
             Constructor, which instantiates a new MinIO Client for file operations
             </summary>
@@ -269,10 +271,10 @@
         </member>
         <member name="M:SWKOM.Services.FileService.DownloadFileAsync(System.String)">
             <summary>
-            Downloads a file from MinIO Microservice asynchrono
+            Downloads a file from MinIO Microservice asynchronously with enhanced error handling.
             </summary>
-            <param name="fileName"></param>
-            <returns></returns>
+            <param name="fileName">The name of the file to download.</param>
+            <returns>A FileStreamResult that contains the file stream for download.</returns>
         </member>
         <member name="M:SWKOM.Services.FileService.DeleteFileAsync(System.String)">
             <summary>
@@ -280,6 +282,18 @@
             </summary>
             <param name="fileName"></param>
             <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:SWKOM.Services.IDocumentProcessor">
+            <summary>
+            Interface IDocumentProcessor for DocumentProcessor functions; functions to process uploaded document
+            </summary>
+        </member>
+        <member name="M:SWKOM.Services.IDocumentProcessor.ProcessDocument(SWKOM.DTO.DocumentItemDTO)">
+            <summary>
+            Interface: Process document function to get information (content, file name, content type, filesize uploaded date) out of uploaded document into single variables
+            </summary>
+            <param name="documentItemDTO"></param>
+            <returns>Updated DocumentItemDTO element with information in single variables</returns>
         </member>
         <member name="T:SWKOM.Services.IFileService">
             <summary>
