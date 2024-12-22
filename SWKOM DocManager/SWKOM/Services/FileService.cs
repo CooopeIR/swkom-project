@@ -11,10 +11,15 @@ namespace SWKOM.Services;
 /// </summary>
 public class FileService : IFileService
 {
-    private readonly IMinioClient _minioClient;
+    private IMinioClient _minioClient;
     private const string BucketName = "uploads";
     private readonly ILogger<FileService> _logger;
 
+    public IMinioClient MinioClient
+    {
+        get { return _minioClient; }
+        set { _minioClient = value; }
+    }
 
     /// <summary>
     /// Constructor, which instantiates a new MinIO Client for file operations
@@ -104,7 +109,7 @@ public class FileService : IFileService
                 });
 
             await _minioClient.GetObjectAsync(args);
-            
+
             memoryStream.Position = 0;
 
             // Get the correct content type based on the file extension
@@ -150,7 +155,7 @@ public class FileService : IFileService
         }
         return contentType;
     }
-    
+
     /// <summary>
     /// Deletes a file from MinIO Microservice
     /// </summary>
