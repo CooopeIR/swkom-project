@@ -71,11 +71,13 @@ namespace SWKOM.Controllers
             if (documentDTO.UploadedFile == null || documentDTO.UploadedFile.Length == 0)
             {
                 ModelState.AddModelError("DocumentFile", "Keine Datei hochgeladen.");
+                _logger.LogError("No File uploaded");
                 return BadRequest(ModelState);
             }
             if (!documentDTO.UploadedFile.FileName.EndsWith(".pdf"))
             {
                 ModelState.AddModelError("DocumentFile", "Nur PDF-Dateien sind erlaubt.");
+                _logger.LogWarning("Only PDF-files are allowed, but file uploaded which is no PDF.");
                 return BadRequest(ModelState);
             }
 
@@ -91,6 +93,7 @@ namespace SWKOM.Controllers
 
             if (!validationResult.IsValid)
             {
+                _logger.LogWarning("Validation: DocumentItemDTO is invalid");
                 return BadRequest(validationResult.Errors);
             }
 
@@ -103,6 +106,7 @@ namespace SWKOM.Controllers
             var saveFileResponse = await client.PostAsJsonAsync("/api/document", item);
             if (!saveFileResponse.IsSuccessStatusCode)
             {
+                _logger.LogError("Error with saving document file, Error Code: {StatusCode}", (int)saveFileResponse.StatusCode);
                 return StatusCode((int)saveFileResponse.StatusCode, $"Fehler beim Speichern des Dateinamens für Dokument {documentDTO.Id}");
             }
 
@@ -110,6 +114,7 @@ namespace SWKOM.Controllers
             var createdDocument = await saveFileResponse.Content.ReadFromJsonAsync<DocumentItem>();
             if (createdDocument == null || createdDocument.Id == 0)
             {
+                _logger.LogError("Error in reading saved data");
                 return NotFound("Fehler beim Abrufen der Dokument-ID nach dem Speichern.");
             }
 
@@ -133,6 +138,7 @@ namespace SWKOM.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogWarning("Error with sending message to RabbitMQ: {message}", ex.Message);
                 return StatusCode(500, $"Fehler beim Senden der Nachricht an RabbitMQ: {ex.Message}");
             }
 
@@ -142,7 +148,6 @@ namespace SWKOM.Controllers
         /// <summary>
         /// Get all documents from the database
         /// </summary>
-        /// <param name="search"></param>
         /// <returns>Success status code with list of DocumentItems or error status code</returns>
         [SwaggerOperation(Summary = "Get all documents from the database")]
         [HttpGet(Name = "GetDocuments")]
@@ -154,6 +159,7 @@ namespace SWKOM.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Error in retrieving documents: Code {StatusCode}", response.StatusCode);
                 return StatusCode((int)response.StatusCode, "Error retrieving documents.");
             }
 
@@ -178,6 +184,7 @@ namespace SWKOM.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Error retrieving Document item from DAL: {StatusCode}", (int)response.StatusCode);
                 return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
             }
 
@@ -186,6 +193,7 @@ namespace SWKOM.Controllers
 
             if (item == null)
             {
+                _logger.LogWarning("Document with id {id} not found", id);
                 return NotFound();
             }
 
@@ -206,6 +214,7 @@ namespace SWKOM.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Error retrieving Document item from DAL: Code {StatusCode}", (int)response.StatusCode);
                 return StatusCode((int)response.StatusCode, "Error retrieving Document item from DAL");
             }
 
@@ -234,6 +243,7 @@ namespace SWKOM.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Error retrieving Document item from DAL: Code {Code}", (int)response.StatusCode);
                 return StatusCode((int)response.StatusCode, "Error fetching Document item in DAL");
             }
 
@@ -242,7 +252,10 @@ namespace SWKOM.Controllers
                 return NotFound($"DocumentContents for id {id} not found");
 
             if (string.IsNullOrEmpty(item.FileName))
+            {
+                _logger.LogWarning("FileName is missing");
                 return NotFound("FileName is missing.");
+            }
 
             // Fetch the file from MinIO
             var fileResult = await _fileService.DownloadFileAsync(item.FileName);
@@ -268,6 +281,7 @@ namespace SWKOM.Controllers
 
                 if (!contentResponse.IsSuccessStatusCode)
                 {
+                    _logger.LogError("Error retrieving Document item from DAL: Code {Code}", (int)contentResponse.StatusCode);
                     return StatusCode((int)contentResponse.StatusCode, "Error fetching Document item in DAL");
                 }
 
@@ -276,7 +290,10 @@ namespace SWKOM.Controllers
                     return NotFound($"DocumentContents for id {id} not found");
 
                 if (string.IsNullOrEmpty(item.FileName))
+                {
+                    _logger.LogWarning("FileName is missing");
                     return NotFound("FileName is missing.");
+                }
 
                 // Delete the file from MinIO
                 await _fileService.DeleteFileAsync(item.FileName);
@@ -298,6 +315,7 @@ namespace SWKOM.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    _logger.LogError("Error deleting Document item in DAL: Code {StatusCode}", (int)response.StatusCode);
                     return StatusCode((int)response.StatusCode, "Error deleting Document item in DAL");
                 }
 
@@ -307,12 +325,14 @@ namespace SWKOM.Controllers
             {
                 // Handle errors related to HTTP requests
                 Console.WriteLine($"HTTP error: {httpEx.Message}");
+                _logger.LogError("An error occurred while processing the request");
                 return StatusCode(500, "An error occurred while processing the request.");
             }
             catch (Exception ex)
             {
                 // Handle any other unexpected exceptions
                 Console.WriteLine($"Unexpected error: {ex.Message}");
+                _logger.LogError("An unexpected error occurred");
                 return StatusCode(500, "An unexpected error occurred.");
             }
 

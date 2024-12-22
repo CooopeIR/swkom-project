@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
-using Minio.DataModel.Args;
 using Minio.Exceptions;
 using Moq;
 using NUnit.Framework;

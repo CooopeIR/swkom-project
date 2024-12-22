@@ -31,7 +31,6 @@
             <summary>
             Get all documents from the database
             </summary>
-            <param name="search"></param>
             <returns>Success status code with list of DocumentItems or error status code</returns>
         </member>
         <member name="M:SWKOM.Controllers.DocumentController.GetDocumentById(System.Int32)">
@@ -255,6 +254,11 @@
         <member name="T:SWKOM.Services.FileService">
             <summary>
             Service which handles File Upload, Download and Deletion from MinIO Microservice
+            </summary>
+        </member>
+        <member name="P:SWKOM.Services.FileService.MinioClient">
+            <summary>
+            Getter and Setter for private IMinioClient _minioClient for unit testing
             </summary>
         </member>
         <member name="M:SWKOM.Services.FileService.#ctor(Microsoft.Extensions.Logging.ILogger{SWKOM.Services.FileService})">

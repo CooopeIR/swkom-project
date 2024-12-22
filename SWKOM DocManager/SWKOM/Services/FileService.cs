@@ -15,6 +15,9 @@ public class FileService : IFileService
     private const string BucketName = "uploads";
     private readonly ILogger<FileService> _logger;
 
+    /// <summary>
+    /// Getter and Setter for private IMinioClient _minioClient for unit testing
+    /// </summary>
     public IMinioClient MinioClient
     {
         get { return _minioClient; }
@@ -123,25 +126,25 @@ public class FileService : IFileService
         catch (MinioException minioEx)
         {
             // Handle specific MinIO exceptions
-            _logger.LogError($"Error downloading file from MinIO: {minioEx.Message}", minioEx);
+            _logger.LogError("Error downloading file from MinIO: {minioEx}", minioEx.Message);
             throw new InvalidOperationException("Error downloading file from MinIO.", minioEx);
         }
         catch (IOException ioEx)
         {
             // Handle IO exceptions (e.g., stream errors)
-            _logger.LogError($"IO error during file download: {ioEx.Message}", ioEx);
+            _logger.LogError("IO error during file download: {ioEx}", ioEx.Message);
             throw new InvalidOperationException("Error during file download processing.", ioEx);
         }
         catch (TimeoutException timeoutEx)
         {
             // Handle timeout exceptions (if any)
-            _logger.LogError($"File download timed out: {timeoutEx.Message}", timeoutEx);
+            _logger.LogError("File download timed out: {timeoutEx}", timeoutEx.Message);
             throw new TimeoutException("The file download operation timed out.", timeoutEx);
         }
         catch (Exception ex)
         {
             // Handle any other unexpected exceptions
-            _logger.LogError($"Unexpected error during file download: {ex.Message}", ex);
+            _logger.LogError("Unexpected error during file download: {ex}", ex.Message);
             throw new ApplicationException("An unexpected error occurred during the file download.", ex);
         }
     }
@@ -181,6 +184,7 @@ public class FileService : IFileService
             }
             catch (ObjectNotFoundException)
             {
+                _logger.LogError("File '{Filename}' not found", fileName);
                 throw new Exception($"File '{fileName}' not found.");
             }
 
@@ -192,11 +196,13 @@ public class FileService : IFileService
         catch (MinioException ex)
         {
             // Log the specific MinIO exception
+            _logger.LogError("MinIO error while deleting file: {message}", ex.Message);
             throw new Exception($"MinIO error while deleting file: {ex.Message}");
         }
         catch (Exception ex)
         {
             // Log the general exception
+            _logger.LogError("Unexpected error while deleting file: {Message}", ex.Message);
             throw new Exception($"Unexpected error while deleting file: {ex.Message}");
         }
     }
