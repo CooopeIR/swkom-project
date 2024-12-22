@@ -48,7 +48,6 @@ namespace DocumentDAL.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync(DocumentMetadata item)
         {
-
             if (item.FileSize == null)
             {
                 Console.WriteLine("DocumentDAL Bad Request");

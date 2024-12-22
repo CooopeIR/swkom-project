@@ -421,7 +421,7 @@
             </summary>
             <param name="id"></param>
             <returns></returns>
-            <exception cref="T:System.Exception"></exception>
+            <exception cref="T:System.Exception">DocumentItem with ID {id} not found</exception>
         </member>
         <member name="T:DocumentDAL.Repositories.IDocumentContentRepository">
             <summary>

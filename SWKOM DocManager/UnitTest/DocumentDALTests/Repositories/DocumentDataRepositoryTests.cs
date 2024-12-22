@@ -71,8 +71,6 @@ namespace UnitTest.DocumentDALTests.Repositories
         [Test]
         public async Task GetMetadataByIdAsync_ShouldReturnDocumentMetadata_WhenIdExists()
         {
-            // Arrange
-
             // Act
             var result = await _repository.GetMetaByIdAsync(1);
 
