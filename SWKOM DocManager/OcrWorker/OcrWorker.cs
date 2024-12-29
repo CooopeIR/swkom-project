@@ -110,6 +110,8 @@ namespace OCRWorker
                     // OCR-Verarbeitung starten
                     var extractedText = await Task.Run(() => PerformOcr(filePath));
 
+                    Console.WriteLine($"Extrahiertzer Text lautet: {extractedText}");
+
                     if (!string.IsNullOrEmpty(extractedText))
                     {
                         // Ergebnis zurück an RabbitMQ senden
@@ -147,30 +149,31 @@ namespace OCRWorker
 
             try
             {
-                using (var images = new MagickImageCollection(filePath)) // MagickImageCollection für mehrere Seiten
+                using var images = new MagickImageCollection(filePath);
+                foreach (var image in images)
                 {
-                    foreach (var image in images)
-                    {
-                        var tempPngFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".png");
+                    var tempPngFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".png");
 
-                        image.Density = new Density(300, 300); // Setze die Auflösung
-                        //image.ColorType = ColorType.Grayscale; //Unnötige Farben weg
-                        image.Contrast(); // Erhöht den Kontrast
-                        image.Sharpen(); // Schärft das Bild, um Unschärfen zu reduzieren
-                        image.Despeckle(); // Entfernt Bildrauschen
-                        image.Format = MagickFormat.Png;
-                        //image.Resize(image.Width * 2, image.Height * 2); // Vergrößere das Bild um das Doppelte
-                        // Prüfe, ob eine erhebliche Schräglage vorhanden ist
-                        image.Write(tempPngFile);
+                    Console.WriteLine($"tempPNGFile: {tempPngFile}");
 
-                        var process = _processFactory.CreateProcess("tesseract", $"{tempPngFile} stdout -l eng");
+                    image.Density = new Density(300, 300); // Setze die Auflösung
+                    //image.ColorType = ColorType.Grayscale; //Unnötige Farben weg
+                    image.Contrast(); // Erhöht den Kontrast
+                    image.Sharpen(); // Schärft das Bild, um Unschärfen zu reduzieren
+                    image.Despeckle(); // Entfernt Bildrauschen
+                    image.Format = MagickFormat.Png;
+                    //image.Resize(image.Width * 2, image.Height * 2); // Vergrößere das Bild um das Doppelte
+                    // Prüfe, ob eine erhebliche Schräglage vorhanden ist
+                    image.Write(tempPngFile);
 
-                        process.Start();
-                        string result = process.GetOutput();
-                        stringBuilder.Append(result);
+                    var process = _processFactory.CreateProcess("tesseract", $"{tempPngFile} stdout -l eng");
 
-                        File.Delete(tempPngFile); // Lösche die temporäre PNG-Datei nach der Verarbeitung
-                    }
+                    process.Start();
+                    string result = process.GetOutput();
+                    Console.WriteLine($"OCR Result: {result}");
+                    stringBuilder.Append(result);
+
+                    File.Delete(tempPngFile); // Lösche die temporäre PNG-Datei nach der Verarbeitung
                 }
             }
             catch (Exception ex)
