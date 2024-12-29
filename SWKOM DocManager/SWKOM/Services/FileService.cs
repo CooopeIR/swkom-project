@@ -85,61 +85,61 @@ public class FileService : IFileService
     /// <param name="fileName">The name of the file to download.</param>
     /// <returns>A FileStreamResult that contains the file stream for download.</returns>
     public async Task<FileStreamResult> DownloadFileAsync(string fileName)
+{
+    if (string.IsNullOrEmpty(fileName))
     {
-        if (string.IsNullOrEmpty(fileName))
-        {
-            throw new ArgumentException("File name cannot be null or empty", nameof(fileName));
-        }
-
-        var memoryStream = new MemoryStream();
-        try
-        {
-            // Attempt to download the file from MinIO
-            var args = new GetObjectArgs()
-                .WithBucket(BucketName)
-                .WithObject(fileName)
-                .WithCallbackStream(async stream =>
-                {
-                    await stream.CopyToAsync(memoryStream);
-                });
-
-            await _minioClient.GetObjectAsync(args);
-            
-            memoryStream.Position = 0;
-
-            // Get the correct content type based on the file extension
-            var contentType = GetContentType(fileName);
-
-            return new FileStreamResult(memoryStream, contentType)
-            {
-                FileDownloadName = fileName
-            };
-        }
-        catch (MinioException minioEx)
-        {
-            // Handle specific MinIO exceptions
-            _logger.LogError($"Error downloading file from MinIO: {minioEx.Message}", minioEx);
-            throw new InvalidOperationException("Error downloading file from MinIO.", minioEx);
-        }
-        catch (IOException ioEx)
-        {
-            // Handle IO exceptions (e.g., stream errors)
-            _logger.LogError($"IO error during file download: {ioEx.Message}", ioEx);
-            throw new InvalidOperationException("Error during file download processing.", ioEx);
-        }
-        catch (TimeoutException timeoutEx)
-        {
-            // Handle timeout exceptions (if any)
-            _logger.LogError($"File download timed out: {timeoutEx.Message}", timeoutEx);
-            throw new TimeoutException("The file download operation timed out.", timeoutEx);
-        }
-        catch (Exception ex)
-        {
-            // Handle any other unexpected exceptions
-            _logger.LogError($"Unexpected error during file download: {ex.Message}", ex);
-            throw new ApplicationException("An unexpected error occurred during the file download.", ex);
-        }
+        throw new ArgumentException("File name cannot be null or empty", nameof(fileName));
     }
+
+    try
+    {
+        // Confirm Object exists
+        StatObjectArgs statObjectArgs = new StatObjectArgs()
+            .WithBucket(BucketName)
+            .WithObject(fileName);
+        await _minioClient.StatObjectAsync(statObjectArgs);
+
+        // Create a memory stream
+        var memoryStream = new MemoryStream();
+        
+        // Download the file from MinIO
+        var args = new GetObjectArgs()
+            .WithBucket(BucketName)
+            .WithObject(fileName)
+            .WithCallbackStream((stream) => 
+                stream.CopyTo(memoryStream)
+                );
+
+        // Get the object and stream it directly
+        var response = await _minioClient.GetObjectAsync(args);
+        //await response.();
+        memoryStream.Position = 0;
+
+        // Get the correct content type based on the file extension
+        var contentType = GetContentType(fileName);
+
+        // Set cache control headers to improve performance
+        var result = new FileStreamResult(memoryStream, contentType)
+        {
+            FileDownloadName = fileName,
+            EnableRangeProcessing = true,
+            EntityTag = new Microsoft.Net.Http.Headers.EntityTagHeaderValue($"\"{fileName}\""),
+            LastModified = DateTimeOffset.UtcNow // Enable partial content requests
+        };
+
+        return result;
+    }
+    catch (MinioException minioEx)
+    {
+        _logger.LogError($"Error downloading file from MinIO: {minioEx.Message}", minioEx);
+        throw new InvalidOperationException("Error downloading file from MinIO.", minioEx);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Unexpected error during file download: {ex.Message}", ex);
+        throw new ApplicationException("An unexpected error occurred during the file download.", ex);
+    }
+}
 
     private string GetContentType(string fileName)
     {

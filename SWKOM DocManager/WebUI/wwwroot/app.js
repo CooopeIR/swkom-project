@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let fetchUrl = new URL(documentUrl);
 
         // Send a POST request to the API
-        fetch(apiUrl, fetchOptions)
+        fetch(fetchUrl, fetchOptions)
             .then(response => {
                 if (response.ok) {
                     document.getElementById("file-name").textContent = "";

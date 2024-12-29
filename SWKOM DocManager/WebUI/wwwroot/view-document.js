@@ -82,24 +82,47 @@ function fetchDocument() {
 
     let fetchUrl = new URL(documentId, fileUrl);
 
-    fetch(fetchUrl)
+    fetch(fetchUrl, {
+        headers: {
+            'Accept': '*/*',  // Accept any content type
+            'Cache-Control': 'no-cache'  // Prevent caching if needed
+        }
+    })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to fetch document.');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.blob(); // Parse response as Blob
+            return response.blob();
         })
         .then(blob => {
             const pdfUrl = URL.createObjectURL(blob);
-            pdfViewer.src = pdfUrl; // Set iframe src
-            spinner.style.display = 'none';
-            documentView.style.display = 'block';
+            pdfViewer.src = pdfUrl;
+
+            // Clean up the object URL when the viewer is done
+            pdfViewer.onload = () => {
+                spinner.style.display = 'none';
+                documentView.style.display = 'block';
+            };
         })
         .catch(error => {
             console.error('Error fetching document:', error);
             spinner.style.display = 'none';
+            // Show error message to user
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.textContent = 'Failed to load document. Please try again.';
+                errorMessage.style.display = 'block';
+            }
         });
 }
+
+// Clean up object URLs when navigating away
+window.addEventListener('unload', () => {
+    const pdfViewer = document.getElementById('pdf-viewer');
+    if (pdfViewer && pdfViewer.src) {
+        URL.revokeObjectURL(pdfViewer.src);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     // Expand/collapse form logic remains the same

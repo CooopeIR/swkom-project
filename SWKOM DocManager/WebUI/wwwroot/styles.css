@@ -259,7 +259,7 @@ button.delete:hover {
 
 /* Form styling inside the expandable content */
 .expandable-form {
-    max-height: 0;
+    height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease-out, 0.5s ease;
     width: 90%;
@@ -267,7 +267,7 @@ button.delete:hover {
 
  
     .expandable-form.open {
-        max-height: 500px; /* Adjust as needed */
+        height: fit-content; /* Adjust as needed */
         padding: 20px; /* Add padding to the content */
         width: 90%;
     }
