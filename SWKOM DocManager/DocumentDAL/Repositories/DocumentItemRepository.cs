@@ -74,7 +74,7 @@ namespace DocumentDAL.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">DocumentItem with ID {id} not found</exception>
         public async Task<DocumentItem> GetFullDocumentAsync(int id)
         {
             var documentItem = await context.DocumentItems
@@ -83,9 +83,9 @@ namespace DocumentDAL.Repositories
                 .Where(d => d.Id == id)     // Filter by Id
                 .FirstOrDefaultAsync(); // Fetch the first match (or null if not found)
 
-            if(documentItem == null)
+            if (documentItem == null)
                 throw new Exception($"DocumentItem with ID {id} not found");
-                
+
             return documentItem;
         }
     }

@@ -2,8 +2,8 @@
 using FluentValidation.TestHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SWKOM.BusinessLogic;
 using SWKOM.DTO;
+using SWKOM.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -16,14 +16,15 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using UnitTest.DocumentDALTests.Entities;
 
 namespace UnitTest.DocumentDALTests.Controllers
 {
-    public class DocumentContentControllerTests
+    public class DocumentDataControllerTests
     {
         private DocumentContext _context;
-        private DocumentContentController _controller;
-        private IDocumentContentRepository _repository;
+        private DocumentDataController _controller;
+        private IDocumentDataRepository _repository;
 
         [SetUp]
         public void SetUp()
@@ -34,16 +35,18 @@ namespace UnitTest.DocumentDALTests.Controllers
                 .Options;
 
             _context = new DocumentContext(options);
-            _repository = new DocumentContentRepository(_context);
-            _controller = new DocumentContentController(_repository);
+            _repository = new DocumentDataRepository(_context);
+            _controller = new DocumentDataController(_repository);
 
             var contentBytes1 = Encoding.UTF8.GetBytes("Test Content 1");
             var contentBytes2 = Encoding.UTF8.GetBytes("Test Content 2");
 
             // Seed the database with test data
-            _context.DocumentContents.AddRange(
-                new DocumentContent { DocumentId = 1, Content = contentBytes1, FileName = "Test File 1" },
-                new DocumentContent { DocumentId = 2, Content = contentBytes2, FileName = "Test File 2" }
+            DateTime now = DateTime.Now;
+            DateTime now2 = DateTime.Now;
+            _context.DocumentMetadatas.AddRange(
+                new DocumentMetadata { DocumentId = 1, UploadDate = now, FileSize = 5 },
+                new DocumentMetadata { DocumentId = 2, UploadDate = now2, FileSize = 10 }
             );
             _context.SaveChanges();
         }
@@ -56,7 +59,7 @@ namespace UnitTest.DocumentDALTests.Controllers
         }
 
         [Test]
-        public async Task GetAllContentAsync_ShouldReturnAllDocumentContents()
+        public async Task GetAllDataAsync_ShouldReturnAllDocumentDatas()
         {
             // Act
             var result = await _controller.GetAllAsync();
@@ -65,24 +68,24 @@ namespace UnitTest.DocumentDALTests.Controllers
             Assert.Multiple(() =>
             {
                 int i = 1;
+                int fileSize = 0;
                 foreach (var item in result)
                 {
                     if (i <= result.Count())
                     {
                         break;
                     }
-                    Assert.That(item.FileName, Is.EqualTo("Test File " + i));
+                    fileSize += 5;
+                    Assert.That(item.DocumentId, Is.EqualTo(i));
+                    Assert.That(item.FileSize, Is.EqualTo(fileSize));
                     i++;
                 }
             });
         }
 
         [Test]
-        public async Task GetContentByIdAsync_ShouldReturnDocumentContent_WhenIdExists()
+        public async Task GetDataByIdAsync_ShouldReturnDocumentData_WhenIdExists()
         {
-            // Arrange
-            var contentBytes1 = Encoding.UTF8.GetBytes("Test Content 1");
-
             // Act
             var result = await _controller.GetAsyncById(1);
 
@@ -91,46 +94,45 @@ namespace UnitTest.DocumentDALTests.Controllers
             {
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.DocumentId, Is.EqualTo(1));
-                Assert.That(result.Content, Is.EqualTo(contentBytes1));
+                Assert.That(result.FileSize, Is.EqualTo(5));
             });
         }
 
         [Test]
-        public async Task GetContentByIdAsync_ShouldThrowException_WhenIdDoesNotExist()
+        public async Task GetDataByIdAsync_ShouldThrowException_WhenIdDoesNotExist()
         {
             // Act & Assert
-            var ex = Assert.ThrowsAsync<Exception>(async () => await _controller.GetAsyncById(99));
-            Assert.That(ex.Message, Is.EqualTo("Document Contents for Document with ID 99 not found"));
+            var ex = Assert.ThrowsAsync<Exception>(async () => await _repository.GetMetaByIdAsync(99));
+            Assert.That(ex.Message, Is.EqualTo("Document Metadata for Document with ID 99 not found"));
         }
 
         [Test]
-        public async Task AddContentAsync_ShouldFail()
+        public async Task AddDataAsync_ShouldFail()
         {
             // Arrange
-            var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
-            var newContent = new DocumentContent { DocumentId = 3, ContentType = null, FileName = null };
+            var newContent = new DocumentMetadata { DocumentId = 3, FileSize = null };
 
             // Act
-            var ex = await _controller.PostAsync(newContent);
+            var result = await _controller.PostAsync(newContent);
 
             // Assert
-            Assert.That(ex, Is.InstanceOf<BadRequestObjectResult>());
-            var badRequestResult = ex as BadRequestObjectResult;
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+            var badRequestResult = result as BadRequestObjectResult;
             Assert.That(badRequestResult, Is.Not.Null, "variable bad request result");
 
             // Deserialize the object
             var json = JsonConvert.SerializeObject(badRequestResult.Value);
             var value = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
             Assert.That(value, Is.Not.Null, "variable value");
-            Assert.That(value["message"], Is.EqualTo("Document ContentType / Filename cannot be empty :/"));
+            Assert.That(value["message"], Is.EqualTo("Document Information cannot be empty :/"));
         }
 
         [Test]
-        public async Task AddContentAsync_ShouldAddNewDocumentContent()
+        public async Task AddDataAsync_ShouldAddNewDocumentData()
         {
             // Arrange
-            var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
-            var newContent = new DocumentContent { DocumentId = 3, Content = contentBytes1, ContentType = "text/plain", FileName = "testFileName" };
+            DateTime now = DateTime.Now;
+            var newContent = new DocumentMetadata { DocumentId = 3, UploadDate = now, FileSize = 5 };
 
             // Act
             var result = await _controller.PostAsync(newContent);
@@ -151,18 +153,17 @@ namespace UnitTest.DocumentDALTests.Controllers
             {
                 Assert.That(addedContent, Is.Not.Null);
                 Assert.That(addedContent.DocumentId, Is.EqualTo(3));
-                Assert.That(addedContent.Content, Is.EqualTo(contentBytes1));
-                Assert.That(addedContent.ContentType, Is.EqualTo("text/plain"));
-                Assert.That(addedContent.FileName, Is.EqualTo("testFileName"));
+                Assert.That(addedContent.UploadDate, Is.EqualTo(now));
+                Assert.That(addedContent.FileSize, Is.EqualTo(5));
             });
         }
 
         [Test]
-        public async Task UpdateContentAsync_ShouldNotThrowException_WhenIdDoesNotExist()
+        public async Task UpdateDataAsync_ShouldNotThrowException_WhenIdDoesNotExist()
         {
             // Arrange
-            var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
-            var newContent = new DocumentContent { DocumentId = 3, Content = contentBytes1, ContentType = "text/plain", FileName = "testFileName" };
+            DateTime now = DateTime.Now;
+            var newContent = new DocumentMetadata { DocumentId = 3, UploadDate = now, FileSize = 5 };
             var result = await _controller.PostAsync(newContent);
             Assert.That(result, Is.InstanceOf<CreatedAtActionResult>());
             var createdAtActionResult = result as CreatedAtActionResult;
@@ -177,18 +178,17 @@ namespace UnitTest.DocumentDALTests.Controllers
             {
                 Assert.That(addedContent, Is.Not.Null);
                 Assert.That(addedContent.DocumentId, Is.EqualTo(3));
-                Assert.That(addedContent.Content, Is.EqualTo(contentBytes1));
-                Assert.That(addedContent.ContentType, Is.EqualTo("text/plain"));
-                Assert.That(addedContent.FileName, Is.EqualTo("testFileName"));
+                Assert.That(addedContent.UploadDate, Is.EqualTo(now));
+                Assert.That(addedContent.FileSize, Is.EqualTo(5));
             });
 
-            var contentBytes2 = Encoding.UTF8.GetBytes("New Test Content changed");
-            newContent.Content = contentBytes2;
-            newContent.ContentType = "text/json";
+            DateTime now2 = DateTime.Now;
+            newContent.UploadDate = now2;
+            newContent.FileSize = 10;
 
             // Act
             await _controller.PutAsync(3, newContent);
-            addedContent = await _context.DocumentContents.FindAsync(3);
+            addedContent = await _context.DocumentMetadatas.FindAsync(3);
 
             // Assert
             createdAtActionResult = result as CreatedAtActionResult;
@@ -204,18 +204,16 @@ namespace UnitTest.DocumentDALTests.Controllers
             {
                 Assert.That(addedContent, Is.Not.Null);
                 Assert.That(addedContent.DocumentId, Is.EqualTo(3));
-                Assert.That(addedContent.Content, Is.EqualTo(contentBytes2));
-                Assert.That(addedContent.ContentType, Is.EqualTo("text/json"));
-                Assert.That(addedContent.FileName, Is.EqualTo("testFileName"));
+                Assert.That(addedContent.UploadDate, Is.EqualTo(now2));
+                Assert.That(addedContent.FileSize, Is.EqualTo(10));
             });
         }
 
         [Test]
-        public async Task UpdateContentAsync_FailingNoItemGiven()
+        public async Task UpdateDataAsync_FailingNoItemGiven()
         {
             // Arrange
-            var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
-            DocumentContent newContent = null;
+            DocumentMetadata newContent = null;
 
             // Act
             var result = await _controller.PutAsync(3, newContent);
@@ -233,38 +231,38 @@ namespace UnitTest.DocumentDALTests.Controllers
         }
 
         [Test]
-        public async Task UpdateContentAsync_FailingInvalidIdGiven()
+        public async Task UpdateDataAsync_FailingInvalidIdGiven()
         {
             // Arrange
-            var contentBytes1 = Encoding.UTF8.GetBytes("New Test Content");
-            var newContent = new DocumentContent { DocumentId = 3, Content = contentBytes1, ContentType = "text/plain", FileName = "testFileName" };
+            DateTime now = DateTime.Now;
+            var newContent = new DocumentMetadata { DocumentId = 3, UploadDate = now, FileSize = 5 };
 
             // Act
             var ex = Assert.ThrowsAsync<Exception>(async () => await _controller.PutAsync(99, newContent));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Document Contents for Document with ID 99 not found"));
+            Assert.That(ex.Message, Is.EqualTo("Document Metadata for Document with ID 99 not found"));
         }
 
         [Test]
-        public async Task DeleteContentAsync_ShouldDeleteDocumentContent_WhenIdExists()
+        public async Task DeleteDataAsync_ShouldDeleteDocumentData_WhenIdExists()
         {
             // Act
             await _controller.DeleteAsync(1);
-            var deletedContent = await _context.DocumentContents.FindAsync(1);
+            var deletedContent = await _context.DocumentMetadatas.FindAsync(1);
 
             // Assert: No exception should be thrown
             Assert.Pass("Method should not throw an exception when deleted an existing record.");
         }
 
         [Test]
-        public async Task DeleteContentAsync_ShouldNotThrowException_WhenIdDoesNotExist()
+        public async Task DeleteDataAsync_ShouldNotThrowException_WhenIdDoesNotExist()
         {
             // Act
             var ex = Assert.ThrowsAsync<Exception>(async () => await _controller.DeleteAsync(99));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Document Contents for Document with ID 99 not found"));
+            Assert.That(ex.Message, Is.EqualTo("Document Metadata for Document with ID 99 not found"));
         }
     }
 }

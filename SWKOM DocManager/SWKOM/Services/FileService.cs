@@ -11,10 +11,18 @@ namespace SWKOM.Services;
 /// </summary>
 public class FileService : IFileService
 {
-    private readonly IMinioClient _minioClient;
+    private IMinioClient _minioClient;
     private const string BucketName = "uploads";
     private readonly ILogger<FileService> _logger;
 
+    /// <summary>
+    /// Getter and Setter for private IMinioClient _minioClient for unit testing
+    /// </summary>
+    public IMinioClient MinioClient
+    {
+        get { return _minioClient; }
+        set { _minioClient = value; }
+    }
 
     /// <summary>
     /// Constructor, which instantiates a new MinIO Client for file operations
@@ -150,7 +158,7 @@ public class FileService : IFileService
         }
         return contentType;
     }
-    
+
     /// <summary>
     /// Deletes a file from MinIO Microservice
     /// </summary>
@@ -176,6 +184,7 @@ public class FileService : IFileService
             }
             catch (ObjectNotFoundException)
             {
+                _logger.LogError("File '{Filename}' not found", fileName);
                 throw new Exception($"File '{fileName}' not found.");
             }
 
@@ -187,11 +196,13 @@ public class FileService : IFileService
         catch (MinioException ex)
         {
             // Log the specific MinIO exception
+            _logger.LogError("MinIO error while deleting file: {message}", ex.Message);
             throw new Exception($"MinIO error while deleting file: {ex.Message}");
         }
         catch (Exception ex)
         {
             // Log the general exception
+            _logger.LogError("Unexpected error while deleting file: {Message}", ex.Message);
             throw new Exception($"Unexpected error while deleting file: {ex.Message}");
         }
     }

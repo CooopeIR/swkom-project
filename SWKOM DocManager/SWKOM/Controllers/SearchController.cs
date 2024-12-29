@@ -52,6 +52,7 @@ namespace SWKOM.Controllers
 
             if (!response.IsValidResponse)
             {
+                _logger.LogError("Failed to search documents with search by query");
                 return StatusCode(500, new { message = "Failed to search documents", details = response.DebugInformation });
             }
 
@@ -82,6 +83,7 @@ namespace SWKOM.Controllers
 
             if (!response.IsValidResponse)
             {
+                _logger.LogError("Failed to search documents with fuzzy");
                 return StatusCode(500, new { message = "Failed to search documents", details = response.DebugInformation });
             }
 

@@ -145,6 +145,13 @@
             <param name="id"></param>
             <returns>Success Status code with no content or error status code</returns>
         </member>
+        <member name="M:DocumentDAL.Controllers.DocumentController.ViewDocumentAsync(System.Int32)">
+            <summary>
+            DAL: Delete a specific document item from the database with the ID of the document
+            </summary>
+            <param name="id"></param>
+            <returns>Success Status code with no content or error status code</returns>
+        </member>
         <member name="T:DocumentDAL.Data.DocumentContext">
             <summary>
             Document Context methods with relationships and database initialization
@@ -380,7 +387,7 @@
             </summary>
             <returns>List of DocumentItem</returns>
         </member>
-        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.GetByIdAsync(System.Int32,System.Boolean)">
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.GetByIdAsync(System.Int32)">
             <summary>
             Database call to get DocumentItem with specific ID
             </summary>
@@ -407,6 +414,14 @@
             Database call to delete specific DocumentItem element from database with its id
             </summary>
             <param name="id"></param>
+        </member>
+        <member name="M:DocumentDAL.Repositories.DocumentItemRepository.GetFullDocumentAsync(System.Int32)">
+            <summary>
+            Fetches a Document including all of its subtypes
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception">DocumentItem with ID {id} not found</exception>
         </member>
         <member name="T:DocumentDAL.Repositories.IDocumentContentRepository">
             <summary>
@@ -498,7 +513,7 @@
             </summary>
             <returns>List of DocumentItem</returns>
         </member>
-        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.GetByIdAsync(System.Int32,System.Boolean)">
+        <member name="M:DocumentDAL.Repositories.IDocumentItemRepository.GetByIdAsync(System.Int32)">
             <summary>
             Interface: Database call to get DocumentItem with specific ID
             </summary>
